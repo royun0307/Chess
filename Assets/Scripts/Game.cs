@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 public class Game : MonoBehaviour
 {
     public GameObject chesspiece;
+    public GameObject movePlate;
 
     private GameObject[,] positions = new GameObject[8, 8];
     private GameObject[] playerBlack = new GameObject[16];

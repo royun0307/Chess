@@ -9,7 +9,7 @@ public class Chessman : MonoBehaviour
     private int xBoard = -1;
     private int yBoard = -1;
 
-    private string player;
+    public string player;
 
     public Sprite black_queen, black_knight, black_bishop, black_king, black_rook, black_pawn;
     public Sprite white_queen, white_knight, white_bishop, white_king, white_rook, white_pawn;
@@ -197,7 +197,7 @@ public class Chessman : MonoBehaviour
             }
             if (sc.PositionOnBoard(x - 1, y) && sc.GetPosition(x - 1, y) != null && sc.GetPosition(x - 1, y).GetComponent<Chessman>().player != player)
             {
-                MovePlateAttackSpawn(x + 1, y);
+                MovePlateAttackSpawn(x - 1, y);
             }
         }
     }
