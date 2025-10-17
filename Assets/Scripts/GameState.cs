@@ -1,4 +1,5 @@
-using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
 
 public class GameState
 {
@@ -9,5 +10,22 @@ public class GameState
     {
         this.CurrnetPlayer = player;
         this.Board = board;
+    }
+
+    public IEnumerable<Move> LegalMoveForPiece(Position pos)
+    {
+        if(Board.IsEmpty(pos) || Board[pos].Color != CurrnetPlayer)
+        {
+            return Enumerable.Empty<Move>();
+        }
+
+        Piece piece = Board[pos];
+        return piece.GetMoves(pos, Board);
+    }
+
+    public void MakeMove(Move move)
+    {
+        move.Execute(Board);
+        CurrnetPlayer = CurrnetPlayer.Opponent();
     }
 }

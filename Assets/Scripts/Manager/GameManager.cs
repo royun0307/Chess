@@ -27,5 +27,6 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         board.Init();
+        board.InitMovePlatform();
     }
 }

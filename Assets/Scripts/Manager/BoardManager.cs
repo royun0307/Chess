@@ -13,6 +13,9 @@ public class BoardManager : MonoBehaviour
 
     public GameObject white_pawn, white_knight, white_bishop, white_rook, white_queen, white_king;
     public GameObject black_pawn, black_knight, black_bishop, black_rook, black_queen, black_king;
+    
+    public GameObject move_platform;
+    public GameObject[,] move_platforms = new GameObject[8, 8];
 
     private void Awake()
     {
@@ -22,6 +25,7 @@ public class BoardManager : MonoBehaviour
     public void Init()
     {
         board = Board.Initial();
+        GameObject parent = GameObject.Find("Piece");
         for (int r = 0; r < 8; r++)
         {
             for (int c = 0; c < 8; c++)
@@ -39,6 +43,24 @@ public class BoardManager : MonoBehaviour
                 Vector3 pos = GridToWorld(r, c);
                 GameObject go = Instantiate(prefab, pos, Quaternion.identity);
                 go.name = $"{piece.Color}_{piece.Type}_{r}_{c}";
+                go.transform.parent = parent.transform;
+            }
+        }
+    }
+
+    public void InitMovePlatform()
+    {
+        GameObject parent = GameObject.Find("MovePlate");
+        for (int r = 0; r < 8; r++)
+        {
+            for (int c = 0; c < 8; c++)
+            {
+                Vector3 pos = GridToWorld(r, c, 0f);
+                GameObject go = Instantiate(move_platform, pos, Quaternion.identity);
+                go.name = $"move_platform_{r}_{c}";
+                move_platforms[r, c] = go;
+                go.SetActive(false);
+                go.transform.parent = parent.transform;
             }
         }
     }
@@ -69,7 +91,7 @@ public class BoardManager : MonoBehaviour
         return prefab;
     }
 
-    private Vector3 GridToWorld(int row, int col)
+    private Vector3 GridToWorld(int row, int col, float z = 1f)
     {
         float x = origin.x + col * cellSize;
         float y = origin.y + (7 - row) * cellSize;
