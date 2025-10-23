@@ -72,4 +72,4 @@ MonoBehaviour:
   black_rook: {fileID: 6394978775257111152, guid: da33e0fa528d9a140b7f06f826d5e027, type: 3}
   black_queen: {fileID: 5274926768920910591, guid: 88d6988a391729842b8c46444052d128, type: 3}
   black_king: {fileID: 495424494967844132, guid: 37d3e528330b0f24c91521506255f9a1, type: 3}
-  move_platform: {fileID: 5831368090473111322, guid: 68f3a837672f5904aa8460d0ac29e1b6, type: 3}
+  move_plate: {fileID: 5831368090473111322, guid: 68f3a837672f5904aa8460d0ac29e1b6, type: 3}

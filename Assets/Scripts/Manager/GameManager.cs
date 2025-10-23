@@ -2,10 +2,11 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    private static GameManager instance = null;
-    public static GameManager Instance;
+    private static GameManager instance;
+    public static GameManager Instance {  get { return instance; } }
 
     public BoardManager board;
+    public GameState state;
 
     public void Awake()
     {
@@ -28,5 +29,6 @@ public class GameManager : MonoBehaviour
     {
         board.Init();
         board.InitMovePlatform();
+        state = new GameState(PlayerColor.White, board.board);
     }
 }

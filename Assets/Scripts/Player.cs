@@ -11,9 +11,9 @@ public static class Player
         switch (player_color)
         {
             case PlayerColor.White:
-                return PlayerColor.White;
-            case PlayerColor.Black:
                 return PlayerColor.Black;
+            case PlayerColor.Black:
+                return PlayerColor.White;
             default:
                 return PlayerColor.None;
         }
