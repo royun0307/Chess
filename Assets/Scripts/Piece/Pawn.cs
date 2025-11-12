@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 public class Pawn : Piece
@@ -45,13 +46,31 @@ public class Pawn : Piece
         return board[pos].Color != Color;
     }
 
+    private static IEnumerable<Move> PromotionMoves(Position from, Position to)
+    {
+        yield return new PawnPromotion(from, to, PieceType.Knight);
+        yield return new PawnPromotion(from, to, PieceType.Bishop);
+        yield return new PawnPromotion(from, to, PieceType.Rook);
+        yield return new PawnPromotion(from, to, PieceType.Queen);
+    }
+
     private IEnumerable<Move> ForwardMoves(Position from, Board board)
     {
         Position one_move_pos = from + forward;
 
         if(CanMoveTo(one_move_pos, board))
         {
-            yield return new NormalMove(from, one_move_pos);
+            if(one_move_pos.row == 0 || one_move_pos.row == 7)
+            {
+                foreach(Move proMove in PromotionMoves(from, one_move_pos))
+                {
+                    yield return proMove;
+                }
+            }
+            else
+            {
+                yield return new NormalMove(from, one_move_pos);
+            }
 
             Position two_move_pos = one_move_pos + forward;
 
@@ -70,7 +89,17 @@ public class Pawn : Piece
 
             if(CanCaptureAt(to, board))
             {
-                yield return new NormalMove(from, to);
+                if (to.row == 0 || to.row == 7)
+                {
+                    foreach (Move proMove in PromotionMoves(from, to))
+                    {
+                        yield return proMove;
+                    }
+                }
+                else
+                {
+                    yield return new NormalMove(from, to);
+                }
             }
         }
     }

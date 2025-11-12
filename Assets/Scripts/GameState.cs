@@ -51,11 +51,14 @@ public class GameState
             if (Board.IsInCheck(CurrnetPlayer))
             {
                 Result = Result.Win(CurrnetPlayer.Opponent());
+                UIManager.Instance.resultUI.SetUI(CurrnetPlayer.Opponent(), Result.EndReason);
             }
             else
             {
                 Result = Result.Draw(EndReason.Stalemate);
+                UIManager.Instance.resultUI.SetUI(PlayerColor.None, Result.EndReason);
             }
+            UIManager.Instance.ChangeState(UIState.Result);
         }
     }
 

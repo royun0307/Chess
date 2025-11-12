@@ -1,3 +1,4 @@
+using Mono.Cecil;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -19,17 +20,42 @@ public class BoardManager : MonoBehaviour
     public MovePlate[,] move_plates = new MovePlate[8, 8];
     public List<Move> cachedMoves = new List<Move>();
 
+    [SerializeField] private Transform pieceParent;
+    [SerializeField] private Transform plateParent;
+
     private Chessman selected;
 
     private void Awake()
     {
         BuildPrefabMap();
+        pieceParent = GameObject.Find("Piece").transform;
+        plateParent = GameObject.Find("MovePlate").transform;
     }
 
     public void Init()
     {
+        DestroyAllPiece();
+        CreateStartPiece();
+    }
+
+    private void DestroyAllPiece()
+    {
+        for (int r = 0; r < 8; r++)
+        {
+            for (int c = 0; c < 8; c++)
+            {
+                if(views[r, c] != null)
+                {
+                    Destroy(views[r, c].gameObject);
+                    views[r, c] = null;
+                }
+            }
+        }
+    }
+
+    private void CreateStartPiece()
+    {
         board = Board.Initial();
-        GameObject parent = GameObject.Find("Piece");
         for (int r = 0; r < 8; r++)
         {
             for (int c = 0; c < 8; c++)
@@ -48,22 +74,19 @@ public class BoardManager : MonoBehaviour
                 GameObject go = Instantiate(prefab, pos, Quaternion.identity);
                 Chessman chessman = go.GetComponent<Chessman>();
                 chessman.Init(new Position(r, c));
-                views[r,c] = chessman;
+                views[r, c] = chessman;
                 go.name = $"{piece.Color}_{piece.Type}_{r}_{c}";
-                go.transform.parent = parent.transform;
+                go.transform.SetParent(pieceParent);
             }
         }
     }
 
     public void InitMovePlatform()
     {
-        GameObject parent = GameObject.Find("MovePlate");
-
         for (int r = 0; r < 8; r++)
         {
             for (int c = 0; c < 8; c++)
             {
-
                 Vector3 pos = GridToWorld(r, c, 0f);
                 GameObject go = Instantiate(move_plate, pos, Quaternion.identity);
                 MovePlate movePlate = go.GetComponent<MovePlate>();
@@ -72,7 +95,7 @@ public class BoardManager : MonoBehaviour
                 go.name = $"move_platform_{r}_{c}";
                 move_plates[r, c] = movePlate;
                 go.SetActive(false);
-                go.transform.parent = parent.transform;
+                go.transform.SetParent(pieceParent.transform);
             }
         }
     }
@@ -96,6 +119,12 @@ public class BoardManager : MonoBehaviour
                 if (p == null) continue;
 
                 var view = views[r, c];
+                if (view == null)
+                {
+                    Debug.LogWarning($"View missing at {r},{c} for {p.Color} {p.Type}");
+                    continue;
+                }
+
                 view.gameObject.SetActive(true);
                 view.SetBoardPos(new Position(r, c));
                 view.transform.position = GridToWorld(r, c);
@@ -114,6 +143,26 @@ public class BoardManager : MonoBehaviour
                     move_plates[r, c].gameObject.SetActive(on);
                 }
             }
+        }
+    }
+
+    private void MoveView(Position from, Position to)
+    {
+        var moving = views[from.row, from.column];
+        var captured = views[to.row, to.column];
+
+        if (captured != null && captured != moving)
+        {
+            Destroy(captured.gameObject);
+        }
+
+        views[to.row, to.column] = moving;
+        views[from.row, from.column] = null;
+
+        if (moving != null)
+        {
+            moving.SetBoardPos(to);
+            moving.transform.position = GridToWorld(to.row, to.column);
         }
     }
 
@@ -188,10 +237,51 @@ public class BoardManager : MonoBehaviour
             return;
         }
 
-        views[mv.ToPos.row, mv.ToPos.column] = selected;
-        GameManager.Instance.state.MakeMove(mv);
-        RefreshPieces();
+        if (mv.Type == MoveType.PawnPromotion)
+        {
+            HandlePromotion(mv.FromPos, mv.ToPos);
+        }
+        else
+        {
+            HandleMove(mv);
+        }
+    }
+
+    private void HandleMove(Move move)
+    {
+        GameManager.Instance.state.MakeMove(move);
+        MoveView(move.FromPos, move.ToPos);
         Deselect();
+    }
+
+    private void HandlePromotion(Position from, Position to)
+    {
+        UIManager.Instance.ChangeState(UIState.Promotion);
+        UIManager.Instance.promotionUI.SetUI();
+        UIManager.Instance.promotionUI.select_promotion += type =>
+        {
+            Move promMove = new PawnPromotion(from, to, type);
+            HandleMove(promMove);
+            ReplaceViewForPromotion(promMove);
+        };
+    }
+
+    private void ReplaceViewForPromotion(Move move)
+    {
+        var old = views[move.ToPos.row, move.ToPos.column];
+        if (old != null)
+        {
+            Destroy(old.gameObject);
+            views[move.ToPos.row, move.ToPos.column] = null;
+        }
+
+        var prefab = GetPrefab(board[move.ToPos.row, move.ToPos.column]);
+        var go = Instantiate(prefab, GridToWorld(move.ToPos.row, move.ToPos.column), Quaternion.identity);
+        go.transform.SetParent(pieceParent);
+
+        var cm = go.GetComponent<Chessman>();
+        cm.Init(move.ToPos);
+        views[move.ToPos.row, move.ToPos.column] = cm;
     }
 
     private GameObject GetPrefab(Piece piece)
