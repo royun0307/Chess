@@ -28,6 +28,7 @@ public class GameState
 
     public void MakeMove(Move move)
     {
+        Board.SetPawnSkipPosition(CurrnetPlayer, null);
         move.Execute(Board);
         CurrnetPlayer = CurrnetPlayer.Opponent();
         CheckForGameOver();

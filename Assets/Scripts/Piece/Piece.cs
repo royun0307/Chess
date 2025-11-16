@@ -3,6 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.UIElements;
 
+public enum PieceType
+{
+    Pawn,
+    Bishop,
+    Knight,
+    Rook,
+    Queen,
+    King
+}
+
 
 public abstract class Piece
 {

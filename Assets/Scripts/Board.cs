@@ -5,6 +5,12 @@ using System.Linq;
 public class Board
 {
     private readonly Piece[,] pieces = new Piece[8, 8];
+    
+    private readonly Dictionary<PlayerColor, Position> pawn_skip_postions = new Dictionary<PlayerColor, Position>
+    {
+        {PlayerColor.White, null },
+        {PlayerColor.Black, null }
+    };
 
     public Piece this[int row, int col]
     {
@@ -16,6 +22,16 @@ public class Board
     {
         get { return pieces[pos.row, pos.column]; }
         set { pieces[pos.row, pos.column] = value; }
+    }
+
+    public Position GetPawnSkipPosition(PlayerColor player)
+    {
+        return pawn_skip_postions[player];
+    }
+
+    public void SetPawnSkipPosition(PlayerColor player, Position pos)
+    {
+        pawn_skip_postions[player] = pos;
     }
 
     public static Board Initial()

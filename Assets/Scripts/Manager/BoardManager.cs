@@ -9,7 +9,7 @@ public class BoardManager : MonoBehaviour
     public Vector2 origin = new(-2.3f, -2.3f);
 
     public Board board;
-    private Chessman[,] views = new Chessman[8, 8];
+    private Chessman[,] views = new Chessman[8, 8]; 
 
     private Dictionary<(PlayerColor, PieceType), GameObject> prefabMap;
 
@@ -251,6 +251,15 @@ public class BoardManager : MonoBehaviour
     {
         GameManager.Instance.state.MakeMove(move);
         MoveView(move.FromPos, move.ToPos);
+
+        if(move.Type == MoveType.CastleKS)
+        {
+            MoveView(new Position(move.FromPos.row, 7), new Position(move.FromPos.row, 5));
+        }
+        else if(move.Type == MoveType.CastleQS)
+        {
+            MoveView(new Position(move.FromPos.row, 0), new Position(move.FromPos.row, 3));
+        }
         Deselect();
     }
 
