@@ -23,15 +23,15 @@ public class Position
 
     public override bool Equals(object obj)
     {
-        return obj is Position position &&
-               base.Equals(obj) &&
-               row == position.row &&
-               column == position.column;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj is not Position other) return false;
+
+        return row == other.row && column == other.column;
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(base.GetHashCode(), row, column);
+        return HashCode.Combine(row, column);
     }
 
     public static bool operator ==(Position left, Position right)

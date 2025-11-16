@@ -260,6 +260,14 @@ public class BoardManager : MonoBehaviour
         {
             MoveView(new Position(move.FromPos.row, 0), new Position(move.FromPos.row, 3));
         }
+        if(move.Type == MoveType.DoublePawn)
+        {
+            PlayerColor player = board[move.ToPos].Color;
+            if (board.GetPawnSkipPosition(player) != null)
+            {
+                Debug.Log(board.GetPawnSkipPosition(player).row + " " + board.GetPawnSkipPosition(player).column);
+            }
+        }
         Deselect();
     }
 

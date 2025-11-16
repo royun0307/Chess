@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 public class Board
@@ -119,6 +121,9 @@ public class Board
         {
             copy[pos] = this[pos].Copy();
         }
+
+        copy.SetPawnSkipPosition(PlayerColor.White, pawn_skip_postions[PlayerColor.White]);
+        copy.SetPawnSkipPosition(PlayerColor.Black, pawn_skip_postions[PlayerColor.Black]);
 
         return copy;
     }

@@ -1,7 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 public class Pawn : Piece
 {
@@ -87,7 +86,7 @@ public class Pawn : Piece
         {
             Position to = from + forward + dir;
 
-            if(to == board.GetPawnSkipPosition(Color.Opponent()))
+            if (to == board.GetPawnSkipPosition(Color.Opponent()))
             {
                 yield return new Enpassant(from, to);
             }
