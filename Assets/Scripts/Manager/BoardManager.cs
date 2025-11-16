@@ -28,14 +28,24 @@ public class BoardManager : MonoBehaviour
     private void Awake()
     {
         BuildPrefabMap();
-        pieceParent = GameObject.Find("Piece").transform;
-        plateParent = GameObject.Find("MovePlate").transform;
+        if (pieceParent == null)
+        {
+            var go = GameObject.Find("Piece");
+            if (go != null) pieceParent = go.transform;
+        }
+
+        if (plateParent == null)
+        {
+            var go = GameObject.Find("MovePlate");
+            if (go != null) plateParent = go.transform;
+        }
     }
 
     public void Init()
     {
         DestroyAllPiece();
-        CreateStartPiece();
+        board = Board.Initial();
+        RedrawPiecesFromBoard();
     }
 
     private void DestroyAllPiece()
@@ -53,9 +63,10 @@ public class BoardManager : MonoBehaviour
         }
     }
 
-    private void CreateStartPiece()
+    public void RedrawPiecesFromBoard()
     {
-        board = Board.Initial();
+        DestroyAllPiece();
+
         for (int r = 0; r < 8; r++)
         {
             for (int c = 0; c < 8; c++)
@@ -100,37 +111,6 @@ public class BoardManager : MonoBehaviour
         }
     }
 
-    public void RefreshPieces()
-    {
-        for (int r = 0; r < 8; r++)
-        {
-            for (int c = 0; c < 8; c++)
-            {
-                if (views[r, c] == null) continue;
-                views[r, c].gameObject.SetActive(false);
-            }
-        }
-
-        for (int r = 0; r < 8; r++)
-        {
-            for (int c = 0; c < 8; c++)
-            {
-                Piece p = board[r, c];
-                if (p == null) continue;
-
-                var view = views[r, c];
-                if (view == null)
-                {
-                    Debug.LogWarning($"View missing at {r},{c} for {p.Color} {p.Type}");
-                    continue;
-                }
-
-                view.gameObject.SetActive(true);
-                view.SetBoardPos(new Position(r, c));
-                view.transform.position = GridToWorld(r, c);
-            }
-        }
-    }
 
     private void SetAllPlatesActive(bool on)
     {
@@ -143,26 +123,6 @@ public class BoardManager : MonoBehaviour
                     move_plates[r, c].gameObject.SetActive(on);
                 }
             }
-        }
-    }
-
-    private void MoveView(Position from, Position to)
-    {
-        var moving = views[from.row, from.column];
-        var captured = views[to.row, to.column];
-
-        if (captured != null && captured != moving)
-        {
-            Destroy(captured.gameObject);
-        }
-
-        views[to.row, to.column] = moving;
-        views[from.row, from.column] = null;
-
-        if (moving != null)
-        {
-            moving.SetBoardPos(to);
-            moving.transform.position = GridToWorld(to.row, to.column);
         }
     }
 
@@ -250,24 +210,7 @@ public class BoardManager : MonoBehaviour
     private void HandleMove(Move move)
     {
         GameManager.Instance.state.MakeMove(move);
-        MoveView(move.FromPos, move.ToPos);
-
-        if(move.Type == MoveType.CastleKS)
-        {
-            MoveView(new Position(move.FromPos.row, 7), new Position(move.FromPos.row, 5));
-        }
-        else if(move.Type == MoveType.CastleQS)
-        {
-            MoveView(new Position(move.FromPos.row, 0), new Position(move.FromPos.row, 3));
-        }
-        if(move.Type == MoveType.DoublePawn)
-        {
-            PlayerColor player = board[move.ToPos].Color;
-            if (board.GetPawnSkipPosition(player) != null)
-            {
-                Debug.Log(board.GetPawnSkipPosition(player).row + " " + board.GetPawnSkipPosition(player).column);
-            }
-        }
+        RedrawPiecesFromBoard();
         Deselect();
     }
 
