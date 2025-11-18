@@ -46,6 +46,7 @@ public class BoardManager : MonoBehaviour
         DestroyAllPiece();
         board = Board.Initial();
         RedrawPiecesFromBoard();
+        Deselect();
     }
 
     private void DestroyAllPiece()

@@ -27,8 +27,13 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        board.Init();
         board.InitMovePlatform();
+        RestartGame();
+    }
+
+    public void RestartGame()
+    {
+        board.Init();
         state = new GameState(PlayerColor.White, board.board);
     }
 }

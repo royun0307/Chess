@@ -5,7 +5,8 @@ public enum UIState
 {
     None,
     Result,
-    Promotion
+    Promotion,
+    Pause
 }
 
 public class UIManager : MonoBehaviour
@@ -17,6 +18,7 @@ public class UIManager : MonoBehaviour
 
     public ResultUI resultUI = null;
     public PromotionUI promotionUI = null;
+    public PauseUI pauseUI = null;
 
     private void Awake()
     {
@@ -26,6 +28,7 @@ public class UIManager : MonoBehaviour
 
             resultUI?.Init(this);
             promotionUI?.Init(this);
+            pauseUI?.Init(this);
 
             ChangeState(currentState);
         }
@@ -40,11 +43,12 @@ public class UIManager : MonoBehaviour
         currentState = state;
         resultUI?.SetActive(currentState);
         promotionUI?.SetActive(currentState);
+        pauseUI?.SetActive(currentState);
     }
 
     public void OnClickRestartButton()
     {
-        GameManager.Instance.board.Init();
+        GameManager.Instance.RestartGame();
     }
     public void OnClickExit()
     {

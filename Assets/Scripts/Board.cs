@@ -127,4 +127,63 @@ public class Board
 
         return copy;
     }
+
+    public Counting CountPieces()
+    {
+        Counting counting = new Counting();
+
+        foreach(Position pos in PiecePositions())
+        {
+            Piece piece = this[pos];
+            counting.Increment(piece.Color, piece.Type);
+        }
+
+        return counting;
+    }
+
+    public bool InsufficientMaterial()
+    {
+        Counting counting = CountPieces();
+
+        return IsKingVKing(counting) || IsKingBishopVKing(counting) ||
+            IsKingKnightVKing(counting) || IsKingBishopVKingBishop(counting);
+    }
+
+    private bool IsKingVKing(Counting counting)
+    {
+        return counting.TotalCount == 2;
+    }
+
+    private bool IsKingBishopVKing(Counting counting)
+    {
+        return counting.TotalCount == 3 && (counting.GetWhiteCount(PieceType.Bishop) == 1 || counting.GetBlackCount(PieceType.Bishop) == 1);
+    }
+
+    private bool IsKingKnightVKing(Counting counting)
+    {
+        return counting.TotalCount == 3 && (counting.GetWhiteCount(PieceType.Knight) == 1 || counting.GetBlackCount(PieceType.Knight) == 1);
+    }
+
+    private bool IsKingBishopVKingBishop(Counting counting)
+    {
+        if(counting.TotalCount != 4)
+        {
+            return false;
+        }
+
+        if(counting.GetWhiteCount(PieceType.Bishop) != 1 || counting.GetBlackCount(PieceType.Bishop) != 1)
+        {
+            return false;
+        }
+
+        Position w_bishop_pos = FindPiece(PlayerColor.White, PieceType.Bishop);
+        Position b_bishop_pos = FindPiece(PlayerColor.Black, PieceType.Bishop);
+
+        return w_bishop_pos.SquareColor() == b_bishop_pos.SquareColor();
+    }
+
+    private Position FindPiece(PlayerColor color, PieceType type)
+    {
+        return PiecePositionsFor(color).First(pos => this[pos].Type == type);
+    }
 }

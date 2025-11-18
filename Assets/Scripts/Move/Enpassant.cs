@@ -13,9 +13,11 @@ public class Enpassant : Move
         capture_pos = new Position(from.row, to.column);
     }
 
-    public override void Execute(Board board)
+    public override bool Execute(Board board)
     {
         new NormalMove(FromPos, ToPos).Execute(board);
         board[capture_pos] = null;
+
+        return true;
     }
 }

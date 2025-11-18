@@ -12,11 +12,13 @@ public class NormalMove : Move
         ToPos = to;
     }
 
-    public override void Execute(Board board)
+    public override bool Execute(Board board)
     {
         Piece piece = board[FromPos];
+        bool capture = !board.IsEmpty(ToPos);
         board[ToPos] = piece;
         board[FromPos] = null;
         piece.hasMoved = true;
+        return capture || piece.Type == PieceType.Pawn;
     }
 }
