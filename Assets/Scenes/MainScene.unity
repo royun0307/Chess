@@ -1131,7 +1131,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resultUI: {fileID: 84754147518679921}
   promotionUI: {fileID: 1399711463}
-  pauseUI: {fileID: 0}
+  pauseUI: {fileID: 1808372462}
 --- !u!1 &1864808161
 GameObject:
   m_ObjectHideFlags: 0
