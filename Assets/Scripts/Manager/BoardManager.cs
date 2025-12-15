@@ -206,6 +206,8 @@ public class BoardManager : MonoBehaviour
         {
             HandleMove(mv);
         }
+
+        GameManager.Instance.engine.EngineMove();
     }
 
     private void HandleMove(Move move)

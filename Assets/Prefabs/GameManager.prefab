@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3405492435295953111}
   - component: {fileID: 1106721664904908628}
   - component: {fileID: 3418320760048354175}
+  - component: {fileID: 6534577046107402987}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -46,6 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   board: {fileID: 3418320760048354175}
+  engine: {fileID: 6534577046107402987}
 --- !u!114 &3418320760048354175
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -73,3 +75,17 @@ MonoBehaviour:
   black_queen: {fileID: 5274926768920910591, guid: 88d6988a391729842b8c46444052d128, type: 3}
   black_king: {fileID: 495424494967844132, guid: 37d3e528330b0f24c91521506255f9a1, type: 3}
   move_plate: {fileID: 5831368090473111322, guid: 68f3a837672f5904aa8460d0ac29e1b6, type: 3}
+  pieceParent: {fileID: 0}
+  plateParent: {fileID: 0}
+--- !u!114 &6534577046107402987
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9159054483897229554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cde13a706a3312b44b2468df99630dd2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

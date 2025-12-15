@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
 
     public BoardManager board;
     public GameState state;
+    public EngineManager engine;
 
     public void Awake()
     {
@@ -17,6 +18,10 @@ public class GameManager : MonoBehaviour
             if(board == null)
             {
                 board = gameObject.AddComponent<BoardManager>();
+            }
+            if(engine == null)
+            {
+                engine = gameObject.AddComponent<EngineManager>();
             }
         }
         else 
