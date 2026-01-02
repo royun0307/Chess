@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class EngineManager : MonoBehaviour
 {
@@ -14,9 +15,9 @@ public class EngineManager : MonoBehaviour
         StartCoroutine(AITurnCorutine());
     }
 
-    private System.Collections.IEnumerator AITurnCorutine()
+    private IEnumerator AITurnCorutine()
     {
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(0.1f);
 
         Move best = engine.GetBestMove(GameManager.Instance.board.board, GameManager.Instance.state.CurrnetPlayer, depth: 3);
 

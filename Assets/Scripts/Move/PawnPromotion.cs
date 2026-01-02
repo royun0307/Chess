@@ -41,4 +41,9 @@ public class PawnPromotion : Move
 
         return true;
     }
+
+    public PieceType GetPromotionPieceType()
+    {
+        return newType;
+    }
 }
