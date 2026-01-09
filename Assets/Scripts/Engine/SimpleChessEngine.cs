@@ -1,3 +1,4 @@
+using Mono.Cecil;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -5,6 +6,7 @@ using System.Linq;
 public class SimpleChessEngine : IChessEngine
 {
     private const int INF = 1000000;
+    private const int QDEPTH_LIMIT = 8;
 
     static readonly int[] PieceValue =
     {
@@ -67,9 +69,9 @@ public class SimpleChessEngine : IChessEngine
 
     private int Search(Board board, int depth, int alpha, int beta, PlayerColor side_to_move)
     {
-        if(depth == 0)
+        if(depth <= 0)
         {
-            return Evaluate(board);
+            return Quiescence(board, alpha, beta, side_to_move, QDEPTH_LIMIT);
         }
 
         GameState state = new GameState(side_to_move, board);
@@ -170,10 +172,7 @@ public class SimpleChessEngine : IChessEngine
 
     private int ScoreMoveMVVLVA(Board board, Move move)
     {
-        int fr = move.FromPos.row;
-        int fc = move.FromPos.column;
-        int tr = move.ToPos.row;
-        int tc = move.ToPos.column;
+        GetFromTo(move, out int fr, out int fc, out int tr, out int tc);
         Piece attacker = board[fr, fc];
 
         if (attacker == null) return 0;
@@ -198,6 +197,133 @@ public class SimpleChessEngine : IChessEngine
         return score;
     }
 
+    private void OrderTacticalMoves(Board board, List<Move> moves)
+    {
+        moves.Sort((a, b) => ScoreTactical(board, b).CompareTo(ScoreTactical(board, a)));
+    }
+
+    private int ScoreTactical(Board board, Move move)
+    {
+        GetFromTo(move, out int fr, out int fc, out int tr, out int tc);
+
+        Piece attacker = board[fr, fc];
+        int attacker_value = attacker != null ? PieceValue[(int)attacker.Type] : 0;
+
+        int score = 0;
+        if (move is PawnPromotion promo)
+        {
+            score += 20000 + PieceValue[(int)promo.GetPromotionPieceType()];
+        }
+
+        if (IsCaptureByBoard(board, move))
+        {
+            Piece victim = board[fr, fc];
+
+            int victim_value = victim != null ? PieceValue[(int)victim.Type] : PieceValue[(int)PieceType.Pawn];
+            score += 10000 + victim_value * 10 - attacker_value;
+        }
+        return score;
+    }
+
+    private int Quiescence(Board board, int alpha, int beta, PlayerColor side_to_move, int qdepth)
+    {
+        int stand_pat = EvaluateStatic(board);
+
+        if(side_to_move == PlayerColor.White)
+        {
+            if(stand_pat >= beta) return beta;
+            if(stand_pat > alpha) alpha = stand_pat;
+        }
+        else
+        {
+            if(stand_pat <= alpha) return alpha;
+            if(stand_pat < beta) beta = stand_pat;
+        }
+
+        if(qdepth <= 0)
+        {
+            return stand_pat;
+        }
+
+        GameState state = new GameState(side_to_move, board);
+        List<Move> moves = state.AllLegalMovesFor(side_to_move).ToList();
+        if (moves.Count == 0)
+        {
+            if (moves.Count == 0)
+            {
+                if (board.IsInCheck(side_to_move))
+                    return side_to_move == PlayerColor.White ? -INF + 1 : INF - 1;
+                return 0;
+            }
+        }
+
+        List<Move> tactical = new List<Move>();
+        for (int i = 0; i < moves.Count; i++)
+        {
+            if (IsTacticalMove(board, moves[i]))
+            {
+                tactical.Add(moves[i]);
+            }
+        }
+
+        if (tactical.Count == 0)
+            return stand_pat;
+
+        OrderTacticalMoves(board, tactical);
+
+        if (side_to_move == PlayerColor.White)
+        {
+            int best = stand_pat;
+
+            foreach (var move in tactical)
+            {
+                Board next = board.Copy();
+                move.Execute(next);
+
+                int score = Quiescence(next, alpha, beta, side_to_move.Opponent(), qdepth - 1);
+                beta = Math.Max(beta, score);
+
+                alpha = Math.Max(alpha, score);
+                if (beta <= alpha) break;
+            }
+
+            return best;
+        }
+        else
+        {
+            int best = stand_pat;
+
+            foreach (var move in tactical)
+            {
+                Board next = board.Copy();
+                move.Execute(next);
+
+                int score = Quiescence(next, alpha, beta, side_to_move.Opponent(), qdepth - 1);
+                best = Math.Min(best, score);
+
+                beta = Math.Min(beta, best);
+                if (beta <= alpha) break;
+            }
+            return best;
+        }
+    }
+
+    private bool IsCaptureByBoard(Board board, Move move)
+    {
+        GetFromTo(move, out _, out _, out int tr, out int tc);
+
+        if (board[tr, tc] != null) return true;
+
+        if (move is Enpassant) return true;
+
+        return false;
+    }
+
+    private bool IsTacticalMove(Board board, Move move)
+    {
+        return IsCaptureByBoard(board, move) || move is PawnPromotion;
+    }
+
     private int Evaluate(Board board)
     {
         int score = 0;
@@ -209,6 +335,17 @@ public class SimpleChessEngine : IChessEngine
         score += EvaluateKingSafety(board);
         score += EvaluateTempo(board);
 
+        return score;
+    }
+
+    private int EvaluateStatic(Board board)
+    {
+        int score = 0;
+        score += EvaluateMaterial(board);
+        score += EvaluatePieceSquare(board);
+        score += EvaluatePawnStructure(board);
+        score += EvaluateKingSafety(board);
+        score += EvaluateTempo(board);
         return score;
     }
 
@@ -370,6 +507,14 @@ public class SimpleChessEngine : IChessEngine
     private int EvaluateTempo(Board board)
     {
         return 0;
+    }
+
+    private void GetFromTo(Move move, out int fr, out int fc, out int tr, out int tc)
+    {
+        fr = move.FromPos.row;
+        fc = move.FromPos.column;
+        tr = move.ToPos.row;
+        tc = move.ToPos.column;
     }
 
 }
