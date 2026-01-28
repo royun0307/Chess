@@ -2,6 +2,7 @@ using Mono.Cecil;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting.Dependencies.NCalc;
 
 public class SimpleChessEngine : IChessEngine
 {
@@ -71,6 +72,17 @@ public class SimpleChessEngine : IChessEngine
     {
         if(depth <= 0)
         {
+            if (board.IsInCheck(side_to_move))
+                return Quiescence(board, alpha, beta, side_to_move, QDEPTH_LIMIT);
+
+            int eval = Evaluate(board);
+
+            GameState st = new GameState(side_to_move, board);
+            var ms = st.AllLegalMovesFor(side_to_move);
+            bool hasTacticl = ms.Any(m => IsTacticalMove(board, m));
+            if(!hasTacticl)
+                return eval;
+
             return Quiescence(board, alpha, beta, side_to_move, QDEPTH_LIMIT);
         }
 
@@ -132,8 +144,6 @@ public class SimpleChessEngine : IChessEngine
 
     private void OrderMoves(Board board, List<Move> moves, PlayerColor side_to_move)
     {
-        int base_mat = EvaluateMaterial(board);
-
         var scored = new List<(Move move, int score)>(moves.Count);
         for (int i = 0; i < moves.Count; i++)
         {
@@ -217,7 +227,7 @@ public class SimpleChessEngine : IChessEngine
 
         if (IsCaptureByBoard(board, move))
         {
-            Piece victim = board[fr, fc];
+            Piece victim = board[tr, tc];
 
             int victim_value = victim != null ? PieceValue[(int)victim.Type] : PieceValue[(int)PieceType.Pawn];
             score += 10000 + victim_value * 10 - attacker_value;
@@ -282,9 +292,8 @@ public class SimpleChessEngine : IChessEngine
 
                 int score = Quiescence(next, alpha, beta, side_to_move.Opponent(), qdepth - 1);
                 beta = Math.Max(beta, score);
-
                 alpha = Math.Max(alpha, score);
-                if (beta <= alpha) break;
+                if (alpha >= beta) break;
             }
 
             return best;
@@ -444,7 +453,7 @@ public class SimpleChessEngine : IChessEngine
         {
             bool is_white = color == PlayerColor.White;
             int[] my_file_count = is_white ? white_file_count : black_file_count;
-            int[] my_black_file_ = is_white ? black_file_count : white_file_count;
+            //int[] my_black_file_ = is_white ? black_file_count : white_file_count;
             
             if (my_file_count[c] > 1)
             {
@@ -474,6 +483,7 @@ public class SimpleChessEngine : IChessEngine
                         if (pp != null && pp.Type == PieceType.Pawn && pp.Color != color)
                         {
                             blocked = true;
+                            break;
                         }
                     }
                 }
@@ -485,9 +495,11 @@ public class SimpleChessEngine : IChessEngine
                         if (pp != null && pp.Type == PieceType.Pawn && pp.Color != color)
                         {
                             blocked = true;
+                            break;
                         }
                     }
                 }
+                if (blocked) break;
             }
             if (!blocked) 
             {
