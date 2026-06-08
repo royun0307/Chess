@@ -1,0 +1,91 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &9159054483897229554
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3405492435295953111}
+  - component: {fileID: 1106721664904908628}
+  - component: {fileID: 3418320760048354175}
+  - component: {fileID: 6534577046107402987}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3405492435295953111
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9159054483897229554}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1106721664904908628
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9159054483897229554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 050c9456be8ab8042bf7c330390fc1ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  board: {fileID: 3418320760048354175}
+  engine: {fileID: 6534577046107402987}
+--- !u!114 &3418320760048354175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9159054483897229554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cff6428f80609954faf4b5223b04fb3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cellSize: 0.66
+  origin: {x: -2.3, y: -2.3}
+  white_pawn: {fileID: 9176980455523124897, guid: 4bdf4ea6b22106f4ca64e66d1546ef9c, type: 3}
+  white_knight: {fileID: 1986053794562888710, guid: e8819f3177e508c49bf384a0681ff575, type: 3}
+  white_bishop: {fileID: 249131713084900034, guid: 6f0b9151cdc90bc4fb6bb62592b7943f, type: 3}
+  white_rook: {fileID: 5135486213695877612, guid: a867b988b0f219141a7db56ec26e7a83, type: 3}
+  white_queen: {fileID: 2434417678667002527, guid: 9f67b6a0e694d8547adb00bec1ec4278, type: 3}
+  white_king: {fileID: 5000480267751878764, guid: f371d92946fb5c1458c97f4d69ebd42e, type: 3}
+  black_pawn: {fileID: 3718254656404105990, guid: 8bfc60b9c771a0048a2053c31980fbf8, type: 3}
+  black_knight: {fileID: 50534152068426742, guid: 0a59259f7ab65a54b81ffe4803dca434, type: 3}
+  black_bishop: {fileID: 7711502516673801189, guid: 110d9dcf9206f7b44b6756537ba9bb8b, type: 3}
+  black_rook: {fileID: 6394978775257111152, guid: da33e0fa528d9a140b7f06f826d5e027, type: 3}
+  black_queen: {fileID: 5274926768920910591, guid: 88d6988a391729842b8c46444052d128, type: 3}
+  black_king: {fileID: 495424494967844132, guid: 37d3e528330b0f24c91521506255f9a1, type: 3}
+  move_plate: {fileID: 5831368090473111322, guid: 68f3a837672f5904aa8460d0ac29e1b6, type: 3}
+  pieceParent: {fileID: 0}
+  plateParent: {fileID: 0}
+--- !u!114 &6534577046107402987
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9159054483897229554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cde13a706a3312b44b2468df99630dd2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
