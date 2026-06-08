@@ -2,29 +2,29 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-// °ÔÀÓ °á°ú È­¸éÀ» ´ã´çÇÏ´Â UI Å¬·¡½º
+// ê²Œì„ ê²°ê³¼ í™”ë©´ì„ ë‹´ë‹¹í•˜ëŠ” UI í´ë˜ìŠ¤
 public class ResultUI : BaseUI
 {
-    // ½Â¸®ÇÑ ÇÃ·¹ÀÌ¾î¸¦ Ç¥½ÃÇÏ´Â ÅØ½ºÆ®
+    // ìŠ¹ë¦¬í•œ í”Œë ˆì´ì–´ë¥¼ í‘œì‹œí•˜ëŠ” í…ìŠ¤íŠ¸
     public TextMeshProUGUI winner_text;
 
-    // °ÔÀÓ Á¾·á »çÀ¯¸¦ Ç¥½ÃÇÏ´Â ÅØ½ºÆ®
+    // ê²Œì„ ì¢…ë£Œ ì‚¬ìœ ë¥¼ í‘œì‹œí•˜ëŠ” í…ìŠ¤íŠ¸
     public TextMeshProUGUI result_text;
 
-    // ´Ù½Ã ½ÃÀÛ ¹öÆ°
+    // ë‹¤ì‹œ ì‹œì‘ ë²„íŠ¼
     public Button restart_button;
     
-    // Á¾·á ¹öÆ°
+    // ì¢…ë£Œ ë²„íŠ¼
     public Button exit_button;
 
-    // ÀÌ UI°¡ ´ã´çÇÏ´Â »óÅÂ´Â Result
+    // ì´ UIê°€ ë‹´ë‹¹í•˜ëŠ” ìƒíƒœëŠ” Result
     protected override UIState GetUIState()
     {
         return UIState.Result;
     }
 
-    // UI ÃÊ±âÈ­ Á¡¼ö
-    // ¹öÆ° Å¬¸¯ ÀÌº¥Æ®¸¦ °¢°¢ÀÇ Ã³¸® ÇÔ¼ö´Â ¿¬°áÇÑ´Ù
+    // UI ì´ˆê¸°í™” ì ìˆ˜
+    // ë²„íŠ¼ í´ë¦­ ì´ë²¤íŠ¸ë¥¼ ê°ê°ì˜ ì²˜ë¦¬ í•¨ìˆ˜ëŠ” ì—°ê²°í•œë‹¤
     public override void Init(UIManager uiManager)
     {
         base.Init(uiManager);
@@ -33,23 +33,23 @@ public class ResultUI : BaseUI
         exit_button.onClick.AddListener(OnClickExitButton);
     }
 
-    // °á°ú UI¿¡ ½Â¸®ÇÑ ÇÃ·¹ÀÌ¾î¿Í Á¾·á »çÀ¯¸¦ Ç¥½Ã
+    // ê²°ê³¼ UIì— ìŠ¹ë¦¬í•œ í”Œë ˆì´ì–´ì™€ ì¢…ë£Œ ì‚¬ìœ ë¥¼ í‘œì‹œ
     public void SetUI(PlayerColor player, EndReason endReason)
     {
         winner_text.text = player.ToString();
         result_text.text = endReason.ToString();
     }
 
-    // ´Ù½Ã ½ÃÀÛ ¹öÆ° Å¬¸¯ ½Ã È£Ãâ
-    // °ÔÀÓÀ» Àç½ÃÀÛÇÏ°í UI »óÅÂ¸¦ NoneÀ¸·Î º¯°æÇÑ´Ù
+    // ë‹¤ì‹œ ì‹œì‘ ë²„íŠ¼ í´ë¦­ ì‹œ í˜¸ì¶œ
+    // ê²Œì„ì„ ì¬ì‹œì‘í•˜ê³  UI ìƒíƒœë¥¼ Noneìœ¼ë¡œ ë³€ê²½í•œë‹¤
     void OnClickRestartButton()
     {
         uiManager.OnClickRestartButton();
         uiManager.ChangeState(UIState.None);
     }
 
-    // Á¾·á ¹öÆ° Å¬¸¯ ½Ã È£Ãâ
-    // °ÔÀÓÀ» Á¾·áÇÏ°í UI »óÅÂ¸¦ NoneÀ¸·Î º¯°æÇÑ´Ù
+    // ì¢…ë£Œ ë²„íŠ¼ í´ë¦­ ì‹œ í˜¸ì¶œ
+    // ê²Œì„ì„ ì¢…ë£Œí•˜ê³  UI ìƒíƒœë¥¼ Noneìœ¼ë¡œ ë³€ê²½í•œë‹¤
     void OnClickExitButton()
     {
         uiManager.OnClickExit();

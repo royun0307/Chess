@@ -3,179 +3,179 @@ using System.Linq;
 
 public class GameState
 {
-    // ÇöÀç °ÔÀÓ¿¡¼­ »ç¿ëÁßÀÎ Ã¼½ºÆÇ
+    // í˜„ì¬ ê²Œì„ì—ì„œ ì‚¬ìš©ì¤‘ì¸ ì²´ìŠ¤íŒ
     public Board Board { get; }
     
-    // ÇöÀç ÅÏÀÎ ÇÃ·¹ÀÌ¾î
+    // í˜„ì¬ í„´ì¸ í”Œë ˆì´ì–´
     public PlayerColor CurrentPlayer { get; private set; }
     
-    // °ÔÀÓ °á°ú
-    // nullÀÌ¸é ¾ÆÁ÷ °ÔÀÓÀÌ ³¡³ªÁö ¾ÊÀº »óÅÂ
+    // ê²Œì„ ê²°ê³¼
+    // nullì´ë©´ ì•„ì§ ê²Œì„ì´ ëë‚˜ì§€ ì•Šì€ ìƒíƒœ
     public Result Result { get; private set; } = null;
     
-    // Àâ±â(capture) ¶Ç´Â Æù ÀÌµ¿ÀÌ ¾øÀÌ ÁøÇàµÈ ¹İ¼ö(half-move) Ä«¿îÆ®
-    // 50¼ö ·ê ÆÇÁ¤¿¡ »ç¿ë
+    // ì¡ê¸°(capture) ë˜ëŠ” í° ì´ë™ì´ ì—†ì´ ì§„í–‰ëœ ë°˜ìˆ˜(half-move) ì¹´ìš´íŠ¸
+    // 50ìˆ˜ ë£° íŒì •ì— ì‚¬ìš©
     private int no_capture_or_pawn_moves = 0;
     
-    // ÇöÀç º¸µå »óÅÂ¸¦ ¹®ÀÚ¿­·Î Ç¥ÇöÇÑ °ª
-    // 3È¸ ¹İº¹ Ã¼Å©¿¡ »ç¿ë
+    // í˜„ì¬ ë³´ë“œ ìƒíƒœë¥¼ ë¬¸ìì—´ë¡œ í‘œí˜„í•œ ê°’
+    // 3íšŒ ë°˜ë³µ ì²´í¬ì— ì‚¬ìš©
     private string state_string;
     
-    // º¸µå »óÅÂ ¹®ÀÚ¿­ÀÌ ¸î ¹ø µîÀåÇß´ÂÁö ÀúÀåÇÏ´Â µñ¼Ç³Ê¸®
-    // key : »óÅÂ ¹®ÀÚ¿­
-    // value : µîÀå È½¼ö
+    // ë³´ë“œ ìƒíƒœ ë¬¸ìì—´ì´ ëª‡ ë²ˆ ë“±ì¥í–ˆëŠ”ì§€ ì €ì¥í•˜ëŠ” ë”•ì…˜ë„ˆë¦¬
+    // key : ìƒíƒœ ë¬¸ìì—´
+    // value : ë“±ì¥ íšŸìˆ˜
     private readonly Dictionary<string, int> state_history = new Dictionary<string, int>();
 
-    // °ÔÀÓ »óÅÂ »ı¼ºÀÚ
-    // ½ÃÀÛ ÇÃ·¹ÀÌ¾î¿Í º¸µå¸¦ ¹Ş¾Æ ÃÊ±â »óÅÂ¸¦ ¼³Á¤
+    // ê²Œì„ ìƒíƒœ ìƒì„±ì
+    // ì‹œì‘ í”Œë ˆì´ì–´ì™€ ë³´ë“œë¥¼ ë°›ì•„ ì´ˆê¸° ìƒíƒœë¥¼ ì„¤ì •
     public GameState(PlayerColor player, Board board)
     {
         this.CurrentPlayer = player;
         this.Board = board;
 
-        //ÇöÀç º¸µå»óÅÂ¸¦ ¹®ÀÚ¿­·Î ÀúÀå
+        //í˜„ì¬ ë³´ë“œìƒíƒœë¥¼ ë¬¸ìì—´ë¡œ ì €ì¥
         state_string = new StateString(CurrentPlayer, board).ToString();
         
-        //ÃÊ±â »óÅÂ´Â 1¹ø µîÀåÇÑ °ÍÀ¸·Î ±â·Ï
+        //ì´ˆê¸° ìƒíƒœëŠ” 1ë²ˆ ë“±ì¥í•œ ê²ƒìœ¼ë¡œ ê¸°ë¡
         state_history[state_string] = 1;
     }
 
-    // Æ¯Á¤ À§Ä¡ÀÇ ¸»¸® ÀÌµ¿ÇÒ ¼ö ÀÖ´Â ÇÕ¹ıÀûÀÎ ¼ö¸¸ ¹İÈ¯
+    // íŠ¹ì • ìœ„ì¹˜ì˜ ë§ë¦¬ ì´ë™í•  ìˆ˜ ìˆëŠ” í•©ë²•ì ì¸ ìˆ˜ë§Œ ë°˜í™˜
     public IEnumerable<Move> LegalMoveForPiece(Position pos)
     {
-        // ÇØ´ç Ä­ÀÌ ºñ¾î ÀÖ°Å³ª, ÇöÀç ÅÏ ÇÃ·¹ÀÌ¾îÀÇ ¸»ÀÌ ¾Æ´Ï¸é ÀÌµ¿ ºÒ°¡
+        // í•´ë‹¹ ì¹¸ì´ ë¹„ì–´ ìˆê±°ë‚˜, í˜„ì¬ í„´ í”Œë ˆì´ì–´ì˜ ë§ì´ ì•„ë‹ˆë©´ ì´ë™ ë¶ˆê°€
         if(Board.IsEmpty(pos) || Board[pos].Color != CurrentPlayer)
         {
             return Enumerable.Empty<Move>();
         }
 
-        // ÇØ´ç À§Ä¡ÀÇ ¸» °¡Á®¿À±â
+        // í•´ë‹¹ ìœ„ì¹˜ì˜ ë§ ê°€ì ¸ì˜¤ê¸°
         Piece piece = Board[pos];
 
-        // ¸» Á¾·ùº° °¡´ÉÇÑ ÀÌµ¿ ÈÄº¸ »ı¼º
-        IEnumerable<Move> moveCandiates = piece.GetMoves(pos, Board);
+        // ë§ ì¢…ë¥˜ë³„ ê°€ëŠ¥í•œ ì´ë™ í›„ë³´ ìƒì„±
+        IEnumerable<Move> moveCandidates = piece.GetMoves(pos, Board);
         
-        // ±×Áß ½ÇÁ¦·Î ÇÕ¹ıÀûÀÎ ¼ö¸¸ ÇÊÅÍ¸µÇØ¼­ ¹İÈ¯
-        return moveCandiates.Where(move => move.IsLegal(Board));
+        // ê·¸ì¤‘ ì‹¤ì œë¡œ í•©ë²•ì ì¸ ìˆ˜ë§Œ í•„í„°ë§í•´ì„œ ë°˜í™˜
+        return moveCandidates.Where(move => move.IsLegal(Board));
     }
 
-    // ½ÇÁ¦·Î ¼ö¸¦ ½ÇÇàÇÏ°í, ÅÏ º¯°æ ¹× °ÔÀÓ Á¾·á ¿©ºÎ¸¦ °»½Å
+    // ì‹¤ì œë¡œ ìˆ˜ë¥¼ ì‹¤í–‰í•˜ê³ , í„´ ë³€ê²½ ë° ê²Œì„ ì¢…ë£Œ ì—¬ë¶€ë¥¼ ê°±ì‹ 
     public void MakeMove(Move move)
     {
-        // ÇöÀç ÇÃ·¹ÀÌ¾îÀÇ ¾ÓÆÄ»ó ±â´É »óÅÂ¸¦ ¸ÕÀú ÃÊ±âÈ­
+        // í˜„ì¬ í”Œë ˆì´ì–´ì˜ ì•™íŒŒìƒ ê¸°ëŠ¥ ìƒíƒœë¥¼ ë¨¼ì € ì´ˆê¸°í™”
         Board.SetPawnSkipPosition(CurrentPlayer, null);
 
-        // ¼ö¸¦ ½ÇÇà
-        // ¹İÈ¯°ªÀº "Àâ±â ¶Ç´Â Æù ÀÌµ¿ÀÌ ÀÖ¾ú´Â°¡" ¿©ºÎ
+        // ìˆ˜ë¥¼ ì‹¤í–‰
+        // ë°˜í™˜ê°’ì€ "ì¡ê¸° ë˜ëŠ” í° ì´ë™ì´ ìˆì—ˆëŠ”ê°€" ì—¬ë¶€
         bool capture_or_pawn_move = move.Execute(Board);
 
         if (capture_or_pawn_move)
         {
-            // Àâ±â ¶Ç´Â Æù ÀÌµ¿ÀÌ ÀÖ¾ú´Ù¸é 50 ¼ö ·ê Ä«¿îÆ® ÃÊ±âÈ­
+            // ì¡ê¸° ë˜ëŠ” í° ì´ë™ì´ ìˆì—ˆë‹¤ë©´ 50 ìˆ˜ ë£° ì¹´ìš´íŠ¸ ì´ˆê¸°í™”
             no_capture_or_pawn_moves = 0;
             
-            // »óÅÂ ¹İº¹ ±â·Ïµµ ÃÊ±âÈ­
-            // ÀÏ¹İÀûÀ¸·Î Àâ±â³ª Æù ÀÌµ¿ÀÌ ÀÖÀ¸¸é ÀÌÀü ¹İº¹ »óÅÂ¿ÍÀÇ ¿¬¼Ó¼ºÀÌ ÀÇ¹Ì ¾ø¾îÁü
+            // ìƒíƒœ ë°˜ë³µ ê¸°ë¡ë„ ì´ˆê¸°í™”
+            // ì¼ë°˜ì ìœ¼ë¡œ ì¡ê¸°ë‚˜ í° ì´ë™ì´ ìˆìœ¼ë©´ ì´ì „ ë°˜ë³µ ìƒíƒœì™€ì˜ ì—°ì†ì„±ì´ ì˜ë¯¸ ì—†ì–´ì§
             state_history.Clear();
         }
         else
         {
-            // ¾Æ¹«°Íµµ ÀâÁö ¾Ê¾Ò°í Æùµµ ¿òÁ÷ÀÌÁö ¾Ê¾Ò´Ù¸é ¹İ¼ö Ä«¿îÆ® Áõ°¡
+            // ì•„ë¬´ê²ƒë„ ì¡ì§€ ì•Šì•˜ê³  í°ë„ ì›€ì§ì´ì§€ ì•Šì•˜ë‹¤ë©´ ë°˜ìˆ˜ ì¹´ìš´íŠ¸ ì¦ê°€
             no_capture_or_pawn_moves++;
         }
 
-        // ÅÏÀ» »ó´ë¹æÀ¸·Î º¯°æ
+        // í„´ì„ ìƒëŒ€ë°©ìœ¼ë¡œ ë³€ê²½
         CurrentPlayer = CurrentPlayer.Opponent();
         
-        // »õ·Î¿î »óÅÂ ¹®ÀÚ¿­ °»½Å ¹× ±â·Ï
+        // ìƒˆë¡œìš´ ìƒíƒœ ë¬¸ìì—´ ê°±ì‹  ë° ê¸°ë¡
         UpdateStateString();
 
-        // °ÔÀÓ Á¾·á Á¶°Ç °Ë»ç
+        // ê²Œì„ ì¢…ë£Œ ì¡°ê±´ ê²€ì‚¬
         CheckForGameOver();
     }
 
-    // Æ¯Á¤ ÇÃ·¹ÀÌ¾î°¡ µÑ ¼ö ÀÖ´Â ¸ğµç ÇÕ¹ıÀûÀÎ ¼ö ¹İÈ¯
+    // íŠ¹ì • í”Œë ˆì´ì–´ê°€ ë‘˜ ìˆ˜ ìˆëŠ” ëª¨ë“  í•©ë²•ì ì¸ ìˆ˜ ë°˜í™˜
     public IEnumerable<Move> AllLegalMovesFor(PlayerColor player)
     {
-        // ÇØ´ç ÇÃ·¹ÀÌ¾îÀÇ ¸ğµç ¸» À§Ä¡¸¦ ¼øÈ¸ÇÏ¸é¼­
-        // °¢ ¸»ÀÇ ÀÌµ¿ ÈÄº¸¸¦ ¸ğµÎ ¸ğÀ½
-        IEnumerable<Move> moveCandiates = Board.PiecePositionsFor(player).SelectMany(pos =>
+        // í•´ë‹¹ í”Œë ˆì´ì–´ì˜ ëª¨ë“  ë§ ìœ„ì¹˜ë¥¼ ìˆœíšŒí•˜ë©´ì„œ
+        // ê° ë§ì˜ ì´ë™ í›„ë³´ë¥¼ ëª¨ë‘ ëª¨ìŒ
+        IEnumerable<Move> moveCandidates = Board.PiecePositionsFor(player).SelectMany(pos =>
         {
             Piece piece = Board[pos];
             return piece.GetMoves(pos, Board);
         });
 
-        // ±×Áß ½ÇÁ¦ ÇÕ¹ı ¼ö¸¸ ¹İÈ¯
-        return moveCandiates.Where(move => move.IsLegal(Board));
+        // ê·¸ì¤‘ ì‹¤ì œ í•©ë²• ìˆ˜ë§Œ ë°˜í™˜
+        return moveCandidates.Where(move => move.IsLegal(Board));
     }
 
-    // Ã¼Å©¸ŞÀÌÆ®, ½ºÅ×ÀÏ¸ŞÀÌÆ®, ±â¹° ºÎÁ·, 50¼ö ·ê, 3È¸ ¹İº¹ µîÀ» °Ë»ç
+    // ì²´í¬ë©”ì´íŠ¸, ìŠ¤í…Œì¼ë©”ì´íŠ¸, ê¸°ë¬¼ ë¶€ì¡±, 50ìˆ˜ ë£°, 3íšŒ ë°˜ë³µ ë“±ì„ ê²€ì‚¬
     private void CheckForGameOver()
     {
-        // ÇöÀç ÅÏ ÇÃ·¹ÀÌ¾î°¡ µÑ ¼ö ÀÖ´Â ÇÕ¹ıÀûÀÎ ¼ö°¡ ÇÏ³ªµµ ¾øÀ» ¶§
+        // í˜„ì¬ í„´ í”Œë ˆì´ì–´ê°€ ë‘˜ ìˆ˜ ìˆëŠ” í•©ë²•ì ì¸ ìˆ˜ê°€ í•˜ë‚˜ë„ ì—†ì„ ë•Œ
         if (!AllLegalMovesFor(CurrentPlayer).Any())
         {
-            // Ã¼Å© »óÅÂÀÎµ¥ µÑ ¼ö ÀÖ´Â ¼ö°¡ ¾øÀ¸¸é Ã¼Å©¸ŞÀÌÆ®
+            // ì²´í¬ ìƒíƒœì¸ë° ë‘˜ ìˆ˜ ìˆëŠ” ìˆ˜ê°€ ì—†ìœ¼ë©´ ì²´í¬ë©”ì´íŠ¸
             if (Board.IsInCheck(CurrentPlayer))
             {
                 Result = Result.Win(CurrentPlayer.Opponent());
             }
-            // Ã¼Å©°¡ ¾Æ´Ñµ¥ µÑ ¼ö ÀÖ´Â ¼ö°¡ ¾øÀ¸¸é ½ºÅ×ÀÏ¸ŞÀÌÆ®
+            // ì²´í¬ê°€ ì•„ë‹Œë° ë‘˜ ìˆ˜ ìˆëŠ” ìˆ˜ê°€ ì—†ìœ¼ë©´ ìŠ¤í…Œì¼ë©”ì´íŠ¸
             else
             {
                 Result = Result.Draw(EndReason.Stalemate);
             }
         }
-        // ±â¹°ÀÌ ºÎÁ·ÇØ¼­ Ã¼Å©¸ŞÀÌÆ®°¡ ºÒ°¡´ÉÇÑ °æ¿ì ¹«½ÂºÎ
+        // ê¸°ë¬¼ì´ ë¶€ì¡±í•´ì„œ ì²´í¬ë©”ì´íŠ¸ê°€ ë¶ˆê°€ëŠ¥í•œ ê²½ìš° ë¬´ìŠ¹ë¶€
         else if (Board.InsufficientMaterial())
         {
             Result = Result.Draw(EndReason.InsufficientMaterial);
         }
-        // 50¼ö ·ê ¸¸Á· ½Ã ¹«½ÂºÎ
-        else if (FiftyMoveRules())
+        // 50ìˆ˜ ë£° ë§Œì¡± ì‹œ ë¬´ìŠ¹ë¶€
+        else if (FiftyMoveRule())
         {
             Result = Result.Draw(EndReason.FiftyMoveRule);
         }
-        // µ¿ÀÏÇÑ »óÅÂ°¡ 3¹ø ¹İº¹µÇ¸é ¹«½ÂºÎ
+        // ë™ì¼í•œ ìƒíƒœê°€ 3ë²ˆ ë°˜ë³µë˜ë©´ ë¬´ìŠ¹ë¶€
         else if (ThreefoldRepetition())
         {
             Result = Result.Draw(EndReason.ThreefoldRepetition);
         }
     }
 
-    // °ÔÀÓÀÌ ³¡³µ´ÂÁö È®ÀÎ
+    // ê²Œì„ì´ ëë‚¬ëŠ”ì§€ í™•ì¸
     public bool IsGameOver()
     {
         return Result != null;
     }
     
-    // 50¼ö ·ê °Ë»ç
-    // ¹İ¼ö 100¹ø = ¾çÂÊÀÌ °¢°¢ 50¹ø¾¿ µĞ °Í
-    private bool FiftyMoveRules()
+    // 50ìˆ˜ ë£° ê²€ì‚¬
+    // ë°˜ìˆ˜ 100ë²ˆ = ì–‘ìª½ì´ ê°ê° 50ë²ˆì”© ë‘” ê²ƒ
+    private bool FiftyMoveRule()
     {
         int full_moves = no_capture_or_pawn_moves / 2;
         return full_moves >= 50;
     }
 
-    // ÇöÀç º¸µå »óÅÂ ¹®ÀÚ¿­À» °»½ÅÇÏ°í µîÀå È½¼ö¸¦ ±â·Ï
+    // í˜„ì¬ ë³´ë“œ ìƒíƒœ ë¬¸ìì—´ì„ ê°±ì‹ í•˜ê³  ë“±ì¥ íšŸìˆ˜ë¥¼ ê¸°ë¡
     public void UpdateStateString()
     {
-        // ÇöÀç ÅÏ ÇÃ·¹ÀÌ¾î¿Í º¸µå »óÅÂ¸¦ ¹®ÀÚ¿­·Î ¹İÈ¯
+        // í˜„ì¬ í„´ í”Œë ˆì´ì–´ì™€ ë³´ë“œ ìƒíƒœë¥¼ ë¬¸ìì—´ë¡œ ë°˜í™˜
         state_string = new StateString(CurrentPlayer, Board).ToString();
 
-        // Ã³À½ µîÀåÇÑ »óÅÂ¸é 1·Î µî·Ï
+        // ì²˜ìŒ ë“±ì¥í•œ ìƒíƒœë©´ 1ë¡œ ë“±ë¡
         if (!state_history.ContainsKey(state_string))
         {
             state_history[state_string] = 1;
         }
         else
         {
-            // ÀÌ¹Ì Á¸ÀçÇÑ »óÅÂ¸é µîÀå È½¼ö Áõ°¡
+            // ì´ë¯¸ ì¡´ì¬í•œ ìƒíƒœë©´ ë“±ì¥ íšŸìˆ˜ ì¦ê°€
             state_history[state_string]++;
         }
     }
 
-    // °°Àº »óÅÂ°¡ 3¹ø µîÀåÇß´ÂÁö È®ÀÎ
+    // ê°™ì€ ìƒíƒœê°€ 3ë²ˆ ë“±ì¥í–ˆëŠ”ì§€ í™•ì¸
     private bool ThreefoldRepetition()
     {
         return state_history[state_string] == 3;
@@ -199,7 +199,7 @@ public class GameState
 
         CurrentPlayer = CurrentPlayer.Opponent();
 
-        // ÇĞ½À Áß¿¡´Â ¹«°Å¿î ¹İº¹ »óÅÂ ¹®ÀÚ¿­ »ı¼º°ú ÀüÃ¼ °ÔÀÓ Á¾·á °Ë»ç¸¦ ¸Å¹ø ÇÏÁö ¾ÊÀ½
+        // í•™ìŠµ ì¤‘ì—ëŠ” ë¬´ê±°ìš´ ë°˜ë³µ ìƒíƒœ ë¬¸ìì—´ ìƒì„±ê³¼ ì „ì²´ ê²Œì„ ì¢…ë£Œ ê²€ì‚¬ë¥¼ ë§¤ë²ˆ í•˜ì§€ ì•ŠìŒ
     }
 
     public bool HasAnyLegalMove(PlayerColor player)

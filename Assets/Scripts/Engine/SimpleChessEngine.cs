@@ -1,19 +1,17 @@
-using Mono.Cecil;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting.Dependencies.NCalc;
 
-//°£´ÜÇÑ Ã¼½º ¿£Áø ±¸Çö
+//ê°„ë‹¨í•œ ì²´ìŠ¤ ì—”ì§„ êµ¬í˜„
 public class SimpleChessEngine : IChessEngine
 {
-    // Å½»ö¿¡¼­ »ç¿ëÇÏ´Â ¸Å¿ì Å« °ª
+    // íƒìƒ‰ì—ì„œ ì‚¬ìš©í•˜ëŠ” ë§¤ìš° í° ê°’
     private const int INF = 1000000;
     
-    // ÄùÀÌ¼±½º Å½»ö ÃÖ´ë ±íÀÌ
+    // í€˜ì´ì„ ìŠ¤ íƒìƒ‰ ìµœëŒ€ ê¹Šì´
     private const int QDEPTH_LIMIT = 8;
 
-    // ±â¹° ±âº» °¡Ä¡
+    // ê¸°ë¬¼ ê¸°ë³¸ ê°€ì¹˜
     static readonly int[] PieceValue =
     {
         0,    // None
@@ -25,38 +23,38 @@ public class SimpleChessEngine : IChessEngine
         100000     // King
     };
 
-    //  ÇöÀç º¸µå¿Í Â÷·Ê, Å½»ö ±íÀÌ¸¦ ¹Ş¾Æ ÃÖ¼±ÀÇ ¼ö¸¦ ¹İÈ¯
+    //  í˜„ì¬ ë³´ë“œì™€ ì°¨ë¡€, íƒìƒ‰ ê¹Šì´ë¥¼ ë°›ì•„ ìµœì„ ì˜ ìˆ˜ë¥¼ ë°˜í™˜
     public Move GetBestMove(Board board, PlayerColor side_to_move, int depth)
     {
         Move best_move = default;
-        // ¹éÀÌ¸é ÃÖ´ë Á¡¼ö¸¦, ÈæÀÌ¸é ÃÖ¼Ò Á¡¼ö¸¦ Ã£´Â´Ù
+        // ë°±ì´ë©´ ìµœëŒ€ ì ìˆ˜ë¥¼, í‘ì´ë©´ ìµœì†Œ ì ìˆ˜ë¥¼ ì°¾ëŠ”ë‹¤
         int best_score = side_to_move == PlayerColor.White ? -INF : INF;
 
         GameState state = new GameState(side_to_move, board);
-        // ÇöÀç Â÷·ÊÀÇ ¸ğµç ÇÕ¹ı ¼ö »ı¼º
+        // í˜„ì¬ ì°¨ë¡€ì˜ ëª¨ë“  í•©ë²• ìˆ˜ ìƒì„±
         List<Move> moves = state.AllLegalMovesFor(side_to_move).ToList();
-        // ¼ö Á¤·Ä(MVV-LVA ±â¹İ)
+        // ìˆ˜ ì •ë ¬(MVV-LVA ê¸°ë°˜)
         OrderMoves(board, moves, side_to_move);
 
-        // µÑ ¼ö ÀÖ´Â ¼ö°¡ ¾øÀ¸¸é default ¹İÈ¯
+        // ë‘˜ ìˆ˜ ìˆëŠ” ìˆ˜ê°€ ì—†ìœ¼ë©´ default ë°˜í™˜
         if (moves.Count == 0)
             return best_move;
 
         int alpha = -INF;
         int beta = INF;
 
-        // ·çÆ® ³ëµå¿¡¼­ ¸ğµç ¼ö¸¦ ½ÃÇè
+        // ë£¨íŠ¸ ë…¸ë“œì—ì„œ ëª¨ë“  ìˆ˜ë¥¼ ì‹œí—˜
         foreach (var move in moves)
         {
             Board next = board.Copy();
             move.Execute(next);
 
-            // »ó´ë ÅÏÀ¸·Î µé¾î°¡¼­ Å½»ö
+            // ìƒëŒ€ í„´ìœ¼ë¡œ ë“¤ì–´ê°€ì„œ íƒìƒ‰
             int score = Search(next, depth - 1, alpha, beta, side_to_move.Opponent());
 
             if (side_to_move == PlayerColor.White)
             {
-                // ¹éÀº ´õ Å« Æò°¡°ªÀ» ¼±È£
+                // ë°±ì€ ë” í° í‰ê°€ê°’ì„ ì„ í˜¸
                 if (score > best_score)
                 {
                     best_score = score;
@@ -66,7 +64,7 @@ public class SimpleChessEngine : IChessEngine
             }
             else
             {
-                // ÈæÀº ´õ ÀÛÀº Æò°¡°ªÀ» ¼±È£
+                // í‘ì€ ë” ì‘ì€ í‰ê°€ê°’ì„ ì„ í˜¸
                 if (score < best_score)
                 {
                     best_score = score;
@@ -75,7 +73,7 @@ public class SimpleChessEngine : IChessEngine
                 beta = Math.Min(beta, score);
             }
 
-            // ¾ËÆÄ-º£Å¸ ÄÆ
+            // ì•ŒíŒŒ-ë² íƒ€ ì»·
             if (beta <= alpha)
                 break;
         }
@@ -83,13 +81,13 @@ public class SimpleChessEngine : IChessEngine
         return best_move;
     }
 
-    // ¹Ì´Ï¸Æ½º + ¾ËÆÄº£Å¸ Å½»ö
+    // ë¯¸ë‹ˆë§¥ìŠ¤ + ì•ŒíŒŒë² íƒ€ íƒìƒ‰
     private int Search(Board board, int depth, int alpha, int beta, PlayerColor side_to_move)
     {
-        // ±íÀÌ°¡ ´Ù ¶³¾îÁö¸é Á¤Àû Æò°¡ or ÄùÀÌ¼±½º Å½»ö
+        // ê¹Šì´ê°€ ë‹¤ ë–¨ì–´ì§€ë©´ ì •ì  í‰ê°€ or í€˜ì´ì„ ìŠ¤ íƒìƒ‰
         if (depth <= 0)
         {
-            // Ã¼Å© »óÅÂ¸é ÄùÀÌ¼±½º Å½»ö
+            // ì²´í¬ ìƒíƒœë©´ í€˜ì´ì„ ìŠ¤ íƒìƒ‰
             if (board.IsInCheck(side_to_move))
                 return Quiescence(board, alpha, beta, side_to_move, QDEPTH_LIMIT);
 
@@ -98,39 +96,39 @@ public class SimpleChessEngine : IChessEngine
             GameState st = new GameState(side_to_move, board);
             var ms = st.AllLegalMovesFor(side_to_move);
 
-            // Àü¼úÀû ¼ö(Àâ±â, ÇÁ·Î¸ğ¼Ç)°¡ ÀÖ´ÂÁö È®ÀÎ
-            bool hasTacticl = ms.Any(m => IsTacticalMove(board, m));
-            // Àü¼ú ¼ö°¡ ¾øÀ¸¸é Á¤Àû Æò°¡
-            if (!hasTacticl)
+            // ì „ìˆ ì  ìˆ˜(ì¡ê¸°, í”„ë¡œëª¨ì…˜)ê°€ ìˆëŠ”ì§€ í™•ì¸
+            bool hasTactical = ms.Any(m => IsTacticalMove(board, m));
+            // ì „ìˆ  ìˆ˜ê°€ ì—†ìœ¼ë©´ ì •ì  í‰ê°€
+            if (!hasTactical)
                 return eval;
 
-            // Àü¼ú ¼ö°¡ ÀÖÀ¸¸é horizon effect ¹æÁö¸¦ À§ÇØ ÄùÀÌ¼±½º Å½»ö
+            // ì „ìˆ  ìˆ˜ê°€ ìˆìœ¼ë©´ horizon effect ë°©ì§€ë¥¼ ìœ„í•´ í€˜ì´ì„ ìŠ¤ íƒìƒ‰
             return Quiescence(board, alpha, beta, side_to_move, QDEPTH_LIMIT);
         }
 
         GameState state = new GameState(side_to_move, board);
         List<Move> moves = state.AllLegalMovesFor(side_to_move).ToList();
-        // ÁÁÀº ¼öºÎÅÍ º¸°Ô ÇØ¼­ pruning È¿À² Çâ»ó
+        // ì¢‹ì€ ìˆ˜ë¶€í„° ë³´ê²Œ í•´ì„œ pruning íš¨ìœ¨ í–¥ìƒ
         OrderMoves(board, moves, side_to_move);
 
-        // ÇÕ¹ı ¼ö°¡ ¾øÀ¸¸é Ã¼Å©¸ŞÀÌÆ® or ½ºÅ×ÀÏ¸ŞÀÌÆ®
+        // í•©ë²• ìˆ˜ê°€ ì—†ìœ¼ë©´ ì²´í¬ë©”ì´íŠ¸ or ìŠ¤í…Œì¼ë©”ì´íŠ¸
         if (moves.Count == 0)
         {
             if (board.IsInCheck(side_to_move))
             {
-                // ÇöÁ¦ »óÅÂ°¡ Ã¼Å© »óÅÂÀÌ¸é, Ã¼Å©¸ŞÀÌÆ®
+                // í˜„ì œ ìƒíƒœê°€ ì²´í¬ ìƒíƒœì´ë©´, ì²´í¬ë©”ì´íŠ¸
                 return side_to_move == PlayerColor.White ? -INF + 1 : INF - 1;
             }
             else
             {
-                // ÇöÁ¦ »óÅÂ°¡ Ã¼±× »óÅÂ°¡ ¾Æ´Ï¸é, ½ºÅ×ÀÏ¸ŞÀÌÆ®
+                // í˜„ì œ ìƒíƒœê°€ ì²´ê·¸ ìƒíƒœê°€ ì•„ë‹ˆë©´, ìŠ¤í…Œì¼ë©”ì´íŠ¸
                 return 0;
             }
         }
 
         if (side_to_move == PlayerColor.White)
         {
-            // ¹éÀº ÃÖ´ëÈ­
+            // ë°±ì€ ìµœëŒ€í™”
             int value = -INF;
 
             foreach (var move in moves)
@@ -150,7 +148,7 @@ public class SimpleChessEngine : IChessEngine
         }
         else
         {
-            //ÈæÀº ÃÖ¼ÒÈ­
+            //í‘ì€ ìµœì†Œí™”
             int value = INF;
 
             foreach (var move in moves)
@@ -170,8 +168,8 @@ public class SimpleChessEngine : IChessEngine
         }
     }
 
-    // ÀÏ¹İ ¼ö Á¤·Ä
-    // ÇöÀç´Â MVV-LVA(°¡Ä¡ ³ôÀº ¸»À» °¡Ä¡ ³·Àº ¸»·Î Àâ´Â ¼ö ¿ì¼±)
+    // ì¼ë°˜ ìˆ˜ ì •ë ¬
+    // í˜„ì¬ëŠ” MVV-LVA(ê°€ì¹˜ ë†’ì€ ë§ì„ ê°€ì¹˜ ë‚®ì€ ë§ë¡œ ì¡ëŠ” ìˆ˜ ìš°ì„ )
     private void OrderMoves(Board board, List<Move> moves, PlayerColor side_to_move)
     {
         var scored = new List<(Move move, int score)>(moves.Count);
@@ -180,7 +178,7 @@ public class SimpleChessEngine : IChessEngine
             scored.Add((moves[i], ScoreMoveMVVLVA(board, moves[i])));
         }
 
-        // Á¡¼ö ³ôÀº ¼öºÎÅÍ ¾ÕÀ¸·Î
+        // ì ìˆ˜ ë†’ì€ ìˆ˜ë¶€í„° ì•ìœ¼ë¡œ
         scored.Sort((a, b) => b.score.CompareTo(a.score));
 
         moves.Clear();
@@ -190,8 +188,8 @@ public class SimpleChessEngine : IChessEngine
         }
     }
 
-    // ½ÇÁ¦·Î ´ÙÀ½ º¸µå±îÁö ¸¸µé¾î¼­ Á¡¼ö¸¦ ÁÖ´Â ¹æ½Ä
-    // ÇöÀç ÄÚµå¿¡¼­´Â »ç¿ëµÇÁö ¾ÊÁö¸¸, Ã¼Å©¸¦ °Å´Â ¼ö µîÀ» ¹İ¿µÇÒ ¼ö ÀÖ´Ù.
+    // ì‹¤ì œë¡œ ë‹¤ìŒ ë³´ë“œê¹Œì§€ ë§Œë“¤ì–´ì„œ ì ìˆ˜ë¥¼ ì£¼ëŠ” ë°©ì‹
+    // í˜„ì¬ ì½”ë“œì—ì„œëŠ” ì‚¬ìš©ë˜ì§€ ì•Šì§€ë§Œ, ì²´í¬ë¥¼ ê±°ëŠ” ìˆ˜ ë“±ì„ ë°˜ì˜í•  ìˆ˜ ìˆë‹¤.
     private int ScoreMove(Board board, Move move, PlayerColor side_to_move, int base_mat)
     {
         Board next = board.Copy();
@@ -199,15 +197,15 @@ public class SimpleChessEngine : IChessEngine
 
         int next_mat = EvaluateMaterial(next);
         int delta = next_mat - base_mat;
-        // ÇöÀç ÇÃ·¹ÀÌ¾î ÀÔÀå¿¡¼­ ÀÌµæÀÎÁö ¼ÕÇØÀÎÁö °è»ê
+        // í˜„ì¬ í”Œë ˆì´ì–´ ì…ì¥ì—ì„œ ì´ë“ì¸ì§€ ì†í•´ì¸ì§€ ê³„ì‚°
         int delta_for_side = (side_to_move == PlayerColor.White) ? delta : -delta;
 
         int score = 0;
 
-        // ¹°Áú ÀÌµæÀ» Å©°Ô ¹İ¿µ
+        // ë¬¼ì§ˆ ì´ë“ì„ í¬ê²Œ ë°˜ì˜
         score += delta_for_side * 100;
 
-        // »ó´ë Å· Ã¼Å©¸é °¡»êÁ¡
+        // ìƒëŒ€ í‚¹ ì²´í¬ë©´ ê°€ì‚°ì 
         if (next.IsInCheck(side_to_move.Opponent()))
         {
             score += 500;
@@ -216,9 +214,9 @@ public class SimpleChessEngine : IChessEngine
         return score;
     }
 
-    // MVV-LVA Á¡¼ö °è»ê
+    // MVV-LVA ì ìˆ˜ ê³„ì‚°
     // Most Valuable Victim - Least Valuable Attacker
-    // ºñ½Ñ ¸»À» ½Ñ ¸»·Î Àâ´Â ¼ö¸¦ ¿ì¼±½ÃÇÔ
+    // ë¹„ì‹¼ ë§ì„ ì‹¼ ë§ë¡œ ì¡ëŠ” ìˆ˜ë¥¼ ìš°ì„ ì‹œí•¨
     private int ScoreMoveMVVLVA(Board board, Move move)
     {
         GetFromTo(move, out int fr, out int fc, out int tr, out int tc);
@@ -228,7 +226,7 @@ public class SimpleChessEngine : IChessEngine
 
         int score = 0;
 
-        // ÇÁ·Î¸ğ¼ÇÀÌ¸é ¸Å¿ì ³ôÀº Á¡¼ö
+        // í”„ë¡œëª¨ì…˜ì´ë©´ ë§¤ìš° ë†’ì€ ì ìˆ˜
         if (move is PawnPromotion promo)
         {
             score += 8000 + PieceValue[(int)promo.GetPromotionPieceType()];
@@ -236,7 +234,7 @@ public class SimpleChessEngine : IChessEngine
 
         Piece victim = board[tr, tc];
 
-        // ¾ÓÆÄ»óµµ Àâ±â Ãë±Ş
+        // ì•™íŒŒìƒë„ ì¡ê¸° ì·¨ê¸‰
         bool isEnPassant = move is Enpassant;
         if (victim != null || isEnPassant)
         {
@@ -248,13 +246,13 @@ public class SimpleChessEngine : IChessEngine
         return score;
     }
 
-    // ÄùÀÌ¼Ç½º¿ë Àü¼ú ¼ö Á¤·Ä
+    // í€˜ì´ì…˜ìŠ¤ìš© ì „ìˆ  ìˆ˜ ì •ë ¬
     private void OrderTacticalMoves(Board board, List<Move> moves)
     {
         moves.Sort((a, b) => ScoreTactical(board, b).CompareTo(ScoreTactical(board, a)));
     }
 
-    // Àü¼ú ¼ö(Àâ±â, ÇÁ·Î¸ğ¼Ç) Á¡¼ö °è»ê
+    // ì „ìˆ  ìˆ˜(ì¡ê¸°, í”„ë¡œëª¨ì…˜) ì ìˆ˜ ê³„ì‚°
     private int ScoreTactical(Board board, Move move)
     {
         GetFromTo(move, out int fr, out int fc, out int tr, out int tc);
@@ -264,13 +262,13 @@ public class SimpleChessEngine : IChessEngine
 
         int score = 0;
 
-        // ÇÁ·Î¸ğ¼ÇÀº ¸Å¿ì °­ÇÑ Àü¼úÀÌ¹Ç·Î Å« Á¡¼ö
+        // í”„ë¡œëª¨ì…˜ì€ ë§¤ìš° ê°•í•œ ì „ìˆ ì´ë¯€ë¡œ í° ì ìˆ˜
         if (move is PawnPromotion promo)
         {
             score += 20000 + PieceValue[(int)promo.GetPromotionPieceType()];
         }
 
-        // Àâ±â ¼ö¸é MVV-LVA ¹æ½ÄÀ¸·Î Á¡¼ö ºÎ¿©
+        // ì¡ê¸° ìˆ˜ë©´ MVV-LVA ë°©ì‹ìœ¼ë¡œ ì ìˆ˜ ë¶€ì—¬
         if (IsCaptureByBoard(board, move))
         {
             Piece victim = board[tr, tc];
@@ -281,27 +279,27 @@ public class SimpleChessEngine : IChessEngine
         return score;
     }
 
-    // ÄùÀÌ¼Ç½º Å½»ö
-    // ÀÏ¹İ Å½»ö ±íÀÌ°¡ ³¡³­ µÚ, ºÒ¾ÈÁ¤ÇÑ Àü¼ú »óÈ²(Àâ±â/ÇÁ·Î¸ğ¼Ç)À» Á¶±İ ´õ º»´Ù
+    // í€˜ì´ì…˜ìŠ¤ íƒìƒ‰
+    // ì¼ë°˜ íƒìƒ‰ ê¹Šì´ê°€ ëë‚œ ë’¤, ë¶ˆì•ˆì •í•œ ì „ìˆ  ìƒí™©(ì¡ê¸°/í”„ë¡œëª¨ì…˜)ì„ ì¡°ê¸ˆ ë” ë³¸ë‹¤
     private int Quiescence(Board board, int alpha, int beta, PlayerColor side_to_move, int qdepth)
     {
-        // ÀÌµ¿¼ºÀº Á¦¿ÜÇÑ Á¤Àû Æò°¡
+        // ì´ë™ì„±ì€ ì œì™¸í•œ ì •ì  í‰ê°€
         int stand_pat = EvaluateStatic(board);
 
         if (side_to_move == PlayerColor.White)
         {
-            //ÀÌ¹Ì beta ÀÌ»óÀÌ¸é ´õ º¼ ÇÊ¿ä ¾øÀ½
+            //ì´ë¯¸ beta ì´ìƒì´ë©´ ë” ë³¼ í•„ìš” ì—†ìŒ
             if (stand_pat >= beta) return beta;
             if (stand_pat > alpha) alpha = stand_pat;
         }
         else
         {
-            // ÈæÀº ÀÛÀº °ªÀ» ¼±È£
+            // í‘ì€ ì‘ì€ ê°’ì„ ì„ í˜¸
             if (stand_pat <= alpha) return alpha;
             if (stand_pat < beta) beta = stand_pat;
         }
 
-        // ÄùÀÌ¼±½º ±íÀÌ Á¦ÇÑ
+        // í€˜ì´ì„ ìŠ¤ ê¹Šì´ ì œí•œ
         if (qdepth <= 0)
         {
             return stand_pat;
@@ -310,7 +308,7 @@ public class SimpleChessEngine : IChessEngine
         GameState state = new GameState(side_to_move, board);
         List<Move> moves = state.AllLegalMovesFor(side_to_move).ToList();
 
-        // µÑ ¼ö±â ÀÖ´Â ¼ö°¡ ¾øÀ¸¸é Ã¼Å©¸ŞÀÌÆ®/½ºÅ×ÀÏ¸ŞÀÌÆ® Ã³¸®
+        // ë‘˜ ìˆ˜ê¸° ìˆëŠ” ìˆ˜ê°€ ì—†ìœ¼ë©´ ì²´í¬ë©”ì´íŠ¸/ìŠ¤í…Œì¼ë©”ì´íŠ¸ ì²˜ë¦¬
         if (moves.Count == 0)
         {
             if (board.IsInCheck(side_to_move))
@@ -318,7 +316,7 @@ public class SimpleChessEngine : IChessEngine
             return 0;
         }
 
-        // Àü¼ú ¼ö¸¸ Ãß¸²
+        // ì „ìˆ  ìˆ˜ë§Œ ì¶”ë¦¼
         List<Move> tactical = new List<Move>();
         for (int i = 0; i < moves.Count; i++)
         {
@@ -328,11 +326,11 @@ public class SimpleChessEngine : IChessEngine
             }
         }
 
-        // Àü¼ú ¼ö°¡ ¾øÀ¸¸é ÇöÀç Á¤Àû Æò°¡ ¹İÈ¯
+        // ì „ìˆ  ìˆ˜ê°€ ì—†ìœ¼ë©´ í˜„ì¬ ì •ì  í‰ê°€ ë°˜í™˜
         if (tactical.Count == 0)
             return stand_pat;
 
-        // ÁÁÀº Àü¼ú ¼öºÎÅÍ º»´Ù
+        // ì¢‹ì€ ì „ìˆ  ìˆ˜ë¶€í„° ë³¸ë‹¤
         OrderTacticalMoves(board, tactical);
 
         if (side_to_move == PlayerColor.White)
@@ -345,7 +343,7 @@ public class SimpleChessEngine : IChessEngine
                 move.Execute(next);
 
                 int score = Quiescence(next, alpha, beta, side_to_move.Opponent(), qdepth - 1);
-                // ¿©±â¼­´Â ¹éÀÌ¹Ç·Î ÃÖ´ë°ªÀ» ÃßÀûÇØ¾ß ÇÑ´Ù
+                // ì—¬ê¸°ì„œëŠ” ë°±ì´ë¯€ë¡œ ìµœëŒ€ê°’ì„ ì¶”ì í•´ì•¼ í•œë‹¤
                 best = Math.Max(best, score);
                 alpha = Math.Max(alpha, score);
                 if (alpha >= beta) break;
@@ -363,7 +361,7 @@ public class SimpleChessEngine : IChessEngine
                 move.Execute(next);
 
                 int score = Quiescence(next, alpha, beta, side_to_move.Opponent(), qdepth - 1);
-                // ÈæÀÌ¹Ç·Î ÃÖ¼Ò°ª ÃßÀû
+                // í‘ì´ë¯€ë¡œ ìµœì†Œê°’ ì¶”ì 
                 best = Math.Min(best, score);
 
                 beta = Math.Min(beta, best);
@@ -373,44 +371,44 @@ public class SimpleChessEngine : IChessEngine
         }
     }
 
-    // ÇöÀç º¸µå ±âÁØÀ¸·Î ÀÌ ¼ö°¡ Àâ±âÀÎÁö ÆÇ“Ş
+    // í˜„ì¬ ë³´ë“œ ê¸°ì¤€ìœ¼ë¡œ ì´ ìˆ˜ê°€ ì¡ê¸°ì¸ì§€ íŒë³–
     private bool IsCaptureByBoard(Board board, Move move)
     {
         GetFromTo(move, out _, out _, out int tr, out int tc);
 
-        // µµÂø Ä­¿¡ ¸»ÀÌ ÀÖÀ¸¸é ÀÏ¹İ Àâ±â
+        // ë„ì°© ì¹¸ì— ë§ì´ ìˆìœ¼ë©´ ì¼ë°˜ ì¡ê¸°
         if (board[tr, tc] != null) return true;
 
-        // ¾ÓÆÄ»óµµ Àâ±â
+        // ì•™íŒŒìƒë„ ì¡ê¸°
         if (move is Enpassant) return true;
 
         return false;
     }
 
-    // Àü¼ú ¼ö ÆÇº°: Àâ±â ¶Ç´Â ÇÁ·Î¸ğ¼Ç
+    // ì „ìˆ  ìˆ˜ íŒë³„: ì¡ê¸° ë˜ëŠ” í”„ë¡œëª¨ì…˜
     private bool IsTacticalMove(Board board, Move move)
     {
         return IsCaptureByBoard(board, move) || move is PawnPromotion;
     }
 
-    // ÀüÃ¼ Æò°¡ ÇÔ¼ö
-    // ¾ç¼ö¸é ¹é ¿ì¼¼, À½¼ö¸é Èæ ¿ì¼¼
+    // ì „ì²´ í‰ê°€ í•¨ìˆ˜
+    // ì–‘ìˆ˜ë©´ ë°± ìš°ì„¸, ìŒìˆ˜ë©´ í‘ ìš°ì„¸
     private int Evaluate(Board board)
     {
         int score = 0;
 
-        score += EvaluateMaterial(board);       // ±â¹° °¡Ä¡
-        score += EvaluatePieceSquare(board);    // ±â¹° À§Ä¡
-        score += EvaluateMobility(board);       // ÀÌµ¿ °¡´É¼º
-        score += EvaluatePawnStructure(board);  // Æù ±¸Á¶
-        score += EvaluateKingSafety(board);     // Å· ¾ÈÁ¤¼º
-        score += EvaluateTempo(board);          // ÅÛÆ÷
+        score += EvaluateMaterial(board);       // ê¸°ë¬¼ ê°€ì¹˜
+        score += EvaluatePieceSquare(board);    // ê¸°ë¬¼ ìœ„ì¹˜
+        score += EvaluateMobility(board);       // ì´ë™ ê°€ëŠ¥ì„±
+        score += EvaluatePawnStructure(board);  // í° êµ¬ì¡°
+        score += EvaluateKingSafety(board);     // í‚¹ ì•ˆì •ì„±
+        score += EvaluateTempo(board);          // í…œí¬
 
         return score;
     }
 
-    //ÄùÀÌ¼±½º¿ë Á¤Àû Æò°¡
-    //ÀÌµ¿¼ºÀ» Á¦¿ÜÇØ ¼Óµµ¸¦ ³ôÀÎ´Ù.
+    //í€˜ì´ì„ ìŠ¤ìš© ì •ì  í‰ê°€
+    //ì´ë™ì„±ì„ ì œì™¸í•´ ì†ë„ë¥¼ ë†’ì¸ë‹¤.
     private int EvaluateStatic(Board board)
     {
         int score = 0;
@@ -422,8 +420,8 @@ public class SimpleChessEngine : IChessEngine
         return score;
     }
 
-    // ±â¹° °¡Áö Æò°¡
-    // ¹é ±â¹°Àº +, Èæ ±â¹°Àº -
+    // ê¸°ë¬¼ ê°€ì§€ í‰ê°€
+    // ë°± ê¸°ë¬¼ì€ +, í‘ ê¸°ë¬¼ì€ -
     private int EvaluateMaterial(Board board)
     {
         int score = 0;
@@ -443,8 +441,8 @@ public class SimpleChessEngine : IChessEngine
         return score;
     }
 
-    // Piece-Square Table Á¶È¸
-    // È¤Àº º¸µå¸¦ µÚÁı¾î¼­ °°Àº Å×ÀÌºíÀ» Àç»ç¿ë
+    // Piece-Square Table ì¡°íšŒ
+    // í˜¹ì€ ë³´ë“œë¥¼ ë’¤ì§‘ì–´ì„œ ê°™ì€ í…Œì´ë¸”ì„ ì¬ì‚¬ìš©
     int GetPST(Piece p, int r, int c)
     {
         int rr = p.Color == PlayerColor.White ? r : 7 - r;
@@ -467,7 +465,7 @@ public class SimpleChessEngine : IChessEngine
         return 0;
     }
 
-    // ±â¹° À§Ä¡ Æò°¡
+    // ê¸°ë¬¼ ìœ„ì¹˜ í‰ê°€
     private int EvaluatePieceSquare(Board board)
     {
         int score = 0;
@@ -486,8 +484,8 @@ public class SimpleChessEngine : IChessEngine
         return score;
     }
 
-    // ÀÌµ¿¼º Æò°¡
-    // ÇöÀç º¸µå¿¡¼­ ¹é/ÈæÀÌ µÑ ¼ö ÀÖ´Â ÇÕ¹ı ¼ö °³¼ö Â÷ÀÌ¸¦ ¹İ¿µ
+    // ì´ë™ì„± í‰ê°€
+    // í˜„ì¬ ë³´ë“œì—ì„œ ë°±/í‘ì´ ë‘˜ ìˆ˜ ìˆëŠ” í•©ë²• ìˆ˜ ê°œìˆ˜ ì°¨ì´ë¥¼ ë°˜ì˜
     private int EvaluateMobility(Board board)
     {
         GameState state = new GameState(PlayerColor.White, board);
@@ -498,17 +496,17 @@ public class SimpleChessEngine : IChessEngine
         return (white_moves - black_moves) * factor;
     }
 
-    // Æù ±¸Á¶ Æò°¡
-    // ´õºí Æù, °í¸³µÈ Æù, Åë°úµÈ Æù µîÀ» ¹İ¿µ
+    // í° êµ¬ì¡° í‰ê°€
+    // ë”ë¸” í°, ê³ ë¦½ëœ í°, í†µê³¼ëœ í° ë“±ì„ ë°˜ì˜
     private int EvaluatePawnStructure(Board board)
     {
         int score = 0;
 
-        // °¢ ÆÄÀÏ(file)º° Æù °³¼ö
+        // ê° íŒŒì¼(file)ë³„ í° ê°œìˆ˜
         int[] white_file_count = new int[8];
         int[] black_file_count = new int[8];
 
-        // ¸ğµç Æù À§Ä¡ ÀúÀå
+        // ëª¨ë“  í° ìœ„ì¹˜ ì €ì¥
         List<(int r, int c, PlayerColor color)> pawns = new();
 
         for (int r = 0; r < 8; r++)
@@ -530,13 +528,13 @@ public class SimpleChessEngine : IChessEngine
             int[] my_file_count = is_white ? white_file_count : black_file_count;
             //int[] my_black_file_ = is_white ? black_file_count : white_file_count;
 
-            // °°Àº ÆÄÀÏ¿¡ ÆùÀÌ 2°³ ÀÌ»óÀÌ¸é ´õºí Æù ÆĞ³ÎÆ¼
+            // ê°™ì€ íŒŒì¼ì— í°ì´ 2ê°œ ì´ìƒì´ë©´ ë”ë¸” í° íŒ¨ë„í‹°
             if (my_file_count[c] > 1)
             {
                 score += is_white ? -10 : 10;
             }
 
-            // ¾ç ¿· ÆÄÀÏ¿¡ °°Àº Æí ÆùÀÌ ¾øÀ¸¸é °í¸³µÈ Æù ÆĞ³ÎÆ¼
+            // ì–‘ ì˜† íŒŒì¼ì— ê°™ì€ í¸ í°ì´ ì—†ìœ¼ë©´ ê³ ë¦½ëœ í° íŒ¨ë„í‹°
             bool left_has = c > 0 && my_file_count[c - 1] > 0;
             bool right_has = c < 7 && my_file_count[c + 1] > 0;
 
@@ -545,8 +543,8 @@ public class SimpleChessEngine : IChessEngine
                 score += is_white ? -15 : 15;
             }
 
-            // Åë°úµÈ Æù ¹İº°¿ë
-            // ¾ÕÂÊ 3°³ ÆÄÀÏ¿¡ »ó´ë ÆùÀÌ ÀÖ´ÂÁö È®ÀÎ
+            // í†µê³¼ëœ í° ë°˜ë³„ìš©
+            // ì•ìª½ 3ê°œ íŒŒì¼ì— ìƒëŒ€ í°ì´ ìˆëŠ”ì§€ í™•ì¸
             bool blocked = false;
 
             for (int dc = -1; dc <= 1; dc++)
@@ -556,7 +554,7 @@ public class SimpleChessEngine : IChessEngine
 
                 if (is_white)
                 {
-                    // º¤ ÆùÀº À§ÂÊ ¹æÇâ °Ë»ç
+                    // ë²¡ í°ì€ ìœ„ìª½ ë°©í–¥ ê²€ì‚¬
                     for (int rr = r + 1; rr < 8; rr++)
                     {
                         Piece pp = board[rr, file];
@@ -569,7 +567,7 @@ public class SimpleChessEngine : IChessEngine
                 }
                 else
                 {
-                    // Èæ ÆùÀº ¾Æ·¡ÂÊ ¹æÇâ °Ë»ç
+                    // í‘ í°ì€ ì•„ë˜ìª½ ë°©í–¥ ê²€ì‚¬
                     for (int rr = r - 1; rr >= 0; rr--)
                     {
                         Piece pp = board[rr, file];
@@ -582,7 +580,7 @@ public class SimpleChessEngine : IChessEngine
                 }
                 if (blocked) break;
             }
-            // ¾Õ¿¡ ¸·´Â »ó´ë ÆùÀÌ ¾øÀ¸¸é Åë°úµÈ Æù º¸³Ê½º
+            // ì•ì— ë§‰ëŠ” ìƒëŒ€ í°ì´ ì—†ìœ¼ë©´ í†µê³¼ëœ í° ë³´ë„ˆìŠ¤
             if (!blocked)
             {
                 int rank = is_white ? r : (7 - r);
@@ -593,21 +591,21 @@ public class SimpleChessEngine : IChessEngine
         return score;
     }
 
-    // Å· ¾ÈÁ¤¼º Æò°¡
-    // ¹Ì±¸Çö
+    // í‚¹ ì•ˆì •ì„± í‰ê°€
+    // ë¯¸êµ¬í˜„
     private int EvaluateKingSafety(Board board)
     {
         return 0;
     }
 
-    // ÅÛÆ÷ Æò°¡
-    // ¹Ì±¸Çö
+    // í…œí¬ í‰ê°€
+    // ë¯¸êµ¬í˜„
     private int EvaluateTempo(Board board)
     {
         return 0;
     }
 
-    // Move¿¡¼­ ½ÃÀÛ ÁÂÇ¥¿Í µµÂø ÁÂÇ¥¸¦ ²¨³»´Â À¯Æ¿ ÇÔ¼ö
+    // Moveì—ì„œ ì‹œì‘ ì¢Œí‘œì™€ ë„ì°© ì¢Œí‘œë¥¼ êº¼ë‚´ëŠ” ìœ í‹¸ í•¨ìˆ˜
     private void GetFromTo(Move move, out int fr, out int fc, out int tr, out int tc)
     {
         fr = move.FromPos.row;

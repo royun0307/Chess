@@ -1,48 +1,48 @@
 using System.Collections.Generic;
 using System.Linq;
 
-// ºñ¼ó(´ë°¢¼±À¸·Î ÀÌµ¿ÇÏ´Â Ã¼½º ±â¹°) Å¬·¡½º
+// ë¹„ìˆ(ëŒ€ê°ì„ ìœ¼ë¡œ ì´ë™í•˜ëŠ” ì²´ìŠ¤ ê¸°ë¬¼) í´ë˜ìŠ¤
 public class Bishop : Piece
 {
-    // ÀÌ ±â¹°ÀÇ Á¾·ù´Â Bishop
+    // ì´ ê¸°ë¬¼ì˜ ì¢…ë¥˜ëŠ” Bishop
     public override PieceType Type => PieceType.Bishop;
     
-    // ÀÌ ±â¹°ÀÇ »ö»ó(Èæ/¹é)
+    // ì´ ê¸°ë¬¼ì˜ ìƒ‰ìƒ(í‘/ë°±)
     public override PlayerColor Color { get; }
 
-    // ºñ¼óÀÇ ÀÌµ¿ÇÒ ¼ö ÀÖ´Â 4°³ÀÇ ´ë°¢¼± ¹æÇâ
+    // ë¹„ìˆì˜ ì´ë™í•  ìˆ˜ ìˆëŠ” 4ê°œì˜ ëŒ€ê°ì„  ë°©í–¥
     private static readonly Direction[] dirs = new Direction[]
     {
-        Direction.NorthWest, // ÁÂ»óÇâ
-        Direction.NorthEast, // ¿ì»óÇâ
-        Direction.SouthWest, // ÁÂÇÏÇâ
-        Direction.SouthEast, // ÁÂ¿ìÇâ
+        Direction.NorthWest, // ì¢Œìƒí–¥
+        Direction.NorthEast, // ìš°ìƒí–¥
+        Direction.SouthWest, // ì¢Œí•˜í–¥
+        Direction.SouthEast, // ì¢Œìš°í–¥
     };
 
-    // ºñ¼ó »ı¼ºÀÚ
-    // »ı¼ºÇÒ ¶§ ±â¹°ÀÇ »ö»óÀ» ¹Ş¾Æ ÀúÀå
+    // ë¹„ìˆ ìƒì„±ì
+    // ìƒì„±í•  ë•Œ ê¸°ë¬¼ì˜ ìƒ‰ìƒì„ ë°›ì•„ ì €ì¥
     public Bishop(PlayerColor color)
     {
         this.Color = color;
     }
 
-    // ÇöÀç ºñ¼ó °´Ã¼¸¦ º¹»çÇØ¼­ »õ·Î¿î ºñ¼ó °´Ã¼¸¦ ¹İÈ¯
+    // í˜„ì¬ ë¹„ìˆ ê°ì²´ë¥¼ ë³µì‚¬í•´ì„œ ìƒˆë¡œìš´ ë¹„ìˆ ê°ì²´ë¥¼ ë°˜í™˜
     public override Piece Copy()
     {
-        // °°Àº »ö»óÀÇ ºñ¼ó »ı¼º
+        // ê°™ì€ ìƒ‰ìƒì˜ ë¹„ìˆ ìƒì„±
         Bishop copy = new Bishop(Color);
 
-        // ÀÌµ¿ ¿©ºÎ(hasMoved)µµ ÇÔ²¾ º¹»ç
+        // ì´ë™ ì—¬ë¶€(hasMoved)ë„ í•¨ê¼ ë³µì‚¬
         copy.hasMoved = hasMoved;
 
         return copy;
     }
 
-    // ÇöÀç À§Ä¡(from)¿¡¼­ ÀÌµ¿ °¡´ÉÇÑ ¸ğµç ¼ö¸¦ ¹İÈ¯
+    // í˜„ì¬ ìœ„ì¹˜(from)ì—ì„œ ì´ë™ ê°€ëŠ¥í•œ ëª¨ë“  ìˆ˜ë¥¼ ë°˜í™˜
     public override IEnumerable<Move> GetMoves(Position from, Board board)
     {
-        // ´ë°¢¼± 4¹æÇâÀ¸·Î °¥ ¼ö ÀÖ´Â ¸ğµç À§Ä¡¸¦ ±¸ÇÑ µÚ
-        // °¢ À§Ä¡¸¦ NormalMove °´Ã¼·Î º¯È¯ÇØ¼­ ¹İÈ¯
+        // ëŒ€ê°ì„  4ë°©í–¥ìœ¼ë¡œ ê°ˆ ìˆ˜ ìˆëŠ” ëª¨ë“  ìœ„ì¹˜ë¥¼ êµ¬í•œ ë’¤
+        // ê° ìœ„ì¹˜ë¥¼ NormalMove ê°ì²´ë¡œ ë³€í™˜í•´ì„œ ë°˜í™˜
         return MovePositionsInDirs(from, board, dirs).Select(to => new NormalMove(from, to));
     }
 }

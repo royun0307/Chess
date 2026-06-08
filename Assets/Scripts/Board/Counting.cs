@@ -3,15 +3,15 @@ using System.Collections.Generic;
 
 public class Counting
 {
-    // ¹é ±â¹° °³¼ö ÀúÀå¿ë µñ¼Å³Ê¸®
+    // ë°± ê¸°ë¬¼ ê°œìˆ˜ ì €ì¥ìš© ë”•ì…”ë„ˆë¦¬
     private readonly Dictionary<PieceType, int> white_count = new();
-    // Èæ ±â¹° °³¼ö ÀúÀå¿ë µñ¼Å³Ê¸®
+    // í‘ ê¸°ë¬¼ ê°œìˆ˜ ì €ì¥ìš© ë”•ì…”ë„ˆë¦¬
     private readonly Dictionary<PieceType, int> black_count = new();
 
-    // º¸µå À§ ÀüÃ¼ ±â¹° ¼ö
+    // ë³´ë“œ ìœ„ ì „ì²´ ê¸°ë¬¼ ìˆ˜
     public int TotalCount { get; private set; }
 
-    // »ı¼ºÀÚ: ¸ğµç PieceType¿¡ ´ëÇØ ÃÊ±â Ä«¿îÆ®¸¦ 0À¸·Î ¼¼ÆÃ
+    // ìƒì„±ì: ëª¨ë“  PieceTypeì— ëŒ€í•´ ì´ˆê¸° ì¹´ìš´íŠ¸ë¥¼ 0ìœ¼ë¡œ ì„¸íŒ…
     public Counting()
     {
         foreach (PieceType type in Enum.GetValues(typeof(PieceType)))
@@ -21,7 +21,7 @@ public class Counting
         }
     }
 
-    // Æ¯Á¤ »ö»óÀÇ Æ¯Á¤ ±â¹° °³¼ö¸¦ 1 Áõ°¡
+    // íŠ¹ì • ìƒ‰ìƒì˜ íŠ¹ì • ê¸°ë¬¼ ê°œìˆ˜ë¥¼ 1 ì¦ê°€
     public void Increment(PlayerColor color, PieceType type)
     {
         if (color == PlayerColor.White)
@@ -33,17 +33,17 @@ public class Counting
             black_count[type]++;
         }
 
-        // »ö»ó°ú °ü°è¾øÀÌ ÀüÃ¼ ±â¹° ¼öµµ Áõ°¡
+        // ìƒ‰ìƒê³¼ ê´€ê³„ì—†ì´ ì „ì²´ ê¸°ë¬¼ ìˆ˜ë„ ì¦ê°€
         TotalCount++;
     }
 
-    // ¹éÀÇ Æ¯Á¤ ±â¹° °³¼ö ¹İÈ¯
+    // ë°±ì˜ íŠ¹ì • ê¸°ë¬¼ ê°œìˆ˜ ë°˜í™˜
     public int GetWhiteCount(PieceType type)
     {
         return white_count[type];
     }
 
-    // ÈæÀÇ Æ¯Á¤ ±â¹° °³¼ö ¹İÈ¯
+    // í‘ì˜ íŠ¹ì • ê¸°ë¬¼ ê°œìˆ˜ ë°˜í™˜
     public int GetBlackCount(PieceType type)
     {
         return black_count[type];

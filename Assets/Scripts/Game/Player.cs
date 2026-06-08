@@ -1,26 +1,26 @@
-// ÇÃ·¹ÀÌ¾îÀÇ »ö»óÀ» ³ªÅ¸³»´Â ¿­°ÅÇü
+// í”Œë ˆì´ì–´ì˜ ìƒ‰ìƒì„ ë‚˜íƒ€ë‚´ëŠ” ì—´ê±°í˜•
 public enum PlayerColor
 {
-    None,   // ÇÃ·¹ÀÌ¾î°¡ ¾ø´Â »óÅÂ
-    White,  // ¹é ÇÃ·¹ÀÌ¾î
-    Black   // Èæ ÇÃ·¹ÀÌ¾î
+    None,   // í”Œë ˆì´ì–´ê°€ ì—†ëŠ” ìƒíƒœ
+    White,  // ë°± í”Œë ˆì´ì–´
+    Black   // í‘ í”Œë ˆì´ì–´
 }
 
-// PlayerColor¿Í °ü·ÃµÈ È®Àå ¸Ş¼­µå¸¦ ¸ğ¾ÆµĞ Á¤Àû Å¬·¡½º
+// PlayerColorì™€ ê´€ë ¨ëœ í™•ì¥ ë©”ì„œë“œë¥¼ ëª¨ì•„ë‘” ì •ì  í´ë˜ìŠ¤
 public static class Player
 {
-    // ÇöÀç ÇÃ·¹ÀÌ¾îÀÇ ¹İ´ëÆí »ö»óÀ» ¹İÈ¯ÇÏ´Â È®Àå ¸Ş¼­µå
+    // í˜„ì¬ í”Œë ˆì´ì–´ì˜ ë°˜ëŒ€í¸ ìƒ‰ìƒì„ ë°˜í™˜í•˜ëŠ” í™•ì¥ ë©”ì„œë“œ
     public static PlayerColor Opponent(this PlayerColor player_color)
     {
         switch (player_color)
         {
             case PlayerColor.White:
-                return PlayerColor.Black; // ¹éÀÇ »ó´ë´Â Èæ
+                return PlayerColor.Black; // ë°±ì˜ ìƒëŒ€ëŠ” í‘
 
             case PlayerColor.Black:
-                return PlayerColor.White; // ÈæÀÇ »ó´ë´Â ¹é
+                return PlayerColor.White; // í‘ì˜ ìƒëŒ€ëŠ” ë°±
             default:
-                return PlayerColor.None;  // NoneÀÇ »ó´ëµµ None Ã³¸®
+                return PlayerColor.None;  // Noneì˜ ìƒëŒ€ë„ None ì²˜ë¦¬
         }
     }
 }

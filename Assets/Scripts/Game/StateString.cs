@@ -2,34 +2,34 @@ using System.Text;
 using UnityEditor.Build;
 using UnityEngine.Rendering;
 
-// ÇöÀç Ã¼½ºÆÇ »óÅÂ¸¦ ¹®ÀÚ¿­·Î º¯È¯ÇÏ´Â Å¬·¡½º
-// ÁÖ·Î 3È¸ ¹Ýº¹ Ã¼Å©³ª »óÅÂ ºñ±³¸¦ À§ÇØ »ç¿ë
+// í˜„ìž¬ ì²´ìŠ¤íŒ ìƒíƒœë¥¼ ë¬¸ìžì—´ë¡œ ë³€í™˜í•˜ëŠ” í´ëž˜ìŠ¤
+// ì£¼ë¡œ 3íšŒ ë°˜ë³µ ì²´í¬ë‚˜ ìƒíƒœ ë¹„êµë¥¼ ìœ„í•´ ì‚¬ìš©
 public class StateString
 {
-    // ¹®ÀÚ¿­À» È¿À²ÀûÀ¸·Î ÀÌ¾îºÙÀÌ±â À§ÇÑ StringBuilder
+    // ë¬¸ìžì—´ì„ íš¨ìœ¨ì ìœ¼ë¡œ ì´ì–´ë¶™ì´ê¸° ìœ„í•œ StringBuilder
     private readonly StringBuilder sb = new StringBuilder();
 
-    // »ý¼ºÀÚ
-    // ÇöÀç ÇÃ·¹ÀÌ¾î¿Í º¸µå »óÅÂ¸¦ ¹Þ¾Æ »óÅÂ ¹®ÀÚ¿­À» ±¸¼º
+    // ìƒì„±ìž
+    // í˜„ìž¬ í”Œë ˆì´ì–´ì™€ ë³´ë“œ ìƒíƒœë¥¼ ë°›ì•„ ìƒíƒœ ë¬¸ìžì—´ì„ êµ¬ì„±
     public StateString(PlayerColor current_player, Board board)
     {
-        AddPiecePlacement(board);           // ±â¹° ¹èÄ¡ Á¤º¸ Ãß°¡
+        AddPiecePlacement(board);           // ê¸°ë¬¼ ë°°ì¹˜ ì •ë³´ ì¶”ê°€
         sb.Append(' ');
-        AddCurrentPlayer(current_player);   // ÇöÀç ÅÏ ÇÃ·¹ÀÌ¾î Ãß°¡
+        AddCurrentPlayer(current_player);   // í˜„ìž¬ í„´ í”Œë ˆì´ì–´ ì¶”ê°€
         sb.Append(' ');
-        AddCastlingRights(board);           // Ä³½½¸µ °¡´É ¿©ºÎ Ãß°¡
+        AddCastlingRights(board);           // ìºìŠ¬ë§ ê°€ëŠ¥ ì—¬ë¶€ ì¶”ê°€
         sb.Append(' ');
-        AddEnPassant(board, current_player);// ¾ÓÆÄ»ó °¡´É À§Ä¡ Ãß°¡
+        AddEnPassant(board, current_player);// ì•™íŒŒìƒ ê°€ëŠ¥ ìœ„ì¹˜ ì¶”ê°€
     }
 
-    // ÃÖÁ¾ÀûÀ¸·Î ¿Ï¼ºµÈ »óÅÂ ¹®ÀÚ¿­ ¹ÝÈ¯
+    // ìµœì¢…ì ìœ¼ë¡œ ì™„ì„±ëœ ìƒíƒœ ë¬¸ìžì—´ ë°˜í™˜
     public override string ToString()
     {
         return sb.ToString();
     }
 
-    // ±â¹°À» FEN ½ºÅ¸ÀÏ ¹®ÀÚ·Î º¯È¯
-    // È¤Àº ¼Ò¹®ÀÚ, ¹éÀº ´ë¹®ÀÚ »ç¿ë
+    // ê¸°ë¬¼ì„ FEN ìŠ¤íƒ€ì¼ ë¬¸ìžë¡œ ë³€í™˜
+    // í˜¹ì€ ì†Œë¬¸ìž, ë°±ì€ ëŒ€ë¬¸ìž ì‚¬ìš©
     private static char PieceChar(Piece piece)
     {
         char c = piece.Type switch
@@ -43,51 +43,51 @@ public class StateString
             _ => ' '
         };
 
-        // ¹é ±â¹°Àº ´ë¹®ÀÚ·Î º¯È¯
+        // ë°± ê¸°ë¬¼ì€ ëŒ€ë¬¸ìžë¡œ ë³€í™˜
         if (piece.Color == PlayerColor.White)
         {
             return char.ToUpper(c);
         }
 
-        // Èæ ±â¹°Àº ±×´ë·Î ¼Ò¹®ÀÚ »ç¿ë
+        // í‘ ê¸°ë¬¼ì€ ê·¸ëŒ€ë¡œ ì†Œë¬¸ìž ì‚¬ìš©
         return c;
     }
 
-    // ÇÑ ÁÙ(row)ÀÇ ±â¹° ¹èÄ¡ Á¤º¸¸¦ ¹®ÀÚ¿­ÀÇ Ãß°¡
+    // í•œ ì¤„(row)ì˜ ê¸°ë¬¼ ë°°ì¹˜ ì •ë³´ë¥¼ ë¬¸ìžì—´ì˜ ì¶”ê°€
     private void AddRowData(Board board, int row)
     {
-        // ¿¬¼ÓµÈ ºóÄ­ °³¼ö ÀúÀå
+        // ì—°ì†ëœ ë¹ˆì¹¸ ê°œìˆ˜ ì €ìž¥
         int empty = 0;
 
         for (int c = 0; c < 8; c++)
         {
-            // ÇöÀç Ä­ÀÌ ºñ¾î ÀÖÀ¸¸é empty Áõ°¡
+            // í˜„ìž¬ ì¹¸ì´ ë¹„ì–´ ìžˆìœ¼ë©´ empty ì¦ê°€
             if (board[row, c] == null)
             {
                 empty++;
                 continue;
             }
 
-            // ÀÌÀü±îÁö ºóÄ­ÀÌ ÀÖ¾ú´Ù¸é ¼ýÀÚ·Î ±â·Ï
+            // ì´ì „ê¹Œì§€ ë¹ˆì¹¸ì´ ìžˆì—ˆë‹¤ë©´ ìˆ«ìžë¡œ ê¸°ë¡
             if(empty > 0)
             {
                 sb.Append(empty);
                 empty = 0;
             }
 
-            // ±â¹°ÀÌ ÀÖÀ¸¸é ÇØ´ç ±â¹° ¹®ÀÚ Ãß°¡
+            // ê¸°ë¬¼ì´ ìžˆìœ¼ë©´ í•´ë‹¹ ê¸°ë¬¼ ë¬¸ìž ì¶”ê°€
             sb.Append(PieceChar(board[row, c]));
         }
 
-        // Çà ³¡±îÁö ¿Ô´Âµ¥ ºóÄ­ÀÌ ³²¾Æ ÀÖÀ¸¸é ±â·Ï
+        // í–‰ ëê¹Œì§€ ì™”ëŠ”ë° ë¹ˆì¹¸ì´ ë‚¨ì•„ ìžˆìœ¼ë©´ ê¸°ë¡
         if (empty > 0)
         {
             sb.Append(empty);
         }
     }
 
-    // ÀüÃ¼ º¸µåÀÇ ±â¹° ¹èÄ¡ Á¤º¸¸¦ ¹®ÀÚ¿­ÀÇ Ãß°¡
-    // °¢ ÇàÀº '/'·Î ±¸ºÐ
+    // ì „ì²´ ë³´ë“œì˜ ê¸°ë¬¼ ë°°ì¹˜ ì •ë³´ë¥¼ ë¬¸ìžì—´ì˜ ì¶”ê°€
+    // ê° í–‰ì€ '/'ë¡œ êµ¬ë¶„
     private void AddPiecePlacement(Board board)
     {
         for (int r = 0; r < 8; r++)
@@ -100,8 +100,8 @@ public class StateString
         }
     }
 
-    // ÇöÀç ÅÏ ÇÃ·¹ÀÌ¾î¸£¸£ ¹®ÀÚ¿­¿¡ Ãß°¡
-    // ¹éÀÌ¸é w, ÈæÀÌ¸é b
+    // í˜„ìž¬ í„´ í”Œë ˆì´ì–´ë¥´ë¥´ ë¬¸ìžì—´ì— ì¶”ê°€
+    // ë°±ì´ë©´ w, í‘ì´ë©´ b
     private void AddCurrentPlayer(PlayerColor current_player)
     {
         if(current_player == PlayerColor.White)
@@ -114,12 +114,12 @@ public class StateString
         }
     }
 
-    // Ä³½½¸µ °¡´É ¿©ºÎ¸¦ ¹®ÀÚ¿­¿¡ Ãß°¡
-    // ¹é Å·»çÀÌµå: K
-    // ¹é Äý»çÀÌµå: Q
-    // Èæ Å·»çÀÌµå: k
-    // Èæ Äý»çÀÌµå: q
-    // Èæ, ¹é µÑ ´Ù Ä³½½¸µ ºÒ°¡¸é: -
+    // ìºìŠ¬ë§ ê°€ëŠ¥ ì—¬ë¶€ë¥¼ ë¬¸ìžì—´ì— ì¶”ê°€
+    // ë°± í‚¹ì‚¬ì´ë“œ: K
+    // ë°± í€¸ì‚¬ì´ë“œ: Q
+    // í‘ í‚¹ì‚¬ì´ë“œ: k
+    // í‘ í€¸ì‚¬ì´ë“œ: q
+    // í‘, ë°± ë‘˜ ë‹¤ ìºìŠ¬ë§ ë¶ˆê°€ë©´: -
     private void AddCastlingRights(Board board)
     {
         bool castleWKS = board.CastleRightKS(PlayerColor.White);
@@ -127,7 +127,7 @@ public class StateString
         bool castleBKS = board.CastleRightKS(PlayerColor.Black);
         bool castleBQS = board.CastleRightQS(PlayerColor.Black);
 
-        // ¾î¶² Ä³½½¸µµµ ºÒ°¡´ÉÇÏ¸é '-'
+        // ì–´ë–¤ ìºìŠ¬ë§ë„ ë¶ˆê°€ëŠ¥í•˜ë©´ '-'
         if (!(castleWKS || castleWQS || castleBKS || castleBQS))
         {
             sb.Append('-');
@@ -152,27 +152,27 @@ public class StateString
         }
     }
 
-    // ¾ÓÆÄ»ó °¡´É À§Ä¡¸¦ ¹®ÀÚ¿­¿¡ Ãß°¡
-    // °¡´ÉÇÏÁö ¾ÊÀ¸¸é '-'
+    // ì•™íŒŒìƒ ê°€ëŠ¥ ìœ„ì¹˜ë¥¼ ë¬¸ìžì—´ì— ì¶”ê°€
+    // ê°€ëŠ¥í•˜ì§€ ì•Šìœ¼ë©´ '-'
     private void AddEnPassant(Board board, PlayerColor current_player)
     {
-        // ÇöÁ¦ ÇÃ·¹ÀÌ¾î°¡ ¾ÓÆÄ»óÀ¸·Î ÀâÀ» ¼ö ¾øÀ¸¸é '-'
+        // í˜„ì œ í”Œë ˆì´ì–´ê°€ ì•™íŒŒìƒìœ¼ë¡œ ìž¡ì„ ìˆ˜ ì—†ìœ¼ë©´ '-'
         if (!board.CanCaptureEnPassant(current_player))
         {
             sb.Append('-');
             return;
         }
 
-        // »ó´ë°¡ Á÷Àü¿¡ 2Ä­ ÀüÁøÇÑ ÆùÀÇ À§Ä¡¸¦ °¡Á®¿È
+        // ìƒëŒ€ê°€ ì§ì „ì— 2ì¹¸ ì „ì§„í•œ í°ì˜ ìœ„ì¹˜ë¥¼ ê°€ì ¸ì˜´
         Position pos = board.GetPawnSkipPosition(current_player.Opponent());
         
-        // ¿­(column)À» Ã¼½º Ç¥±â¹ý ÆÄÀÏ ¹®ÀÚ(a~h)·Î º¯È¯
+        // ì—´(column)ì„ ì²´ìŠ¤ í‘œê¸°ë²• íŒŒì¼ ë¬¸ìž(a~h)ë¡œ ë³€í™˜
         char file = (char)('a' + pos.column);
 
-        // Çà(row)À» Ã¼½º Ç¥±â¹ý ·©Å©(1~8)·Î º¯È¯
+        // í–‰(row)ì„ ì²´ìŠ¤ í‘œê¸°ë²• ëž­í¬(1~8)ë¡œ ë³€í™˜
         int rank = 8 - pos.row;
 
-        // ¿¹: e3 °°Àº ÇüÅÂ·Î ±â·Ï
+        // ì˜ˆ: e3 ê°™ì€ í˜•íƒœë¡œ ê¸°ë¡
         sb.Append(file);
         sb.Append(rank);
     }

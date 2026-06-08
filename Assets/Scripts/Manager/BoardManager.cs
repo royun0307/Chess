@@ -1,60 +1,59 @@
-using Mono.Cecil;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-// Ã¼½ºÆÇÀÇ ¸» ¿ÀºêÁ§Æ® »ı¼º, »èÁ¦, ¼±ÅÃ, ÀÌµ¿ Ç¥½ÃÆÇ °ü¸® µîÀ» ´ã´çÇÏ´Â ¸Å´ÏÀú
+// ì²´ìŠ¤íŒì˜ ë§ ì˜¤ë¸Œì íŠ¸ ìƒì„±, ì‚­ì œ, ì„ íƒ, ì´ë™ í‘œì‹œíŒ ê´€ë¦¬ ë“±ì„ ë‹´ë‹¹í•˜ëŠ” ë§¤ë‹ˆì €
 public class BoardManager : MonoBehaviour
 {
-    // ÇÑ Ä­ÀÇ ¿ùµå ÁÂÇ¥ Å©±â
+    // í•œ ì¹¸ì˜ ì›”ë“œ ì¢Œí‘œ í¬ê¸°
     public float cellSize = 0.66f;
     
-    // Ã¼½ºÆÇ ½ÃÀÛ ¿øÁ¡ ÁÂÇ¥
+    // ì²´ìŠ¤íŒ ì‹œì‘ ì›ì  ì¢Œí‘œ
     public Vector2 origin = new(-2.3f, -2.3f);
 
-    // ½ÇÁ¦ ³í¸® Ã¼½ºÆÇ µ¥ÀÌÅÍ
+    // ì‹¤ì œ ë…¼ë¦¬ ì²´ìŠ¤íŒ ë°ì´í„°
     public Board board;
 
-    // È­¸é¿¡ º¸ÀÌ´Â Ã¼½º¸» ¿ÀºêÁ§Æ®¸¦ ÀúÀåÇÏ´Â 2Â÷¿ø ¹è¿­
+    // í™”ë©´ì— ë³´ì´ëŠ” ì²´ìŠ¤ë§ ì˜¤ë¸Œì íŠ¸ë¥¼ ì €ì¥í•˜ëŠ” 2ì°¨ì› ë°°ì—´
     private Chessman[,] views = new Chessman[8, 8]; 
 
-    // (ÇÃ·¹ÀÌ¾î »ö, ¸» Á¾·ù) -> ÇÁ¸®ÆÕ ¸ÅÇÎ¿ë µñ¼Å³Ê¸®
+    // (í”Œë ˆì´ì–´ ìƒ‰, ë§ ì¢…ë¥˜) -> í”„ë¦¬íŒ¹ ë§¤í•‘ìš© ë”•ì…”ë„ˆë¦¬
     private Dictionary<(PlayerColor, PieceType), GameObject> prefabMap;
 
-    // °¢ ¸»ÀÇ ÇÁ¸®ÆÕ
+    // ê° ë§ì˜ í”„ë¦¬íŒ¹
     public GameObject white_pawn, white_knight, white_bishop, white_rook, white_queen, white_king;
     public GameObject black_pawn, black_knight, black_bishop, black_rook, black_queen, black_king;
     
-    // ÀÌµ¿ °¡´É À§Ä¡¸¦ Ç¥½ÃÇÏ´Â ÇÃ·¹ÀÌÆ® ÇÁ¸®ÆÕ
+    // ì´ë™ ê°€ëŠ¥ ìœ„ì¹˜ë¥¼ í‘œì‹œí•˜ëŠ” í”Œë ˆì´íŠ¸ í”„ë¦¬íŒ¹
     public GameObject move_plate;
 
-    // º¸µå ÀüÃ¼ÀÇ ÀÌµ¿ ÇÃ·¹ÀÌÆ® ÀúÀå ¹è¿­
+    // ë³´ë“œ ì „ì²´ì˜ ì´ë™ í”Œë ˆì´íŠ¸ ì €ì¥ ë°°ì—´
     public MovePlate[,] move_plates = new MovePlate[8, 8];
     
-    // ÇöÀç ¼±ÅÃµÈ ¸»ÀÌ ÀÌµ¿ °¡´ÉÇÑ ¼ö¸¦ Ä³½Ì
+    // í˜„ì¬ ì„ íƒëœ ë§ì´ ì´ë™ ê°€ëŠ¥í•œ ìˆ˜ë¥¼ ìºì‹±
     public List<Move> cachedMoves = new List<Move>();
 
-    // ¸» ¿ÀºêÁ§Æ®¸¦ ³Ö¾îµÑ ºÎ¸ğ Transform
+    // ë§ ì˜¤ë¸Œì íŠ¸ë¥¼ ë„£ì–´ë‘˜ ë¶€ëª¨ Transform
     [SerializeField] private Transform pieceParent;
-    // ÀÌµ¿ ÇÃ·¹ÀÌÆ®µéÀ» ³Ö¾îµÑ ºÎ¸ğ Transform
+    // ì´ë™ í”Œë ˆì´íŠ¸ë“¤ì„ ë„£ì–´ë‘˜ ë¶€ëª¨ Transform
     [SerializeField] private Transform plateParent;
 
-    // ÇöÁ¦ ¼±ÅÃµÈ Ã¼½º¸»
+    // í˜„ì œ ì„ íƒëœ ì²´ìŠ¤ë§
     private Chessman selected;
 
     private void Awake()
     {
-        // ¸» ÇÁ¸®ÆÕ ¸ÅÇÎ Å×ÀÌºí »ı¼º
+        // ë§ í”„ë¦¬íŒ¹ ë§¤í•‘ í…Œì´ë¸” ìƒì„±
         BuildPrefabMap();
 
-        // pieceParent°¡ Inspector¿¡¼­ ÁöÁ¤µÇÁö ¾Ê¾Ò´Ù¸é ÀÌ¸§À¸·Î Ã£¾Æ¼­ ¿¬°á
+        // pieceParentê°€ Inspectorì—ì„œ ì§€ì •ë˜ì§€ ì•Šì•˜ë‹¤ë©´ ì´ë¦„ìœ¼ë¡œ ì°¾ì•„ì„œ ì—°ê²°
         if (pieceParent == null)
         {
             var go = GameObject.Find("Piece");
             if (go != null) pieceParent = go.transform;
         }
 
-        // plateParent°¡ Inspector¿¡¼­ ÁöÁ¤µÇÁö ¾Ê¾Ò´Ù¸é ÀÌ¸§À¸·Î Ã£¾Æ¼­ ¿¬°á
+        // plateParentê°€ Inspectorì—ì„œ ì§€ì •ë˜ì§€ ì•Šì•˜ë‹¤ë©´ ì´ë¦„ìœ¼ë¡œ ì°¾ì•„ì„œ ì—°ê²°
         if (plateParent == null)
         {
             var go = GameObject.Find("MovePlate");
@@ -62,16 +61,16 @@ public class BoardManager : MonoBehaviour
         }
     }
 
-    // °ÔÀÓ ½ÃÀÛ ½Ã º¸µå¸¦ ÃÊ±âÈ­ÇÏ°í È­¸éÀ» ´Ù½Ã ±×¸²
+    // ê²Œì„ ì‹œì‘ ì‹œ ë³´ë“œë¥¼ ì´ˆê¸°í™”í•˜ê³  í™”ë©´ì„ ë‹¤ì‹œ ê·¸ë¦¼
     public void Init()
     {
-        DestroyAllPiece();          // ±âÁ¸ ¸» Á¦°Å
-        board = Board.Initial();    // ÃÊ±â Ã¼½ºÆÇ ¼¼ÆÃ
-        RedrawPiecesFromBoard();    // º¸µå »óÅÂ¸¦ ±âÁØÀ¸·Î È­¸é ¸» »ı¼º
-        Deselect();                 // ¼±ÅÃ »óÅÂ ÃÊ±âÈ­
+        DestroyAllPiece();          // ê¸°ì¡´ ë§ ì œê±°
+        board = Board.Initial();    // ì´ˆê¸° ì²´ìŠ¤íŒ ì„¸íŒ…
+        RedrawPiecesFromBoard();    // ë³´ë“œ ìƒíƒœë¥¼ ê¸°ì¤€ìœ¼ë¡œ í™”ë©´ ë§ ìƒì„±
+        Deselect();                 // ì„ íƒ ìƒíƒœ ì´ˆê¸°í™”
     }
 
-    // ÇöÀç È­¸é¿¡ ÀÖ´Â ¸ğµç ¸» ¿ÀºêÁ§Æ® »èÁ¦
+    // í˜„ì¬ í™”ë©´ì— ìˆëŠ” ëª¨ë“  ë§ ì˜¤ë¸Œì íŠ¸ ì‚­ì œ
     private void DestroyAllPiece()
     {
         for (int r = 0; r < 8; r++)
@@ -87,13 +86,13 @@ public class BoardManager : MonoBehaviour
         }
     }
 
-    // ½ÇÁ¦ Board µ¥ÀÌÅÍ¸¦ ±âÁØÀ¸·Î È­¸éÀÇ ¸» ¿ÀºêÁ§Æ®¸¦ ´Ù½Ã »ı¼º
+    // ì‹¤ì œ Board ë°ì´í„°ë¥¼ ê¸°ì¤€ìœ¼ë¡œ í™”ë©´ì˜ ë§ ì˜¤ë¸Œì íŠ¸ë¥¼ ë‹¤ì‹œ ìƒì„±
     public void RedrawPiecesFromBoard()
     {
-        // ±âÁ¸ È­¸é ¿ÀºêÁ§Æ® ÀüºÎ Á¦°Å
+        // ê¸°ì¡´ í™”ë©´ ì˜¤ë¸Œì íŠ¸ ì „ë¶€ ì œê±°
         DestroyAllPiece();
 
-        // º¸µå ÀüÃ¼¸¦ ¼øÈ¸ÇÏ¸é¼­ ¸»ÀÌ ÀÖ´Â Ä­¸¸ ÇÁ¸®ÆÕ »ı¼º
+        // ë³´ë“œ ì „ì²´ë¥¼ ìˆœíšŒí•˜ë©´ì„œ ë§ì´ ìˆëŠ” ì¹¸ë§Œ í”„ë¦¬íŒ¹ ìƒì„±
         for (int r = 0; r < 8; r++)
         {
             for (int c = 0; c < 8; c++)
@@ -101,7 +100,7 @@ public class BoardManager : MonoBehaviour
                 Piece piece = board[r, c];
                 if (piece == null) continue;
 
-                // ÇØ´ç ¸»¿¡ ¸Â´Â ÇÁ¸®ÆÕ Ã£±â
+                // í•´ë‹¹ ë§ì— ë§ëŠ” í”„ë¦¬íŒ¹ ì°¾ê¸°
                 GameObject prefab = GetPrefab(piece);
                 if (prefab == null)
                 {
@@ -109,27 +108,27 @@ public class BoardManager : MonoBehaviour
                     continue;
                 }
 
-                // º¸µå ÁÂÇ¥¸¦ ¿ùµå ÁÂÇ¥·Î º¯È¯ ÈÄ »ı¼º
+                // ë³´ë“œ ì¢Œí‘œë¥¼ ì›”ë“œ ì¢Œí‘œë¡œ ë³€í™˜ í›„ ìƒì„±
                 Vector3 pos = GridToWorld(r, c);
                 GameObject go = Instantiate(prefab, pos, Quaternion.identity);
                 
-                // Chessman ÄÄÆ÷³ÍÆ® ÃÊ±âÈ­
+                // Chessman ì»´í¬ë„ŒíŠ¸ ì´ˆê¸°í™”
                 Chessman chessman = go.GetComponent<Chessman>();
                 chessman.Init(new Position(r, c));
 
-                // views ¹è¿­¿¡ ÀúÀå
+                // views ë°°ì—´ì— ì €ì¥
                 views[r, c] = chessman;
 
-                // ¿ÀºêÁ§Æ® ÀÌ¸§ ÀúÀå
+                // ì˜¤ë¸Œì íŠ¸ ì´ë¦„ ì €ì¥
                 go.name = $"{piece.Color}_{piece.Type}_{r}_{c}";
                 
-                // ºÎ¸ğ ÁöÁ¤
+                // ë¶€ëª¨ ì§€ì •
                 go.transform.SetParent(pieceParent);
             }
         }
     }
 
-    // ÀÌµ¿ °¡´É À§Ä¡¸¦ Ç¥½ÃÇÒ ¸ğµç MovePlate¸¦ ¹Ì¸® »ı¼º
+    // ì´ë™ ê°€ëŠ¥ ìœ„ì¹˜ë¥¼ í‘œì‹œí•  ëª¨ë“  MovePlateë¥¼ ë¯¸ë¦¬ ìƒì„±
     public void InitMovePlatform()
     {
         for (int r = 0; r < 8; r++)
@@ -140,22 +139,22 @@ public class BoardManager : MonoBehaviour
                 GameObject go = Instantiate(move_plate, pos, Quaternion.identity);
                 MovePlate movePlate = go.GetComponent<MovePlate>();
 
-                // °¢ ÇÃ·¹ÀÌÆ®¿¡ ÀÚ±â º¸µå À§Ä¡ ÀúÀå
+                // ê° í”Œë ˆì´íŠ¸ì— ìê¸° ë³´ë“œ ìœ„ì¹˜ ì €ì¥
                 movePlate.Init(new Position(r, c));
 
                 go.name = $"move_platform_{r}_{c}";
                 move_plates[r, c] = movePlate;
                 
-                // Ã³À½¿¡´Â ºñÈ°¼ºÈ­
+                // ì²˜ìŒì—ëŠ” ë¹„í™œì„±í™”
                 go.SetActive(false);
 
-                // ºÎ¸ğ ¼³Á¤
+                // ë¶€ëª¨ ì„¤ì •
                 go.transform.SetParent(pieceParent.transform);
             }
         }
     }
 
-    // ¸ğµç ÀÌµ¿ ÇÃ·¹ÀÌÆ®¸¦ ÇÑ ¹ø¿¡ ÄÑ°Å³ª ²ô´Â ÇÔ¼ö
+    // ëª¨ë“  ì´ë™ í”Œë ˆì´íŠ¸ë¥¼ í•œ ë²ˆì— ì¼œê±°ë‚˜ ë„ëŠ” í•¨ìˆ˜
     private void SetAllPlatesActive(bool on)
     {
         for (int r = 0; r < 8; r++)
@@ -170,7 +169,7 @@ public class BoardManager : MonoBehaviour
         }
     }
 
-    // ¸» ÇÁ¸®ÆÕµéÀ» µñ¼Å³Ê¸®¿¡ µî·Ï
+    // ë§ í”„ë¦¬íŒ¹ë“¤ì„ ë”•ì…”ë„ˆë¦¬ì— ë“±ë¡
     private void BuildPrefabMap()
     {
         prefabMap = new()
@@ -191,34 +190,34 @@ public class BoardManager : MonoBehaviour
         };
     }
 
-    // Ã¼½º¸» Å¬¸¯ ½Ã È£Ãâ
+    // ì²´ìŠ¤ë§ í´ë¦­ ì‹œ í˜¸ì¶œ
     public void OnClickChessman(Chessman chessman)
     {
-        // ÀÌ¹Ì ¼±ÅÃµÈ ¸»À» ´Ù½Ã Å¬¸¯ÇÏ¸é ¼±ÅÃ ÇØÁ¦ 
+        // ì´ë¯¸ ì„ íƒëœ ë§ì„ ë‹¤ì‹œ í´ë¦­í•˜ë©´ ì„ íƒ í•´ì œ 
         if(selected == chessman)
         {
             Deselect();
             return;
         }
 
-        // ÇöÀç °ÔÀÓ »óÅÂ¿¡¼­ ÇØ´ç ¸»ÀÇ ÇÕ¹ıÀûÀÎ ÀÌµ¿ ¸ñ·Ï °¡Á®¿À±â
+        // í˜„ì¬ ê²Œì„ ìƒíƒœì—ì„œ í•´ë‹¹ ë§ì˜ í•©ë²•ì ì¸ ì´ë™ ëª©ë¡ ê°€ì ¸ì˜¤ê¸°
         var moves = GameManager.Instance.state.LegalMoveForPiece(chessman.Pos).ToList();
        
-        // ÀÌµ¿ °¡´ÉÇÑ ¼ö°¡ ¾øÀ¸¸é ¼±ÅÃ ÇØÁ¦
+        // ì´ë™ ê°€ëŠ¥í•œ ìˆ˜ê°€ ì—†ìœ¼ë©´ ì„ íƒ í•´ì œ
         if(moves.Count == 0)
         {
             Deselect();
             return;
         }
 
-        // ¸» ¼±ÅÃ ¹× ÀÌµ¿ ¸ñ·Ï ÀúÀå
+        // ë§ ì„ íƒ ë° ì´ë™ ëª©ë¡ ì €ì¥
         selected = chessman;
         cachedMoves = moves;
 
-        // ±âÁ¸ Ç¥½ÃÆÇ ÀüºÎ ²ô±â
+        // ê¸°ì¡´ í‘œì‹œíŒ ì „ë¶€ ë„ê¸°
         SetAllPlatesActive(false);
 
-        // ÀÌµ¿ °¡´ÉÇÑ Ä­¿¡ ÇØ´çÇÏ´Â ÇÃ·¹ÀÌÆ®¸¸ È°¼ºÈ­
+        // ì´ë™ ê°€ëŠ¥í•œ ì¹¸ì— í•´ë‹¹í•˜ëŠ” í”Œë ˆì´íŠ¸ë§Œ í™œì„±í™”
         foreach(var mv in cachedMoves)
         {
             int r = mv.ToPos.row;
@@ -234,65 +233,65 @@ public class BoardManager : MonoBehaviour
         }
     }
 
-    // ÀÌµ¿ ÇÃ·¹ÀÌÆ® Å¬¸¯ ½Ã È£Ãâ
+    // ì´ë™ í”Œë ˆì´íŠ¸ í´ë¦­ ì‹œ í˜¸ì¶œ
     public void OnClickMovePlate(MovePlate movePlate)
     {
-        // ¼±ÅÃµÈ ¸»ÀÌ ¾øÀ¸¸é ¾Æ¹«°Íµµ ¾È ÇÔ
+        // ì„ íƒëœ ë§ì´ ì—†ìœ¼ë©´ ì•„ë¬´ê²ƒë„ ì•ˆ í•¨
         if(selected == null)
         {
             return;
         }
 
-        // Å¬¸¯ÇÑ ÇÃ·¹ÀÌÆ®ÀÇ À§Ä¡
+        // í´ë¦­í•œ í”Œë ˆì´íŠ¸ì˜ ìœ„ì¹˜
         var target = movePlate.Pos;
 
-        // Ä³½ÌµÈ ¼ö Áß¿¡¼­ Å¬¸¯ÇÑ Ä­À¸·Î °¡´Â ¼ö Ã£±â
+        // ìºì‹±ëœ ìˆ˜ ì¤‘ì—ì„œ í´ë¦­í•œ ì¹¸ìœ¼ë¡œ ê°€ëŠ” ìˆ˜ ì°¾ê¸°
         var mv = cachedMoves.FirstOrDefault(m => m.ToPos.row == target.row && m.ToPos.column == target.column);
 
-        // ÇØ´ç ¼ö°¡ ¾øÀ¸¸é Á¾·á
+        // í•´ë‹¹ ìˆ˜ê°€ ì—†ìœ¼ë©´ ì¢…ë£Œ
         if(mv == null)
         {
             return;
         }
 
-        // Æù ÇÁ·Î¸ğ¼ÇÀÌ¸é ½Â±Ş Ã³¸®
+        // í° í”„ë¡œëª¨ì…˜ì´ë©´ ìŠ¹ê¸‰ ì²˜ë¦¬
         if (mv.Type == MoveType.PawnPromotion)
         {
             HandlePromotion(mv.FromPos, mv.ToPos);
         }
         else
         {
-            // ÀÏ¹İ ÀÌµ¿ Ã³¸®
+            // ì¼ë°˜ ì´ë™ ì²˜ë¦¬
             HandleMove(mv);
         }
 
-        // ÇÃ·¹ÀÌ¾î ¼ö°¡ ³¡³­ µÚ ¿£Áø ¼ö ÁøÇà
+        // í”Œë ˆì´ì–´ ìˆ˜ê°€ ëë‚œ ë’¤ ì—”ì§„ ìˆ˜ ì§„í–‰
         GameManager.Instance.engine.EngineMove();
     }
 
-    // ½ÇÁ¦ ÀÌµ¿À» Ã³¸®ÇÏ´Â ÇÔ¼ö
+    // ì‹¤ì œ ì´ë™ì„ ì²˜ë¦¬í•˜ëŠ” í•¨ìˆ˜
     private void HandleMove(Move move)
     {
-        // °ÔÀÓ »óÅÂ¿¡ ¼ö ¹İ¿µ
+        // ê²Œì„ ìƒíƒœì— ìˆ˜ ë°˜ì˜
         GameManager.Instance.MakeMove(move);
         
-        // È­¸é¿¡ ´Ù½Ã ±×¸²
+        // í™”ë©´ì— ë‹¤ì‹œ ê·¸ë¦¼
         RedrawPiecesFromBoard();
             
-        // ¼±ÅÃ ÇØÁ¦
+        // ì„ íƒ í•´ì œ
         Deselect();
     }
 
-    // Æù ½Â±Ş Ã³¸®
+    // í° ìŠ¹ê¸‰ ì²˜ë¦¬
     private void HandlePromotion(Position from, Position to)
     {
-        // ½Â±Ş UI »óÅÂ·Î º¯°æ
+        // ìŠ¹ê¸‰ UI ìƒíƒœë¡œ ë³€ê²½
         UIManager.Instance.ChangeState(UIState.Promotion);
         
-        // ½Â±Ş ¼±ÅÃ UI Ç¥½Ã
+        // ìŠ¹ê¸‰ ì„ íƒ UI í‘œì‹œ
         UIManager.Instance.promotionUI.SetUI();
 
-        // »ç¿ëÀÚ°¡ ½Â±Ş ±â¹°À» ¼±ÅÃÇßÀ» ¶§ ½ÇÇàµÉ Äİ¹é µî·Ï
+        // ì‚¬ìš©ìê°€ ìŠ¹ê¸‰ ê¸°ë¬¼ì„ ì„ íƒí–ˆì„ ë•Œ ì‹¤í–‰ë  ì½œë°± ë“±ë¡
         UIManager.Instance.promotionUI.select_promotion += type =>
         {
             Move promMove = new PawnPromotion(from, to, type);
@@ -301,7 +300,7 @@ public class BoardManager : MonoBehaviour
         };
     }
 
-    // ½Â±Ş ÈÄ ÇØ´ç Ä­ÀÇ ¸» ºä¸¦ »õ ±â¹°·Î ±³Ã¼
+    // ìŠ¹ê¸‰ í›„ í•´ë‹¹ ì¹¸ì˜ ë§ ë·°ë¥¼ ìƒˆ ê¸°ë¬¼ë¡œ êµì²´
     private void ReplaceViewForPromotion(Move move)
     {
         var old = views[move.ToPos.row, move.ToPos.column];
@@ -311,7 +310,7 @@ public class BoardManager : MonoBehaviour
             views[move.ToPos.row, move.ToPos.column] = null;
         }
 
-        // ½Â±Ş ÈÄ º¸µå¿¡ ³õÀÎ ±â¹°¿¡ ¸Â´Â ÇÁ¸®ÆÕ »ı¼º
+        // ìŠ¹ê¸‰ í›„ ë³´ë“œì— ë†“ì¸ ê¸°ë¬¼ì— ë§ëŠ” í”„ë¦¬íŒ¹ ìƒì„±
         var prefab = GetPrefab(board[move.ToPos.row, move.ToPos.column]);
         var go = Instantiate(prefab, GridToWorld(move.ToPos.row, move.ToPos.column), Quaternion.identity);
         go.transform.SetParent(pieceParent);
@@ -321,14 +320,14 @@ public class BoardManager : MonoBehaviour
         views[move.ToPos.row, move.ToPos.column] = cm;
     }
 
-    // ±â¹° Á¤º¸¿¡ ¸Â´Â ÇÁ¸®ÆÕ ¹İÈ¯
+    // ê¸°ë¬¼ ì •ë³´ì— ë§ëŠ” í”„ë¦¬íŒ¹ ë°˜í™˜
     private GameObject GetPrefab(Piece piece)
     {
         prefabMap.TryGetValue((piece.Color, piece.Type), out GameObject prefab);
         return prefab;
     }
 
-    // º¸µå ÁÂÇ¥(row, col)¸¦ ¿ùµå ÁÂÇ¥·Î º¯È¯
+    // ë³´ë“œ ì¢Œí‘œ(row, col)ë¥¼ ì›”ë“œ ì¢Œí‘œë¡œ ë³€í™˜
     private Vector3 GridToWorld(int row, int col, float z = 1f)
     {
         float x = origin.x + col * cellSize;
@@ -336,7 +335,7 @@ public class BoardManager : MonoBehaviour
         return new Vector3(x, y, z);
     }
 
-    // ÇöÀç ¼±ÅÃ »óÅÂ¿Í ÀÌµ¿ ÇÃ·¹ÀÌÆ® Ç¥½Ã¸¦ ¸ğµÎ ÃÊ±âÈ­
+    // í˜„ì¬ ì„ íƒ ìƒíƒœì™€ ì´ë™ í”Œë ˆì´íŠ¸ í‘œì‹œë¥¼ ëª¨ë‘ ì´ˆê¸°í™”
     private void Deselect()
     {
         selected = null;
@@ -344,6 +343,6 @@ public class BoardManager : MonoBehaviour
         SetAllPlatesActive(false);
     }
 
-    // ÁÂÇ¥°¡ º¸µå ¹üÀ§ ¾È¿¡ ÀÖ´ÂÁö È®ÀÎ
+    // ì¢Œí‘œê°€ ë³´ë“œ ë²”ìœ„ ì•ˆì— ìˆëŠ”ì§€ í™•ì¸
     private static bool InBounds(int r, int c) => (uint)r < 8 && (uint)c < 8;
 }

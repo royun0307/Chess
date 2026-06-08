@@ -1,39 +1,39 @@
-// °ÔÀÓÀÌ Á¾·áµÈ ÀÌÀ¯¸¦ ³ªÅ¸³»´Â ¿­°ÅÇü
+// ê²Œì„ì´ ì¢…ë£Œëœ ì´ìœ ë¥¼ ë‚˜íƒ€ë‚´ëŠ” ì—´ê±°í˜•
 public enum EndReason
 {
-    Checkmate,              // Ã¼Å©¸ŞÀÌÆ®
-    Stalemate,              // ½ºÅ×ÀÏ¸ŞÀÌÆ®
-    FiftyMoveRule,          // 50¼ö ·ê
-    InsufficientMaterial,   // ±â¹° ºÎÁ·
-    ThreefoldRepetition     // µ¿ÀÏÇÑ »óÅÂ 3È¸ ¹İº¹
+    Checkmate,              // ì²´í¬ë©”ì´íŠ¸
+    Stalemate,              // ìŠ¤í…Œì¼ë©”ì´íŠ¸
+    FiftyMoveRule,          // 50ìˆ˜ ë£°
+    InsufficientMaterial,   // ê¸°ë¬¼ ë¶€ì¡±
+    ThreefoldRepetition     // ë™ì¼í•œ ìƒíƒœ 3íšŒ ë°˜ë³µ
 };
 
-// °ÔÀÓ Á¾·á °æ°ú¸¦ ³ªÅ¸³»´Â Å¬·¡½º
+// ê²Œì„ ì¢…ë£Œ ê²½ê³¼ë¥¼ ë‚˜íƒ€ë‚´ëŠ” í´ë˜ìŠ¤
 public class Result
 {
-    // ½Â¸®ÇÑ ÇÃ·¹ÀÌ¾î
-    // ¹«½ÂºÎ¶ó¸é PlayerColor.None
+    // ìŠ¹ë¦¬í•œ í”Œë ˆì´ì–´
+    // ë¬´ìŠ¹ë¶€ë¼ë©´ PlayerColor.None
     public PlayerColor Winner { get; }
 
-    // °ÔÀÓÀÌ ¾î¶² ÀÌÀ¯·Î ³¡³µ´ÂÁö ÀúÀå
+    // ê²Œì„ì´ ì–´ë–¤ ì´ìœ ë¡œ ëë‚¬ëŠ”ì§€ ì €ì¥
     public EndReason EndReason { get; }
 
-    // °á°ú °´Ã¼ »ı¼ºÀÚ
+    // ê²°ê³¼ ê°ì²´ ìƒì„±ì
     public Result(PlayerColor winner, EndReason endReason)
     {
         this.Winner = winner;
         this.EndReason = endReason;
     }
 
-    // ½Â¸® °á°ú¸¦ »ı¼ºÇÏ´Â Á¤Àû ¸Ş¼­µå
-    // Ã¼Å­¸ŞÀÌÆ®·Î °ÔÀÓÀÌ ³¡³­ °æ¿ì »ç¿ë
+    // ìŠ¹ë¦¬ ê²°ê³¼ë¥¼ ìƒì„±í•˜ëŠ” ì •ì  ë©”ì„œë“œ
+    // ì²´í¼ë©”ì´íŠ¸ë¡œ ê²Œì„ì´ ëë‚œ ê²½ìš° ì‚¬ìš©
     public static Result Win(PlayerColor winner)
     {
         return new Result(winner, EndReason.Checkmate);
     }
 
-    // ¹«½ÂºÎ °á°ú¸¦ »ı¼ºÇÏ´Â Á¤Àû ¸Ş¼­µå
-    // ¹«½ÂºÎ »çÀ¯¸¦ ¹Ş¾Æ¼­ Result °´Ã¼ »ı¼º
+    // ë¬´ìŠ¹ë¶€ ê²°ê³¼ë¥¼ ìƒì„±í•˜ëŠ” ì •ì  ë©”ì„œë“œ
+    // ë¬´ìŠ¹ë¶€ ì‚¬ìœ ë¥¼ ë°›ì•„ì„œ Result ê°ì²´ ìƒì„±
     public static Result Draw(EndReason reason)
     {
         return new Result(PlayerColor.None, reason);

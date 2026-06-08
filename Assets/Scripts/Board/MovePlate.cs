@@ -3,16 +3,16 @@ using UnityEngine;
 
 public class MovePlate : MonoBehaviour
 {
-    //MovePlate Æ÷Áö¼Ç
+    //MovePlate í¬ì§€ì…˜
     public Position Pos {  get; private set; }
 
-    // »ı¼ºÀÚ: Æ÷Áö¼Ç ¼¼ÆÃ
+    // ìƒì„±ì: í¬ì§€ì…˜ ì„¸íŒ…
     public void Init(Position pos)
     {
         Pos = pos;
     }
 
-    //¸¶¿ì½º Å¬¸¯½Ã
+    //ë§ˆìš°ìŠ¤ í´ë¦­ì‹œ
     private void OnMouseUpAsButton()
     {
         GameManager.Instance.board.OnClickMovePlate(this);

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 // 폰(앞으로 전진하고 대각선으로 잡으며, 프로모션과 앙파상이 가능한 체스 기물) 클래스

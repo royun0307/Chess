@@ -1,38 +1,38 @@
 using UnityEngine;
 
-// °ÔÀÓ ÀüÃ¼ Èå¸§À» °ü¸®ÇÏ´Â ¸Å´ÏÀú
-// ½Ì±ÛÅæÀ¸·Î Á¢±ÙÇÏ¸ç º¸µå, °ÔÀÓ »óÅÂ, ¿£ÁøÀ» °ü¸®ÇÔ
+// ê²Œì„ ì „ì²´ íë¦„ì„ ê´€ë¦¬í•˜ëŠ” ë§¤ë‹ˆì €
+// ì‹±ê¸€í†¤ìœ¼ë¡œ ì ‘ê·¼í•˜ë©° ë³´ë“œ, ê²Œì„ ìƒíƒœ, ì—”ì§„ì„ ê´€ë¦¬í•¨
 public class GameManager : MonoBehaviour
 {
-    // ½Ì±ÛÅæ ÀÎ½ºÅÏ½º ÀúÀå º¯¼ö
+    // ì‹±ê¸€í†¤ ì¸ìŠ¤í„´ìŠ¤ ì €ì¥ ë³€ìˆ˜
     private static GameManager instance;
 
-    // ¿ÜºÎ¿¡¼­ GameManager.Instance·Î Á¢±ÙÇÏ±â À§ÇÑ ÇÁ·ÎÆÛÆ¼
+    // ì™¸ë¶€ì—ì„œ GameManager.Instanceë¡œ ì ‘ê·¼í•˜ê¸° ìœ„í•œ í”„ë¡œí¼í‹°
     public static GameManager Instance {  get { return instance; } }
 
-    // Ã¼½ºÆÇ È­¸é ¹× ÀÔ·ÂÀ» °ü¸®ÇÏ´Â BoardManager
+    // ì²´ìŠ¤íŒ í™”ë©´ ë° ì…ë ¥ì„ ê´€ë¦¬í•˜ëŠ” BoardManager
     public BoardManager board;
 
-    // ÇöÁ¦ °ÔÀÓ ÁøÇà »óÅÂ¸¦ °ü¸®ÇÏ´Â GameState
+    // í˜„ì œ ê²Œì„ ì§„í–‰ ìƒíƒœë¥¼ ê´€ë¦¬í•˜ëŠ” GameState
     public GameState state;
 
-    // AI ¿£Áø µ¿ÀÛÀ» °ü¸®ÇÏ´Â EngineManager
+    // AI ì—”ì§„ ë™ì‘ì„ ê´€ë¦¬í•˜ëŠ” EngineManager
     public EngineManager engine;
 
     public void Awake()
     {
-        // ¾ÆÁ÷ ÀÎ½ºÅÏ½º°¡ ¾øÀ¸¸é ÇöÀç ¿ÀºêÁ§Æ®¸¦ ½Ì±ÛÅæ ÀÎ½ºÅÏ½º·Î µî·Ï
+        // ì•„ì§ ì¸ìŠ¤í„´ìŠ¤ê°€ ì—†ìœ¼ë©´ í˜„ì¬ ì˜¤ë¸Œì íŠ¸ë¥¼ ì‹±ê¸€í†¤ ì¸ìŠ¤í„´ìŠ¤ë¡œ ë“±ë¡
         if (instance == null)
         {
             instance = this;
 
-            // board°¡ ¿¬°áµÇÁö ¾Ê¾Ò´Ù¸é ÇöÀç ¿ÀºêÁ§Æ®¿¡ BoardManager Ãß°¡
+            // boardê°€ ì—°ê²°ë˜ì§€ ì•Šì•˜ë‹¤ë©´ í˜„ì¬ ì˜¤ë¸Œì íŠ¸ì— BoardManager ì¶”ê°€
             if(board == null)
             {
                 board = gameObject.AddComponent<BoardManager>();
             }
 
-            // engineÀÌ ¿¬°áµÇÁö ¾Ê¾Ò´Ù¸é ÇöÀç ¿ÀºêÁ§Æ®¿¡ EngineManager Ãß°¡
+            // engineì´ ì—°ê²°ë˜ì§€ ì•Šì•˜ë‹¤ë©´ í˜„ì¬ ì˜¤ë¸Œì íŠ¸ì— EngineManager ì¶”ê°€
             if(engine == null)
             {
                 engine = gameObject.AddComponent<EngineManager>();
@@ -40,27 +40,27 @@ public class GameManager : MonoBehaviour
         }
         else 
         { 
-            // ÀÌ¹Ì ÀÎ½ºÅÏ½º°¡ ÀÖÀ¸¸é Áßº¹ »ı¼ºµÈ °ÍÀÌ¹Ç·Î Á¦°Å
+            // ì´ë¯¸ ì¸ìŠ¤í„´ìŠ¤ê°€ ìˆìœ¼ë©´ ì¤‘ë³µ ìƒì„±ëœ ê²ƒì´ë¯€ë¡œ ì œê±°
             Destroy(this);
         }
     }
 
     private void Start()
     {
-        // ÀÌµ¿ °¡´É À§Ä¡ Ç¥½ÃÆÇ »ı¼º
+        // ì´ë™ ê°€ëŠ¥ ìœ„ì¹˜ í‘œì‹œíŒ ìƒì„±
         board.InitMovePlatform();
 
-        // °ÔÀÓ ½ÃÀÛ ¶Ç´Â Àç½ÃÀÛ
+        // ê²Œì„ ì‹œì‘ ë˜ëŠ” ì¬ì‹œì‘
         RestartGame();
     }
 
-    // °ÔÀÓÀ» ÃÊ±â »óÅÂ·Î ´Ù½Ã ½ÃÀÛÇÏ´Â ÇÔ¼ö
+    // ê²Œì„ì„ ì´ˆê¸° ìƒíƒœë¡œ ë‹¤ì‹œ ì‹œì‘í•˜ëŠ” í•¨ìˆ˜
     public void RestartGame()
     {
-        // º¸µå ÃÊ±âÈ­
+        // ë³´ë“œ ì´ˆê¸°í™”
         board.Init();
 
-        // ¹éºÎÅÍ ½ÃÀÛÇÏ´Â »õ·Î¿î °ÔÀÓ »óÅÂ »ı¼º
+        // ë°±ë¶€í„° ì‹œì‘í•˜ëŠ” ìƒˆë¡œìš´ ê²Œì„ ìƒíƒœ ìƒì„±
         state = new GameState(PlayerColor.White, board.board);
     }
 
