@@ -53,10 +53,10 @@ public class GameState
         Piece piece = Board[pos];
 
         // 말 종류별 가능한 이동 후보 생성
-        IEnumerable<Move> moveCandiates = piece.GetMoves(pos, Board);
+        IEnumerable<Move> moveCandidates = piece.GetMoves(pos, Board);
         
         // 그중 실제로 합법적인 수만 필터링해서 반환
-        return moveCandiates.Where(move => move.IsLegal(Board));
+        return moveCandidates.Where(move => move.IsLegal(Board));
     }
 
     // 실제로 수를 실행하고, 턴 변경 및 게임 종료 여부를 갱신
@@ -99,14 +99,14 @@ public class GameState
     {
         // 해당 플레이어의 모든 말 위치를 순회하면서
         // 각 말의 이동 후보를 모두 모음
-        IEnumerable<Move> moveCandiates = Board.PiecePositionsFor(player).SelectMany(pos =>
+        IEnumerable<Move> moveCandidates = Board.PiecePositionsFor(player).SelectMany(pos =>
         {
             Piece piece = Board[pos];
             return piece.GetMoves(pos, Board);
         });
 
         // 그중 실제 합법 수만 반환
-        return moveCandiates.Where(move => move.IsLegal(Board));
+        return moveCandidates.Where(move => move.IsLegal(Board));
     }
 
     // 체크메이트, 스테일메이트, 기물 부족, 50수 룰, 3회 반복 등을 검사
@@ -132,7 +132,7 @@ public class GameState
             Result = Result.Draw(EndReason.InsufficientMaterial);
         }
         // 50수 룰 만족 시 무승부
-        else if (FiftyMoveRules())
+        else if (FiftyMoveRule())
         {
             Result = Result.Draw(EndReason.FiftyMoveRule);
         }
@@ -151,7 +151,7 @@ public class GameState
     
     // 50수 룰 검사
     // 반수 100번 = 양쪽이 각각 50번씩 둔 것
-    private bool FiftyMoveRules()
+    private bool FiftyMoveRule()
     {
         int full_moves = no_capture_or_pawn_moves / 2;
         return full_moves >= 50;

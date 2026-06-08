@@ -10,7 +10,7 @@ public class Board
     // 앙파상(En Passant) 가능 판정을 위해,
     // 각 플레이어 기준 "상대가 직전에 2칸 전진한 폰의 위치"를 저장
     // ex) White 차례에서 Black의 skip position 확인
-    private readonly Dictionary<PlayerColor, Position> pawn_skip_postions = new Dictionary<PlayerColor, Position>
+    private readonly Dictionary<PlayerColor, Position> pawnSkipPostions = new Dictionary<PlayerColor, Position>
     {
         {PlayerColor.White, null },
         {PlayerColor.Black, null }
@@ -33,13 +33,13 @@ public class Board
     // 특정 플레이어 기준 저장된 pawn skip 위치 반환
     public Position GetPawnSkipPosition(PlayerColor player)
     {
-        return pawn_skip_postions[player];
+        return pawnSkipPostions[player];
     }
 
     // 특정 플레이어 기준 pawn skip 위치 설정
     public void SetPawnSkipPosition(PlayerColor player, Position pos)
     {
-        pawn_skip_postions[player] = pos;
+        pawnSkipPostions[player] = pos;
     }
 
     // 초기 배치된 새 보드 생성
@@ -139,8 +139,8 @@ public class Board
         }
 
         // 앙파상 관련 상태도 함께 복사
-        copy.SetPawnSkipPosition(PlayerColor.White, pawn_skip_postions[PlayerColor.White]);
-        copy.SetPawnSkipPosition(PlayerColor.Black, pawn_skip_postions[PlayerColor.Black]);
+        copy.SetPawnSkipPosition(PlayerColor.White, pawnSkipPostions[PlayerColor.White]);
+        copy.SetPawnSkipPosition(PlayerColor.Black, pawnSkipPostions[PlayerColor.Black]);
 
         return copy;
     }

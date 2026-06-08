@@ -1,8 +1,6 @@
-using Mono.Cecil;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting.Dependencies.NCalc;
 
 //간단한 체스 엔진 구현
 public class SimpleChessEngine : IChessEngine
@@ -99,9 +97,9 @@ public class SimpleChessEngine : IChessEngine
             var ms = st.AllLegalMovesFor(side_to_move);
 
             // 전술적 수(잡기, 프로모션)가 있는지 확인
-            bool hasTacticl = ms.Any(m => IsTacticalMove(board, m));
+            bool hasTactical = ms.Any(m => IsTacticalMove(board, m));
             // 전술 수가 없으면 정적 평가
-            if (!hasTacticl)
+            if (!hasTactical)
                 return eval;
 
             // 전술 수가 있으면 horizon effect 방지를 위해 퀘이선스 탐색
