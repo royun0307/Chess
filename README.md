@@ -71,6 +71,7 @@ Unity Test Framework 기반 EditMode 테스트를 통해 주요 체스 규칙을
 
 ## 프로젝트 구조
 
+```text
 Assets/
 ├─ Scripts/
 │  ├─ Board      # 보드 데이터, 위치, 이동 표시
@@ -91,6 +92,7 @@ Assets/
 
 이 프로젝트는 체스 규칙 로직과 Unity 화면 표시 로직을 분리하는 방향으로 설계했습니다.
 
+```text
 UI Layer
 ├─ Result UI
 ├─ Promotion UI
@@ -162,6 +164,7 @@ Unity 화면 표시와 입력 처리는 `BoardManager`, `GameManager`에서 담�
 
 강화학습 구조는 다음 흐름을 기준으로 설계했습니다.
 
+```text
 Board State
     ↓
 CollectObservations()
