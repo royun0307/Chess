@@ -1,38 +1,38 @@
 using UnityEngine;
 using System.Collections;
 
-// Ã¼½º AIÀÇ ¼ö¸¦ °è»êÇÏ°í ½ÇÇàÇÏ´Â ¸Å´ÏÀú
+// ì²´ìŠ¤ AIì˜ ìˆ˜ë¥¼ ê³„ì‚°í•˜ê³  ì‹¤í–‰í•˜ëŠ” ë§¤ë‹ˆì €
 public class EngineManager : MonoBehaviour
 {
-    // ½ÇÁ¦·Î ¼ö¸¦ °è»êÇÏ´Â Ã¼½º ¿£Áø °´Ã¼
+    // ì‹¤ì œë¡œ ìˆ˜ë¥¼ ê³„ì‚°í•˜ëŠ” ì²´ìŠ¤ ì—”ì§„ ê°ì²´
     private IChessEngine engine;
 
     private void Awake()
     {
-        // °ÔÀÓ ½ÃÀÛ ½Ã »ç¿ëÇÒ Ã¼½º ¿£Áø »ı¼º
+        // ê²Œì„ ì‹œì‘ ì‹œ ì‚¬ìš©í•  ì²´ìŠ¤ ì—”ì§„ ìƒì„±
         engine = new SimpleChessEngine();
     }
 
-    // AI Â÷·¹¸¦ ½ÃÀÛÇÏ´Â ÇÔ¼ö
+    // AI ì°¨ë ˆë¥¼ ì‹œì‘í•˜ëŠ” í•¨ìˆ˜
     public void EngineMove()
     {
-        // ÄÚ·çÆ¾À» ½ÇÇàÇØ¼­ ¾à°£ÀÇ µô·¹ÀÌ ÈÄ AI°¡ µÎµµ·Ï ÇÔ
+        // ì½”ë£¨í‹´ì„ ì‹¤í–‰í•´ì„œ ì•½ê°„ì˜ ë”œë ˆì´ í›„ AIê°€ ë‘ë„ë¡ í•¨
         StartCoroutine(AITurnCorutine());
     }
 
-    // AI°¡ ½ÇÁ¦·Î ¼ö¸¦ °è»êÇÏ°í ½ÇÇàÇÏ´Â ÄÚ·çÆ¾
+    // AIê°€ ì‹¤ì œë¡œ ìˆ˜ë¥¼ ê³„ì‚°í•˜ê³  ì‹¤í–‰í•˜ëŠ” ì½”ë£¨í‹´
     private IEnumerator AITurnCorutine()
     {
-        // ³Ê¹« Áï½Ã µÎÁö ¾Êµµ·Ï ¾àÇÑ ±â´Ù¸²
+        // ë„ˆë¬´ ì¦‰ì‹œ ë‘ì§€ ì•Šë„ë¡ ì•½í•œ ê¸°ë‹¤ë¦¼
         yield return new WaitForSeconds(0.1f);
 
-        // ÇöÀç º¸µå »óÅÂ¿Í ÇöÀç ÇÃ·¹ÀÌ¾î ±âÁØÀ¸·Î ¿£ÁøÀÌ °¡Àå ÁÁÀº ¼ö¸¦ °è»ê
+        // í˜„ì¬ ë³´ë“œ ìƒíƒœì™€ í˜„ì¬ í”Œë ˆì´ì–´ ê¸°ì¤€ìœ¼ë¡œ ì—”ì§„ì´ ê°€ì¥ ì¢‹ì€ ìˆ˜ë¥¼ ê³„ì‚°
         Move best = engine.GetBestMove(GameManager.Instance.board.board, GameManager.Instance.state.CurrentPlayer, depth: 3);
 
-        // °è»êµÈ ¼ö¸¦ °ÔÀÓ »óÅÂ¿¡ ¹İ¿µ
+        // ê³„ì‚°ëœ ìˆ˜ë¥¼ ê²Œì„ ìƒíƒœì— ë°˜ì˜
         GameManager.Instance.MakeMove(best);
 
-        // º¯°æµÈ º¸µå »óÅÂ¸¦ È­¸é¿¡ ´Ù½Ã ±×¸²
+        // ë³€ê²½ëœ ë³´ë“œ ìƒíƒœë¥¼ í™”ë©´ì— ë‹¤ì‹œ ê·¸ë¦¼
         GameManager.Instance.board.RedrawPiecesFromBoard();
     }
 }

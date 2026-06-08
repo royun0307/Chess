@@ -1,19 +1,19 @@
 using UnityEngine.UI;
 
-// ÀÏ½ÃÁ¤Áö È­¸éÀ» ´ã´çÇÏ´Â UI Å¬·¡½º
+// ì¼ì‹œì •ì§€ í™”ë©´ì„ ë‹´ë‹¹í•˜ëŠ” UI í´ë˜ìŠ¤
 public class PauseUI : BaseUI
 {
-    // ÀÏ½ÃÁ¤Áö ¹öÆ°
+    // ì¼ì‹œì •ì§€ ë²„íŠ¼
     public Button pause_button;
     
-    // Àç½ÃÀÛ ¹öÆ°
+    // ì¬ì‹œì‘ ë²„íŠ¼
     public Button restart_button;
     
-    // °è¼ÓÇÏ±â ¹öÆ°
+    // ê³„ì†í•˜ê¸° ë²„íŠ¼
     public Button continue_button;
 
-    // UI ÃÊ±âÈ­ ¹öÆ°
-    // ¹öÆ° Å¬¸¯ ÀÌº¥Æ®¸¦ °¢°¢ÀÇ Ã³¸® ÇÔ¼ö¿Í ¿¬°áÇÑ´Ù
+    // UI ì´ˆê¸°í™” ë²„íŠ¼
+    // ë²„íŠ¼ í´ë¦­ ì´ë²¤íŠ¸ë¥¼ ê°ê°ì˜ ì²˜ë¦¬ í•¨ìˆ˜ì™€ ì—°ê²°í•œë‹¤
     public override void Init(UIManager uiManager)
     {
         base.Init(uiManager);
@@ -23,49 +23,49 @@ public class PauseUI : BaseUI
         continue_button.onClick.AddListener(OnClickContinueButton);
     }
 
-    // ÀÌ UI°¡ ´ã´çÇÏ´Â »óÅÂ´Â Pause
+    // ì´ UIê°€ ë‹´ë‹¹í•˜ëŠ” ìƒíƒœëŠ” Pause
     protected override UIState GetUIState()
     {
         return UIState.Pause;
     }
 
-    // ÇöÀç »óÅÂ¿¡ µû¶ó UI È°¼ºÈ­ ¿©ºÎ¸¦ ¼³Á¤
-    // Pause »óÅÂ°¡ µé¾î¿À¸é Åä±Û ¹æ½ÄÀ¸·Î ÄÑ°í ²ô¸ç,
-    // ´Ù¸¥ »óÅÂ°¡ µé¾î¿À¸é ¹«Á¶°Ç ºñÈ°¼ºÈ­ÇÑ´Ù
+    // í˜„ì¬ ìƒíƒœì— ë”°ë¼ UI í™œì„±í™” ì—¬ë¶€ë¥¼ ì„¤ì •
+    // Pause ìƒíƒœê°€ ë“¤ì–´ì˜¤ë©´ í† ê¸€ ë°©ì‹ìœ¼ë¡œ ì¼œê³  ë„ë©°,
+    // ë‹¤ë¥¸ ìƒíƒœê°€ ë“¤ì–´ì˜¤ë©´ ë¬´ì¡°ê±´ ë¹„í™œì„±í™”í•œë‹¤
     public override void SetActive(UIState uIState)
     {
-        // ÇöÀç ¿ÀºêÁ§Æ®°¡ È°¼ºÈ­µÇ¾î ÀÖ´ÂÁö È®ÀÎ
+        // í˜„ì¬ ì˜¤ë¸Œì íŠ¸ê°€ í™œì„±í™”ë˜ì–´ ìˆëŠ”ì§€ í™•ì¸
         bool isActive = gameObject.activeSelf;
 
-        // Àü´ŞµÈ »óÅÂ°¡ Pause »óÅÂ¶ó¸é ÇöÀç »óÅÂ¸¦ ¹İÀü½ÃÄÑ Åä±Û
+        // ì „ë‹¬ëœ ìƒíƒœê°€ Pause ìƒíƒœë¼ë©´ í˜„ì¬ ìƒíƒœë¥¼ ë°˜ì „ì‹œì¼œ í† ê¸€
         if (uIState == GetUIState())
         {
             gameObject.SetActive(!isActive);
         }
         else
         {
-            // Pause »óÅÂ°¡ ¾Æ´Ï¸é ºñÈ°¼ºÈ­
+            // Pause ìƒíƒœê°€ ì•„ë‹ˆë©´ ë¹„í™œì„±í™”
             gameObject.SetActive(false);
         }
     }
 
-    // ÀÏ½ÃÁ¤Áö ¹öÆ° Å¬¸¯ ½Ã È£Ãâ
-    // Pause UI¸¦ Åä±ÛÇÑ´Ù
+    // ì¼ì‹œì •ì§€ ë²„íŠ¼ í´ë¦­ ì‹œ í˜¸ì¶œ
+    // Pause UIë¥¼ í† ê¸€í•œë‹¤
     void OnClickPauseButton()
     {
         SetActive(UIState.Pause);
     }
 
-    // Àç½ÃÀÛ ¹öÆ° Å¬¸¯ ½Ã È£Ãâ
-    // °ÔÀÓÀ» Àç½ÃÀÛÇÏ°í UI »óÅÂ¸¦ NoneÀ¸·Î º¯°æÇÑ´Ù
+    // ì¬ì‹œì‘ ë²„íŠ¼ í´ë¦­ ì‹œ í˜¸ì¶œ
+    // ê²Œì„ì„ ì¬ì‹œì‘í•˜ê³  UI ìƒíƒœë¥¼ Noneìœ¼ë¡œ ë³€ê²½í•œë‹¤
     void OnClickRestartButton()
     {
         uiManager.OnClickRestartButton();
         uiManager.ChangeState(UIState.None);
     }
 
-    // °è¼ÓÇÏ±â ¹öÆ° Å¬¸¯ ½Ã È£Ãâ
-    // Pause UI¸¦ ´İ°í ÀÏ¹İ »óÅÂ·Î µ¹¾Æ°£´Ù
+    // ê³„ì†í•˜ê¸° ë²„íŠ¼ í´ë¦­ ì‹œ í˜¸ì¶œ
+    // Pause UIë¥¼ ë‹«ê³  ì¼ë°˜ ìƒíƒœë¡œ ëŒì•„ê°„ë‹¤
     void OnClickContinueButton()
     {
         uiManager.ChangeState(UIState.None);

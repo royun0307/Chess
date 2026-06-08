@@ -16,7 +16,7 @@ public class ChessRuleTests
             BindingFlags.Instance | BindingFlags.NonPublic
         );
 
-        Assert.NotNull(method, "GameState.CheckForGameOver() private ¸Ş¼­µå¸¦ Ã£Áö ¸øÇß½À´Ï´Ù.");
+        Assert.NotNull(method, "GameState.CheckForGameOver() private ë©”ì„œë“œë¥¼ ì°¾ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.");
         method.Invoke(state, null);
     }
 
@@ -39,8 +39,8 @@ public class ChessRuleTests
         board[P(7, 4)] = new King(PlayerColor.White);
         board[P(0, 4)] = new King(PlayerColor.Black);
 
-        board[P(3, 4)] = new Pawn(PlayerColor.White); // e5¿¡ white pawn À§Ä¡
-        board[P(3, 5)] = new Pawn(PlayerColor.Black); // f5¿¡ black pawn À§Ä¡
+        board[P(3, 4)] = new Pawn(PlayerColor.White); // e5ì— white pawn ìœ„ì¹˜
+        board[P(3, 5)] = new Pawn(PlayerColor.Black); // f5ì— black pawn ìœ„ì¹˜
 
         board.SetPawnSkipPosition(PlayerColor.Black, P(2, 5));
 
@@ -50,9 +50,9 @@ public class ChessRuleTests
 
         move.Execute(board);
 
-        Assert.IsNull(board[P(3, 5)], "¾ÓÆÄ»óÀ¸·Î ÀâÈù °ËÀº ÆùÀÌ Á¦°ÅµÇ¾î¾ß ÇÕ´Ï´Ù.");
-        Assert.IsNull(board[P(3, 4)], "±âÁ¸ À§Ä¡´Â ºñ¾î¾ß ÇÕ´Ï´Ù.");
-        Assert.NotNull(board[P(2, 5)], "¹é ÆùÀÌ ¾ÓÆÄ»ó µµÂø À§Ä¡·Î ÀÌµ¿ÇØ¾ß ÇÕ´Ï´Ù.");
+        Assert.IsNull(board[P(3, 5)], "ì•™íŒŒìƒìœ¼ë¡œ ì¡íŒ ê²€ì€ í°ì´ ì œê±°ë˜ì–´ì•¼ í•©ë‹ˆë‹¤.");
+        Assert.IsNull(board[P(3, 4)], "ê¸°ì¡´ ìœ„ì¹˜ëŠ” ë¹„ì–´ì•¼ í•©ë‹ˆë‹¤.");
+        Assert.NotNull(board[P(2, 5)], "ë°± í°ì´ ì•™íŒŒìƒ ë„ì°© ìœ„ì¹˜ë¡œ ì´ë™í•´ì•¼ í•©ë‹ˆë‹¤.");
         Assert.AreEqual(PieceType.Pawn, board[P(2, 5)].Type);
         Assert.AreEqual(PlayerColor.White, board[P(2, 5)].Color);
     }
@@ -62,8 +62,8 @@ public class ChessRuleTests
     {
         Board board = Board.Initial();
 
-        board[P(7, 5)] = null; // f1 white bishop Á¦°Å
-        board[P(7, 6)] = null; // g1 white knight Á¦°Å
+        board[P(7, 5)] = null; // f1 white bishop ì œê±°
+        board[P(7, 6)] = null; // g1 white knight ì œê±°
 
         GameState state = new GameState(PlayerColor.White, board);
 
@@ -86,14 +86,14 @@ public class ChessRuleTests
         board[P(7, 4)] = new King(PlayerColor.White);
         board[P(0, 4)] = new King(PlayerColor.Black);
 
-        board[P(1, 0)] = new Pawn(PlayerColor.White); // a7 white pawn À§Ä¡
+        board[P(1, 0)] = new Pawn(PlayerColor.White); // a7 white pawn ìœ„ì¹˜
 
         Move move = new PawnPromotion(P(1, 0), P(0, 0), PieceType.Queen);
 
         move.Execute(board);
 
-        Assert.IsNull(board[P(1, 0)], "½Â±Ş Àü Æù À§Ä¡´Â ºñ¾î¾ß ÇÕ´Ï´Ù.");
-        Assert.NotNull(board[P(0, 0)], "½Â±Ş À§Ä¡¿¡ »õ ±â¹°ÀÌ ÀÖ¾î¾ß ÇÕ´Ï´Ù.");
+        Assert.IsNull(board[P(1, 0)], "ìŠ¹ê¸‰ ì „ í° ìœ„ì¹˜ëŠ” ë¹„ì–´ì•¼ í•©ë‹ˆë‹¤.");
+        Assert.NotNull(board[P(0, 0)], "ìŠ¹ê¸‰ ìœ„ì¹˜ì— ìƒˆ ê¸°ë¬¼ì´ ìˆì–´ì•¼ í•©ë‹ˆë‹¤.");
         Assert.AreEqual(PieceType.Queen, board[P(0, 0)].Type);
         Assert.AreEqual(PlayerColor.White, board[P(0, 0)].Color);
         Assert.IsTrue(board[P(0, 0)].hasMoved);
@@ -104,9 +104,9 @@ public class ChessRuleTests
     {
         Board board = new Board();
 
-        board[P(7, 4)] = new King(PlayerColor.White); // e1 white king À§Ä¡
+        board[P(7, 4)] = new King(PlayerColor.White); // e1 white king ìœ„ì¹˜
         board[P(0, 0)] = new King(PlayerColor.Black);
-        board[P(0, 4)] = new Rook(PlayerColor.Black); // e8 black rook À§Ä¡
+        board[P(0, 4)] = new Rook(PlayerColor.Black); // e8 black rook ìœ„ì¹˜
 
         Assert.IsTrue(board.IsInCheck(PlayerColor.White));
     }
@@ -116,9 +116,9 @@ public class ChessRuleTests
     {
         Board board = new Board();
 
-        board[P(0, 0)] = new King(PlayerColor.Black);  // a8 black king À§Ä¡
-        board[P(1, 1)] = new Queen(PlayerColor.White); // b7 white queen À§Ä¡
-        board[P(2, 2)] = new King(PlayerColor.White);  // c6 white king À§Ä¡
+        board[P(0, 0)] = new King(PlayerColor.Black);  // a8 black king ìœ„ì¹˜
+        board[P(1, 1)] = new Queen(PlayerColor.White); // b7 white queen ìœ„ì¹˜
+        board[P(2, 2)] = new King(PlayerColor.White);  // c6 white king ìœ„ì¹˜
 
         GameState state = new GameState(PlayerColor.Black, board);
 
@@ -135,9 +135,9 @@ public class ChessRuleTests
     {
         Board board = new Board();
 
-        board[P(0, 0)] = new King(PlayerColor.Black);  // a8 black king À§Ä¡
-        board[P(1, 2)] = new Queen(PlayerColor.White); // c7 white queen À§Ä¡
-        board[P(2, 2)] = new King(PlayerColor.White);  // c6 white king À§Ä¡
+        board[P(0, 0)] = new King(PlayerColor.Black);  // a8 black king ìœ„ì¹˜
+        board[P(1, 2)] = new Queen(PlayerColor.White); // c7 white queen ìœ„ì¹˜
+        board[P(2, 2)] = new King(PlayerColor.White);  // c6 white king ìœ„ì¹˜
 
         GameState state = new GameState(PlayerColor.Black, board);
 

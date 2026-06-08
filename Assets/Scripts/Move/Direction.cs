@@ -1,54 +1,54 @@
 public class Direction
 {
-    // À§ÂÊÀ¸·Î ÀÌµ¿ÇÏ´Â ¹æÇâ ´ÜÀ§ º¤ÅÍ
-    // Çà(row)Àº °¨¼ÒÇÏ°í, ¿­(col)Àº ±×´ë·Î
+    // ìœ„ìª½ìœ¼ë¡œ ì´ë™í•˜ëŠ” ë°©í–¥ ë‹¨ìœ„ ë²¡í„°
+    // í–‰(row)ì€ ê°ì†Œí•˜ê³ , ì—´(col)ì€ ê·¸ëŒ€ë¡œ
     public readonly static Direction North = new Direction(-1, 0);
 
-    // ¾Æ·¡ÂÊÀ¸·Î ÀÌµ¿ÇÏ´Â ¹æÇâ ´ÜÀ§ º¤ÅÍ
-    // Çà(row)Àº Áõ°¡ÇÏ°í, ¿­(col)Àº ±×´ë·Î
+    // ì•„ë˜ìª½ìœ¼ë¡œ ì´ë™í•˜ëŠ” ë°©í–¥ ë‹¨ìœ„ ë²¡í„°
+    // í–‰(row)ì€ ì¦ê°€í•˜ê³ , ì—´(col)ì€ ê·¸ëŒ€ë¡œ
     public readonly static Direction South = new Direction(1, 0);
 
-    // ¿À¸¥ÂÊÀ¸·Î ÀÌµ¿ÇÏ´Â ¹æÇâ ´ÜÀ§ º¤ÅÍ
-    // Çà(row)Àº ±×´ë·Î, ¿­(col)Àº Áõ°¡
+    // ì˜¤ë¥¸ìª½ìœ¼ë¡œ ì´ë™í•˜ëŠ” ë°©í–¥ ë‹¨ìœ„ ë²¡í„°
+    // í–‰(row)ì€ ê·¸ëŒ€ë¡œ, ì—´(col)ì€ ì¦ê°€
     public readonly static Direction East = new Direction(0, 1);
 
-    // ¿ŞÂÊÀ¸·Î ÀÌµ¿ÇÏ´Â ¹æÇâ ´ÜÀ§ º¤ÅÍ
-    // Çà(row)Àº ±×´ë·Î, ¿­(col)Àº °¨¼Ò
+    // ì™¼ìª½ìœ¼ë¡œ ì´ë™í•˜ëŠ” ë°©í–¥ ë‹¨ìœ„ ë²¡í„°
+    // í–‰(row)ì€ ê·¸ëŒ€ë¡œ, ì—´(col)ì€ ê°ì†Œ
     public readonly static Direction West = new Direction(0, -1);
 
-    // ´ë°¢¼± ¹æÇâ ´ÜÀ§ º¤ÅÍµé
-    // ±âÁ¸ ¹æÇâ ´ÜÀ§ º¤ÅÍµéÀ» ´õÇØ¼­ »ı¼º
-    public readonly static Direction NorthEast = North + East; // ¿À¸¥ÂÊ À§
-    public readonly static Direction NorthWest = North + West; // ¿ŞÂÊ À§
-    public readonly static Direction SouthEast = South + East; // ¿À¸¥ÂÊ ¾Æ·¡
-    public readonly static Direction SouthWest = South + West; // ¿ŞÂÊ ¾Æ·¡
+    // ëŒ€ê°ì„  ë°©í–¥ ë‹¨ìœ„ ë²¡í„°ë“¤
+    // ê¸°ì¡´ ë°©í–¥ ë‹¨ìœ„ ë²¡í„°ë“¤ì„ ë”í•´ì„œ ìƒì„±
+    public readonly static Direction NorthEast = North + East; // ì˜¤ë¥¸ìª½ ìœ„
+    public readonly static Direction NorthWest = North + West; // ì™¼ìª½ ìœ„
+    public readonly static Direction SouthEast = South + East; // ì˜¤ë¥¸ìª½ ì•„ë˜
+    public readonly static Direction SouthWest = South + West; // ì™¼ìª½ ì•„ë˜
 
-    // Çà ¹æÇâ º¯È­·®
-    // ¿¹: À§·Î °¡¸é -1, ¾Æ·¡·Î °¡¸é +1
+    // í–‰ ë°©í–¥ ë³€í™”ëŸ‰
+    // ì˜ˆ: ìœ„ë¡œ ê°€ë©´ -1, ì•„ë˜ë¡œ ê°€ë©´ +1
     public int row_delta { get; }
 
-    // ¿­ ¹æÇâ º¯È­·®
-    // ¿¹: ¿ŞÂÊÀ¸·Î °¡¸é -1, ¿À¸¥ÂÊÀ¸·Î °¡¸é +1
+    // ì—´ ë°©í–¥ ë³€í™”ëŸ‰
+    // ì˜ˆ: ì™¼ìª½ìœ¼ë¡œ ê°€ë©´ -1, ì˜¤ë¥¸ìª½ìœ¼ë¡œ ê°€ë©´ +1
     public int col_delta { get; }
 
     public Direction(int row_delta, int col_delta)
     {
-        // ¹æÇâÀÌ °¡Áö´Â Çà/¿­ º¯È­·® ÀúÀå
+        // ë°©í–¥ì´ ê°€ì§€ëŠ” í–‰/ì—´ ë³€í™”ëŸ‰ ì €ì¥
         this.row_delta = row_delta;
         this.col_delta = col_delta;
     }
 
     public static Direction operator +(Direction dir1, Direction dir2)
     {
-        // µÎ ¹æÇâÀ» ´õÇØ¼­ »õ·Î¿î “‡Çâ »ı¼º
-        // ¿¹: North + East = NorthEast
+        // ë‘ ë°©í–¥ì„ ë”í•´ì„œ ìƒˆë¡œìš´ ë±¡í–¥ ìƒì„±
+        // ì˜ˆ: North + East = NorthEast
         return new Direction(dir1.row_delta + dir2.row_delta, dir1.col_delta + dir2.col_delta);
     }
 
     public static Direction operator *(int scalar, Direction dir)
     {
-        // ¹æÇâ¿¡ Á¤¼ö¸¦ °öÇØ¼­ ÀÌµ¿°Å¸® È®Àå
-        // ¿¹: 2 * North = À§·Î 2Ä­
+        // ë°©í–¥ì— ì •ìˆ˜ë¥¼ ê³±í•´ì„œ ì´ë™ê±°ë¦¬ í™•ì¥
+        // ì˜ˆ: 2 * North = ìœ„ë¡œ 2ì¹¸
         return new Direction(scalar * dir.row_delta, scalar * dir.col_delta);
     }
 }

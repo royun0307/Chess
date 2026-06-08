@@ -43,7 +43,7 @@ public class ChessAgent : Agent
 
         Board board = state.Board;
 
-        // 1. º¸µå 64Ä­ °üÂû
+        // 1. ë³´ë“œ 64ì¹¸ ê´€ì°°
         for (int row = 0; row < 8; row++)
         {
             for (int col = 0; col < 8; col++)
@@ -53,16 +53,16 @@ public class ChessAgent : Agent
             }
         }
 
-        // 2. ÇöÀç ÅÏ
+        // 2. í˜„ì¬ í„´
         sensor.AddObservation(state.CurrentPlayer == PlayerColor.White ? 1f : -1f);
 
-        // 3. Ä³½½¸µ °¡´É ¿©ºÎ
+        // 3. ìºìŠ¬ë§ ê°€ëŠ¥ ì—¬ë¶€
         sensor.AddObservation(board.CastleRightKS(PlayerColor.White) ? 1f : 0f);
         sensor.AddObservation(board.CastleRightQS(PlayerColor.White) ? 1f : 0f);
         sensor.AddObservation(board.CastleRightKS(PlayerColor.Black) ? 1f : 0f);
         sensor.AddObservation(board.CastleRightQS(PlayerColor.Black) ? 1f : 0f);
 
-        // 4. ¾ÓÆÄ»ó °¡´É ¿©ºÎ
+        // 4. ì•™íŒŒìƒ ê°€ëŠ¥ ì—¬ë¶€
         sensor.AddObservation(board.CanCaptureEnPassant(PlayerColor.White) ? 1f : 0f);
         sensor.AddObservation(board.CanCaptureEnPassant(PlayerColor.Black) ? 1f : 0f);
     }
@@ -89,7 +89,7 @@ public class ChessAgent : Agent
         {
             UnityEngine.Debug.LogWarning("Agent has no legal moves. Ending episode.");
 
-            // ¹é Â÷·ÊÀÎµ¥ µÑ ¼ö ÀÖ´Â ¼ö°¡ ¾øÀ¸¸é Ã¼Å©¸ŞÀÌÆ® ¶Ç´Â ½ºÅ×ÀÏ¸ŞÀÌÆ®
+            // ë°± ì°¨ë¡€ì¸ë° ë‘˜ ìˆ˜ ìˆëŠ” ìˆ˜ê°€ ì—†ìœ¼ë©´ ì²´í¬ë©”ì´íŠ¸ ë˜ëŠ” ìŠ¤í…Œì¼ë©”ì´íŠ¸
             GiveResultReward(agentColor);
             EndEpisode();
             return;
@@ -106,13 +106,13 @@ public class ChessAgent : Agent
 
         float beforeScore = EvaluateBoard(state.Board, agentColor);
 
-        // 1. ¹é Agent ¼ö ½ÇÇà
+        // 1. ë°± Agent ìˆ˜ ì‹¤í–‰
         Move selectMove = legalMoves[actionIndex];
 
         state.MakeMoveForTraining(selectMove);
 
-        // ¹éÀÌ µĞ µÚ¿¡´Â Èæ Â÷·Ê.
-        // ÈæÀÌ µÑ ¼ö ¾øÀ¸¸é °ÔÀÓ Á¾·á.
+        // ë°±ì´ ë‘” ë’¤ì—ëŠ” í‘ ì°¨ë¡€.
+        // í‘ì´ ë‘˜ ìˆ˜ ì—†ìœ¼ë©´ ê²Œì„ ì¢…ë£Œ.
         List<Move> opponentMoves = GetLegalMovesForTraining(opponentColor, "Opponent");
 
         if (opponentMoves.Count == 0)
@@ -122,11 +122,11 @@ public class ChessAgent : Agent
             return;
         }
 
-        // 2. Èæ ÀÚµ¿ ¼ö ½ÇÇà
+        // 2. í‘ ìë™ ìˆ˜ ì‹¤í–‰
         PlayRandomOpponentMove(opponentMoves);
 
-        // ÈæÀÌ µĞ µÚ¿¡´Â ¹é Â÷·Ê.
-        // ¹éÀÌ µÑ ¼ö ¾øÀ¸¸é °ÔÀÓ Á¾·á.
+        // í‘ì´ ë‘” ë’¤ì—ëŠ” ë°± ì°¨ë¡€.
+        // ë°±ì´ ë‘˜ ìˆ˜ ì—†ìœ¼ë©´ ê²Œì„ ì¢…ë£Œ.
         legalMoves = GetLegalMovesForTraining(agentColor, "Agent");
 
         if (legalMoves.Count == 0)
@@ -138,10 +138,10 @@ public class ChessAgent : Agent
 
         float afterScore = EvaluateBoard(state.Board, agentColor);
 
-        // 3. ¹é ±âÁØ ±â¹° ÀÌµæ º¸»ó
+        // 3. ë°± ê¸°ì¤€ ê¸°ë¬¼ ì´ë“ ë³´ìƒ
         AddReward((afterScore - beforeScore) * 0.01f);
 
-        // 4. ³Ê¹« ±ä °ÔÀÓ ¹æÁö
+        // 4. ë„ˆë¬´ ê¸´ ê²Œì„ ë°©ì§€
         AddReward(-0.001f);
 
         turnCount++;
@@ -300,18 +300,18 @@ public class ChessAgent : Agent
         {
             if (playerToMove == opponentColor)
             {
-                // ÈæÀÌ µÑ Â÷·ÊÀÎµ¥ Ã¼Å©¸ŞÀÌÆ®¸é ¹é Agent ½Â¸®
+                // í‘ì´ ë‘˜ ì°¨ë¡€ì¸ë° ì²´í¬ë©”ì´íŠ¸ë©´ ë°± Agent ìŠ¹ë¦¬
                 AddReward(1f);
             }
             else
             {
-                // ¹éÀÌ µÑ Â÷·ÊÀÎµ¥ Ã¼Å©¸ŞÀÌÆ®¸é ¹é Agent ÆĞ¹è
+                // ë°±ì´ ë‘˜ ì°¨ë¡€ì¸ë° ì²´í¬ë©”ì´íŠ¸ë©´ ë°± Agent íŒ¨ë°°
                 AddReward(-1f);
             }
         }
         else
         {
-            // µÑ ¼ö ÀÖ´Â ¼ö°¡ ¾ø´Âµ¥ Ã¼Å©°¡ ¾Æ´Ï¸é ½ºÅ×ÀÏ¸ŞÀÌÆ®
+            // ë‘˜ ìˆ˜ ìˆëŠ” ìˆ˜ê°€ ì—†ëŠ”ë° ì²´í¬ê°€ ì•„ë‹ˆë©´ ìŠ¤í…Œì¼ë©”ì´íŠ¸
             AddReward(-0.1f);
         }
     }

@@ -2,43 +2,43 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-// Æù ½Â±Ş ½Ã ¾î¶² ±â¹°·Î ¹Ù²ÜÁö ¼±ÅÃÇÏ´Â UI Å¬·¡½º
+// í° ìŠ¹ê¸‰ ì‹œ ì–´ë–¤ ê¸°ë¬¼ë¡œ ë°”ê¿€ì§€ ì„ íƒí•˜ëŠ” UI í´ë˜ìŠ¤
 public class PromotionUI : BaseUI
 {
-    // ¹é»ö ³ªÀÌÆ® ½ºÇÁ¶óÀÌÆ®
+    // ë°±ìƒ‰ ë‚˜ì´íŠ¸ ìŠ¤í”„ë¼ì´íŠ¸
     public Sprite white_knight;
-    // Èæ»ö ³ªÀÌÆ® ½ºÇÁ¶óÀÌÆ®
+    // í‘ìƒ‰ ë‚˜ì´íŠ¸ ìŠ¤í”„ë¼ì´íŠ¸
     public Sprite black_knight;
 
-    // ¹é»ö ºñ¼ó ½ºÇÁ¶óÀÌÆ®
+    // ë°±ìƒ‰ ë¹„ìˆ ìŠ¤í”„ë¼ì´íŠ¸
     public Sprite white_bishop;
-    // Èæ»ö ºñ¼ó ½ºÇÁ¶óÀÌÆ®
+    // í‘ìƒ‰ ë¹„ìˆ ìŠ¤í”„ë¼ì´íŠ¸
     public Sprite black_bishop;
 
-    // ¹é»ö ·è ½ºÇÁ¶óÀÌÆ®
+    // ë°±ìƒ‰ ë£© ìŠ¤í”„ë¼ì´íŠ¸
     public Sprite white_rook;
-    // Èæ»ö ·è ½ºÇÁ¶óÀÌÆ®
+    // í‘ìƒ‰ ë£© ìŠ¤í”„ë¼ì´íŠ¸
     public Sprite black_rook;
 
-    // ¹é»ö Äı ½ºÇÁ¶óÀÌÆ®
+    // ë°±ìƒ‰ í€¸ ìŠ¤í”„ë¼ì´íŠ¸
     public Sprite white_queen;
-    // Èæ»ö Äı ½ºÇÁ¶óÀÌÆ®
+    // í‘ìƒ‰ í€¸ ìŠ¤í”„ë¼ì´íŠ¸
     public Sprite black_queen;
 
-    // ³ªÀÌÆ® ¼±ÅÃ ¹öÆ°ÀÌ ºÙ¾î ÀÖ´Â ¿ÀºêÁ§Æ®
+    // ë‚˜ì´íŠ¸ ì„ íƒ ë²„íŠ¼ì´ ë¶™ì–´ ìˆëŠ” ì˜¤ë¸Œì íŠ¸
     public GameObject knight_image;
-    // ºñ¼ó ¼±ÅÃ ¹öÆ°ÀÌ ºÙ¾î ÀÖ´Â ¿ÀºêÁ§Æ®
+    // ë¹„ìˆ ì„ íƒ ë²„íŠ¼ì´ ë¶™ì–´ ìˆëŠ” ì˜¤ë¸Œì íŠ¸
     public GameObject bishop_image;
-    // ·è ¼±ÅÃ ¹öÆ°ÀÌ ºÙ¾î ÀÖ´Â ¿ÀºêÁ§Æ®
+    // ë£© ì„ íƒ ë²„íŠ¼ì´ ë¶™ì–´ ìˆëŠ” ì˜¤ë¸Œì íŠ¸
     public GameObject rook_image;
-    // Äı ¼±ÅÃ ¹öÆ°ÀÌ ºÙ¾î ÀÖ´Â ¿ÀºêÁ§Æ®
+    // í€¸ ì„ íƒ ë²„íŠ¼ì´ ë¶™ì–´ ìˆëŠ” ì˜¤ë¸Œì íŠ¸
     public GameObject quenn_image;
 
-    // ½Â±Ş ±â¹°ÀÌ ¼±ÅÃµÇ¾úÀ» ¶§ È£ÃâµÇ´Â ÀÌº¥Æ®
+    // ìŠ¹ê¸‰ ê¸°ë¬¼ì´ ì„ íƒë˜ì—ˆì„ ë•Œ í˜¸ì¶œë˜ëŠ” ì´ë²¤íŠ¸
     public event Action<PieceType> select_promotion;
 
-    // UI ÃÊ±âÈ­ Á¡¼ö
-    // °¢ ¹öÆ° Å¬¸¯ ÀÌº¥Æ®¸¦ ½Â±Ş Ã³¸® ÇÔ¼ö¿Í ¿¬°áÇÑ´Ù
+    // UI ì´ˆê¸°í™” ì ìˆ˜
+    // ê° ë²„íŠ¼ í´ë¦­ ì´ë²¤íŠ¸ë¥¼ ìŠ¹ê¸‰ ì²˜ë¦¬ í•¨ìˆ˜ì™€ ì—°ê²°í•œë‹¤
     public override void Init(UIManager uiManager)
     {
         base.Init(uiManager);
@@ -49,13 +49,13 @@ public class PromotionUI : BaseUI
         quenn_image.GetComponent<Button>().onClick.AddListener(OnClickQuennPromotion);
     }
 
-    // ÀÌ UI°¡ ´ã´çÇÏ´Â »óÅÂ´Â Promotion
+    // ì´ UIê°€ ë‹´ë‹¹í•˜ëŠ” ìƒíƒœëŠ” Promotion
     protected override UIState GetUIState()
     {
         return UIState.Promotion;
     }
 
-    // ÇöÀç ÅÏÀÇ ÇÃ·¹ÀÌÀÌ »ö»ó¿¡ ¸Â°Ô ½Â±Ş UI ÀÌ¹ÌÁö¸¦ ¼³Á¤
+    // í˜„ì¬ í„´ì˜ í”Œë ˆì´ì´ ìƒ‰ìƒì— ë§ê²Œ ìŠ¹ê¸‰ UI ì´ë¯¸ì§€ë¥¼ ì„¤ì •
     public void SetUI()
     {
         if(GameManager.Instance.state.CurrentPlayer == PlayerColor.White)
@@ -74,43 +74,43 @@ public class PromotionUI : BaseUI
         }
     }
 
-    // UI È°¼ºÈ­ »óÅÂ¸¦ ¼³Á¤
-    // È°¼ºÈ­/ºñÈ°¼ºÈ­°¡ ÀÌ·ç¾îÁø µÚ ÀÌÀü¿¡ µî·ÏµÈ ½Â±Ş ÀÌº¥Æ®¸¦ ÃÊ±âÈ­ÇÑ´Ù
+    // UI í™œì„±í™” ìƒíƒœë¥¼ ì„¤ì •
+    // í™œì„±í™”/ë¹„í™œì„±í™”ê°€ ì´ë£¨ì–´ì§„ ë’¤ ì´ì „ì— ë“±ë¡ëœ ìŠ¹ê¸‰ ì´ë²¤íŠ¸ë¥¼ ì´ˆê¸°í™”í•œë‹¤
     public override void SetActive(UIState state)
     {
         base.SetActive(state);
         ResetAction();
     }
 
-    // ³ªÀÌÆ® ½Â±Ş ¹öÆ° Å¬¸¯ ½Ã È£Ãâ
+    // ë‚˜ì´íŠ¸ ìŠ¹ê¸‰ ë²„íŠ¼ í´ë¦­ ì‹œ í˜¸ì¶œ
     private void OnClickKnightPromotion()
     {
         select_promotion?.Invoke(PieceType.Knight);
         uiManager.ChangeState(UIState.None);
     }
 
-    // ºñ¼ó ½Â±Ş ¹öÆ° Å¬¸¯ ½Ã È£Ãâ
+    // ë¹„ìˆ ìŠ¹ê¸‰ ë²„íŠ¼ í´ë¦­ ì‹œ í˜¸ì¶œ
     private void OnClickBishopPromotion()
     {
         select_promotion?.Invoke(PieceType.Bishop);
         uiManager.ChangeState(UIState.None);
     }
 
-    // ·è ½Â±Ş ¹öÆ° Å¬¸¯ ½Ã È£Ãâ
+    // ë£© ìŠ¹ê¸‰ ë²„íŠ¼ í´ë¦­ ì‹œ í˜¸ì¶œ
     private void OnClickRookPromotion() 
     {
         select_promotion?.Invoke(PieceType.Rook);
         uiManager.ChangeState(UIState.None);
     }
 
-    // Äı ½Â±Ş ¹öÆ° Å¬¸¯ ½Ã È£Ãâ
+    // í€¸ ìŠ¹ê¸‰ ë²„íŠ¼ í´ë¦­ ì‹œ í˜¸ì¶œ
     private void OnClickQuennPromotion()
     {
         select_promotion?.Invoke(PieceType.Queen);
         uiManager.ChangeState(UIState.None);
     }
 
-    // µî·ÏµÈ ½Â±Ş ÀÌº¥Æ®¸¦ ÃÊ±âÈ­
+    // ë“±ë¡ëœ ìŠ¹ê¸‰ ì´ë²¤íŠ¸ë¥¼ ì´ˆê¸°í™”
     public void ResetAction()
     {
         select_promotion = null;

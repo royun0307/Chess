@@ -4,45 +4,45 @@ using System.Linq;
 
 public class Board
 {
-    // Ã¼½ºÆÇ(8x8). °¢ Ä­¿¡ Piece ¶Ç´Â null ÀúÀå
+    // ì²´ìŠ¤íŒ(8x8). ê° ì¹¸ì— Piece ë˜ëŠ” null ì €ì¥
     private readonly Piece[,] pieces = new Piece[8, 8];
 
-    // ¾ÓÆÄ»ó(En Passant) °¡´É ÆÇÁ¤À» À§ÇØ,
-    // °¢ ÇÃ·¹ÀÌ¾î ±âÁØ "»ó´ë°¡ Á÷Àü¿¡ 2Ä­ ÀüÁøÇÑ ÆùÀÇ À§Ä¡"¸¦ ÀúÀå
-    // ex) White Â÷·Ê¿¡¼­ BlackÀÇ skip position È®ÀÎ
+    // ì•™íŒŒìƒ(En Passant) ê°€ëŠ¥ íŒì •ì„ ìœ„í•´,
+    // ê° í”Œë ˆì´ì–´ ê¸°ì¤€ "ìƒëŒ€ê°€ ì§ì „ì— 2ì¹¸ ì „ì§„í•œ í°ì˜ ìœ„ì¹˜"ë¥¼ ì €ì¥
+    // ex) White ì°¨ë¡€ì—ì„œ Blackì˜ skip position í™•ì¸
     private readonly Dictionary<PlayerColor, Position> pawnSkipPostions = new Dictionary<PlayerColor, Position>
     {
         {PlayerColor.White, null },
         {PlayerColor.Black, null }
     };
 
-    // [row, col] ÀÎµ¦¼­·Î ¸» Á¢±Ù °¡´É
+    // [row, col] ì¸ë±ì„œë¡œ ë§ ì ‘ê·¼ ê°€ëŠ¥
     public Piece this[int row, int col]
     {
         get { return pieces[row, col]; }
         set { pieces[row, col] = value; }
     }
 
-    // [Position] ÀÎµ¦¼­·Î ¸» Á¢±Ù °¡´É
+    // [Position] ì¸ë±ì„œë¡œ ë§ ì ‘ê·¼ ê°€ëŠ¥
     public Piece this[Position pos]
     {
         get { return pieces[pos.row, pos.column]; }
         set { pieces[pos.row, pos.column] = value; }
     }
 
-    // Æ¯Á¤ ÇÃ·¹ÀÌ¾î ±âÁØ ÀúÀåµÈ pawn skip À§Ä¡ ¹İÈ¯
+    // íŠ¹ì • í”Œë ˆì´ì–´ ê¸°ì¤€ ì €ì¥ëœ pawn skip ìœ„ì¹˜ ë°˜í™˜
     public Position GetPawnSkipPosition(PlayerColor player)
     {
         return pawnSkipPostions[player];
     }
 
-    // Æ¯Á¤ ÇÃ·¹ÀÌ¾î ±âÁØ pawn skip À§Ä¡ ¼³Á¤
+    // íŠ¹ì • í”Œë ˆì´ì–´ ê¸°ì¤€ pawn skip ìœ„ì¹˜ ì„¤ì •
     public void SetPawnSkipPosition(PlayerColor player, Position pos)
     {
         pawnSkipPostions[player] = pos;
     }
 
-    // ÃÊ±â ¹èÄ¡µÈ »õ º¸µå »ı¼º
+    // ì´ˆê¸° ë°°ì¹˜ëœ ìƒˆ ë³´ë“œ ìƒì„±
     public static Board Initial()
     {
         Board board = new Board();
@@ -50,10 +50,10 @@ public class Board
         return board;
     }
 
-    // ½ÃÀÛ ±â¹° ¹èÄ¡
+    // ì‹œì‘ ê¸°ë¬¼ ë°°ì¹˜
     private void AddStartPieces()
     {
-        // Èæ ±â¹° ÃÊ±â ¹èÄ¡
+        // í‘ ê¸°ë¬¼ ì´ˆê¸° ë°°ì¹˜
         this[0, 0] = new Rook(PlayerColor.Black);
         this[0, 1] = new Knight(PlayerColor.Black);
         this[0, 2] = new Bishop(PlayerColor.Black);
@@ -63,7 +63,7 @@ public class Board
         this[0, 6] = new Knight(PlayerColor.Black);
         this[0, 7] = new Rook(PlayerColor.Black);
 
-        // ¹é ±â¹° ÃÊ±â ¹èÄ¡
+        // ë°± ê¸°ë¬¼ ì´ˆê¸° ë°°ì¹˜
         this[7, 0] = new Rook(PlayerColor.White);
         this[7, 1] = new Knight(PlayerColor.White);
         this[7, 2] = new Bishop(PlayerColor.White);
@@ -73,7 +73,7 @@ public class Board
         this[7, 6] = new Knight(PlayerColor.White);
         this[7, 7] = new Rook(PlayerColor.White);
 
-        // Æù ÃÊ±â ¹èÄ¡
+        // í° ì´ˆê¸° ë°°ì¹˜
         for (int i = 0; i < 8; i++)
         {
             this[1, i] = new Pawn(PlayerColor.Black);
@@ -81,19 +81,19 @@ public class Board
         }
     }
 
-    // º¸µå ³»ºÎ ÁÂÇ¥ÀÎÁö °Ë»ç
+    // ë³´ë“œ ë‚´ë¶€ ì¢Œí‘œì¸ì§€ ê²€ì‚¬
     public static bool IsInside(Position pos)
     {
         return pos.row >= 0 && pos.row < 8 && pos.column >= 0 && pos.column < 8;
     }
 
-    // ÇØ´ç À§Ä¡°¡ ºñ¾îÀÖ´ÂÁö ¿©ºÎ
+    // í•´ë‹¹ ìœ„ì¹˜ê°€ ë¹„ì–´ìˆëŠ”ì§€ ì—¬ë¶€
     public bool IsEmpty(Position pos)
     {
         return this[pos] == null;
     }
 
-    // ÇöÀç º¸µå¿¡ Á¸ÀçÇÏ´Â ¸ğµç ±â¹°ÀÇ À§Ä¡¸¦ ¹İÈ¯
+    // í˜„ì¬ ë³´ë“œì— ì¡´ì¬í•˜ëŠ” ëª¨ë“  ê¸°ë¬¼ì˜ ìœ„ì¹˜ë¥¼ ë°˜í™˜
     public IEnumerable<Position> PiecePositions()
     {
         for (int r = 0; r < 8; r++)
@@ -110,14 +110,14 @@ public class Board
         }
     }
 
-    // Æ¯Á¤ ÇÃ·¹ÀÌ¾îÀÇ ±â¹° À§Ä¡¸¸ ¹İÈ¯
+    // íŠ¹ì • í”Œë ˆì´ì–´ì˜ ê¸°ë¬¼ ìœ„ì¹˜ë§Œ ë°˜í™˜
     public IEnumerable<Position> PiecePositionsFor(PlayerColor player)
     {
         return PiecePositions().Where(pos => this[pos].Color == player);
     }
 
-    // player°¡ Ã¼Å© »óÅÂÀÎÁö È®ÀÎ
-    // »ó´ë ±â¹° Áß ÇÏ³ª¶óµµ playerÀÇ Å·À» ÀâÀ» ¼ö ÀÖÀ¸¸é true
+    // playerê°€ ì²´í¬ ìƒíƒœì¸ì§€ í™•ì¸
+    // ìƒëŒ€ ê¸°ë¬¼ ì¤‘ í•˜ë‚˜ë¼ë„ playerì˜ í‚¹ì„ ì¡ì„ ìˆ˜ ìˆìœ¼ë©´ true
     public bool IsInCheck(PlayerColor player)
     {
         return PiecePositionsFor(player.Opponent()).Any(pos =>
@@ -127,25 +127,25 @@ public class Board
         });
     }
 
-    // ÇöÀç º¸µå¸¦ ±íÀº º¹»ç
+    // í˜„ì¬ ë³´ë“œë¥¼ ê¹Šì€ ë³µì‚¬
     public Board Copy()
     {
         Board copy = new Board();
 
-        // °¢ ±â¹°À» Copy()·Î º¹Á¦
+        // ê° ê¸°ë¬¼ì„ Copy()ë¡œ ë³µì œ
         foreach (Position pos in PiecePositions())
         {
             copy[pos] = this[pos].Copy();
         }
 
-        // ¾ÓÆÄ»ó °ü·Ã »óÅÂµµ ÇÔ²² º¹»ç
+        // ì•™íŒŒìƒ ê´€ë ¨ ìƒíƒœë„ í•¨ê»˜ ë³µì‚¬
         copy.SetPawnSkipPosition(PlayerColor.White, pawnSkipPostions[PlayerColor.White]);
         copy.SetPawnSkipPosition(PlayerColor.Black, pawnSkipPostions[PlayerColor.Black]);
 
         return copy;
     }
 
-    // º¸µå À§ ±â¹° °³¼ö/Á¾·ù¸¦ Ä«¿îÆÃÇØ¼­ ¹İÈ¯
+    // ë³´ë“œ ìœ„ ê¸°ë¬¼ ê°œìˆ˜/ì¢…ë¥˜ë¥¼ ì¹´ìš´íŒ…í•´ì„œ ë°˜í™˜
     public Counting CountPieces()
     {
         Counting counting = new Counting();
@@ -159,7 +159,7 @@ public class Board
         return counting;
     }
 
-    // ºÒÃæºĞÇÑ ±â¹°(¹«½ÂºÎ) ÆÇÁ¤
+    // ë¶ˆì¶©ë¶„í•œ ê¸°ë¬¼(ë¬´ìŠ¹ë¶€) íŒì •
     public bool InsufficientMaterial()
     {
         Counting counting = CountPieces();
@@ -168,25 +168,25 @@ public class Board
             IsKingKnightVKing(counting) || IsKingBishopVKingBishop(counting);
     }
 
-    // Å· vs Å·
+    // í‚¹ vs í‚¹
     private bool IsKingVKing(Counting counting)
     {
         return counting.TotalCount == 2;
     }
 
-    // Å·+ºñ¼ó vs Å·
+    // í‚¹+ë¹„ìˆ vs í‚¹
     private bool IsKingBishopVKing(Counting counting)
     {
         return counting.TotalCount == 3 && (counting.GetWhiteCount(PieceType.Bishop) == 1 || counting.GetBlackCount(PieceType.Bishop) == 1);
     }
 
-    // Å·+³ªÀÌÆ® vs Å·
+    // í‚¹+ë‚˜ì´íŠ¸ vs í‚¹
     private bool IsKingKnightVKing(Counting counting)
     {
         return counting.TotalCount == 3 && (counting.GetWhiteCount(PieceType.Knight) == 1 || counting.GetBlackCount(PieceType.Knight) == 1);
     }
 
-    // Å·+ºñ¼ó vs Å·+ºñ¼ó (µÑ ´Ù ºñ¼ó 1°³¾¿, °°Àº »ö Ä­ ºñ¼óÀÌ¸é ºÒÃæºĞ ±â¹°)
+    // í‚¹+ë¹„ìˆ vs í‚¹+ë¹„ìˆ (ë‘˜ ë‹¤ ë¹„ìˆ 1ê°œì”©, ê°™ì€ ìƒ‰ ì¹¸ ë¹„ìˆì´ë©´ ë¶ˆì¶©ë¶„ ê¸°ë¬¼)
     private bool IsKingBishopVKingBishop(Counting counting)
     {
         if(counting.TotalCount != 4)
@@ -202,18 +202,18 @@ public class Board
         Position w_bishop_pos = FindPiece(PlayerColor.White, PieceType.Bishop);
         Position b_bishop_pos = FindPiece(PlayerColor.Black, PieceType.Bishop);
 
-        // ºñ¼óÀÌ °°Àº »ö Ä­¸¸ ´Ù´Ï´Â °æ¿ì Ã¼Å©¸ŞÀÌÆ® ºÒ°¡ ¡æ ¹«½ÂºÎ ÆÇÁ¤
+        // ë¹„ìˆì´ ê°™ì€ ìƒ‰ ì¹¸ë§Œ ë‹¤ë‹ˆëŠ” ê²½ìš° ì²´í¬ë©”ì´íŠ¸ ë¶ˆê°€ â†’ ë¬´ìŠ¹ë¶€ íŒì •
         return w_bishop_pos.SquareColor() == b_bishop_pos.SquareColor();
     }
 
-    // Æ¯Á¤ »ö/Å¸ÀÔÀÇ ±â¹° À§Ä¡ Ã£±â (Ã¹ ¹øÂ° °Í)
+    // íŠ¹ì • ìƒ‰/íƒ€ì…ì˜ ê¸°ë¬¼ ìœ„ì¹˜ ì°¾ê¸° (ì²« ë²ˆì§¸ ê²ƒ)
     private Position FindPiece(PlayerColor color, PieceType type)
     {
         return PiecePositionsFor(color).First(pos => this[pos].Type == type);
     }
 
-    // Ä³½½¸µ ±Ç¸® ÆÇÁ¤¿ë:
-    // ÇØ´ç À§Ä¡¿¡ Å·/·èÀÌ ÀÖ°í, µÑ ´Ù ¾ÆÁ÷ ÀÌµ¿ÇÏÁö ¾Ê¾Ò´ÂÁö È®ÀÎ
+    // ìºìŠ¬ë§ ê¶Œë¦¬ íŒì •ìš©:
+    // í•´ë‹¹ ìœ„ì¹˜ì— í‚¹/ë£©ì´ ìˆê³ , ë‘˜ ë‹¤ ì•„ì§ ì´ë™í•˜ì§€ ì•Šì•˜ëŠ”ì§€ í™•ì¸
     private bool IsUnmovedKingAndRook(Position king_pos, Position rook_pos)
     {
         if(IsEmpty(king_pos) || IsEmpty(rook_pos))
@@ -227,8 +227,8 @@ public class Board
         return king.Type == PieceType.King && rook.Type == PieceType.Rook && !king.hasMoved && !rook.hasMoved;
     }
 
-    // Å·»çÀÌµå Ä³½½¸µ ±Ç¸® ¿©ºÎ (¸»ÀÇ ÀÌµ¿ ¿©ºÎ ±âÁØ)
-    // ½ÇÁ¦ Ä³½½¸µ °¡´É ¿©ºÎ(Áß°£ Ä­ ºñ¾ú´ÂÁö/Ã¼Å© Åë°ú ¿©ºÎ µî)´Â º°µµ move legality¿¡¼­ °Ë»çÇØ¾ß ÇÔ
+    // í‚¹ì‚¬ì´ë“œ ìºìŠ¬ë§ ê¶Œë¦¬ ì—¬ë¶€ (ë§ì˜ ì´ë™ ì—¬ë¶€ ê¸°ì¤€)
+    // ì‹¤ì œ ìºìŠ¬ë§ ê°€ëŠ¥ ì—¬ë¶€(ì¤‘ê°„ ì¹¸ ë¹„ì—ˆëŠ”ì§€/ì²´í¬ í†µê³¼ ì—¬ë¶€ ë“±)ëŠ” ë³„ë„ move legalityì—ì„œ ê²€ì‚¬í•´ì•¼ í•¨
     public bool CastleRightKS(PlayerColor player)
     {
         return player switch
@@ -239,7 +239,7 @@ public class Board
         };
     }
 
-    // Äı»çÀÌµå Ä³½½¸µ ±Ç¸® ¿©ºÎ (¸»ÀÇ ÀÌµ¿ ¿©ºÎ ±âÁØ)
+    // í€¸ì‚¬ì´ë“œ ìºìŠ¬ë§ ê¶Œë¦¬ ì—¬ë¶€ (ë§ì˜ ì´ë™ ì—¬ë¶€ ê¸°ì¤€)
     public bool CastleRightQS(PlayerColor player)
     {
         return player switch
@@ -250,20 +250,20 @@ public class Board
         };
     }
 
-    // ÁÖ¾îÁø ÈÄº¸ À§Ä¡µé Áß¿¡¼­ ½ÇÁ¦·Î ¾ÓÆÄ»ó °¡´ÉÇÑ ÆùÀÌ ÀÖ´ÂÁö °Ë»ç
+    // ì£¼ì–´ì§„ í›„ë³´ ìœ„ì¹˜ë“¤ ì¤‘ì—ì„œ ì‹¤ì œë¡œ ì•™íŒŒìƒ ê°€ëŠ¥í•œ í°ì´ ìˆëŠ”ì§€ ê²€ì‚¬
     private bool HasPawnInPosition(PlayerColor player, Position[] pawn_positinos, Position skip_pos)
     {
         foreach (Position pos in pawn_positinos.Where(IsInside))
         {
             Piece piece = this[pos];
 
-            // ÇÃ·¹ÀÌ¾îÀÇ ÆùÀÌ ¾Æ´Ï¸é ½ºÅµ
+            // í”Œë ˆì´ì–´ì˜ í°ì´ ì•„ë‹ˆë©´ ìŠ¤í‚µ
             if (piece == null || piece.Color != player || piece.Type != PieceType.Pawn)
             {
                 continue;
             }
 
-            // ÇØ´ç ÆùÀÌ skip_pos·Î ¾ÓÆÄ»ó °¡´ÉÇÑÁö Move °´Ã¼·Î ÆÇÁ¤
+            // í•´ë‹¹ í°ì´ skip_posë¡œ ì•™íŒŒìƒ ê°€ëŠ¥í•œì§€ Move ê°ì²´ë¡œ íŒì •
             Enpassant move = new Enpassant(pos, skip_pos);
             if (move.IsLegal(this))
             {
@@ -274,19 +274,19 @@ public class Board
         return false;
     }
 
-    // ÇöÀç ÇÃ·¹ÀÌ¾î°¡ ¾ÓÆÄ»ó Ä¸Ã³¸¦ ÇÒ ¼ö ÀÖ´ÂÁö ¿©ºÎ
+    // í˜„ì¬ í”Œë ˆì´ì–´ê°€ ì•™íŒŒìƒ ìº¡ì²˜ë¥¼ í•  ìˆ˜ ìˆëŠ”ì§€ ì—¬ë¶€
     public bool CanCaptureEnPassant(PlayerColor player)
     {
-        // »ó´ë°¡ Á÷Àü¿¡ 2Ä­ ÀüÁøÇÑ ÆùÀÇ À§Ä¡¸¦ °¡Á®¿È
+        // ìƒëŒ€ê°€ ì§ì „ì— 2ì¹¸ ì „ì§„í•œ í°ì˜ ìœ„ì¹˜ë¥¼ ê°€ì ¸ì˜´
         Position skip_pos = GetPawnSkipPosition(player.Opponent());
 
-        // ±×·± À§Ä¡°¡ ¾øÀ¸¸é ¾ÓÆÄ»ó ºÒ°¡
+        // ê·¸ëŸ° ìœ„ì¹˜ê°€ ì—†ìœ¼ë©´ ì•™íŒŒìƒ ë¶ˆê°€
         if (skip_pos == null)
         {
             return false;
         }
 
-        // skip_pos¸¦ ±âÁØÀ¸·Î, ¾ÓÆÄ»ó °¡´ÉÇÑ ³» ÆùÀÇ ÈÄº¸ À§Ä¡ °è»ê
+        // skip_posë¥¼ ê¸°ì¤€ìœ¼ë¡œ, ì•™íŒŒìƒ ê°€ëŠ¥í•œ ë‚´ í°ì˜ í›„ë³´ ìœ„ì¹˜ ê³„ì‚°
         Position[] pawn_positions = player switch
         {
             PlayerColor.White => new Position[] {skip_pos + Direction.SouthWest, skip_pos + Direction.SouthEast},

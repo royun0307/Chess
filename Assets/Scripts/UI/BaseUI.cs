@@ -1,25 +1,25 @@
 using UnityEngine;
 
-// ¸ğµç UIÀÇ °øÅë ±â´ÉÀ» Á¤ÀÇÇÏ´Â Ãß»ó Å¬·¡½º
+// ëª¨ë“  UIì˜ ê³µí†µ ê¸°ëŠ¥ì„ ì •ì˜í•˜ëŠ” ì¶”ìƒ í´ë˜ìŠ¤
 public abstract class BaseUI : MonoBehaviour
 {
-    // ÀÌ UI¸¦ °ü¸®ÇÏ´Â UIManager ÂüÁ¶
+    // ì´ UIë¥¼ ê´€ë¦¬í•˜ëŠ” UIManager ì°¸ì¡°
     protected UIManager uiManager;
 
-    // UI ÃÊ±âÈ­ ÇÔ¼ö
-    // UIManager¸¦ Àü´Ş¹Ş¾Æ ÀúÀåÇÑ
+    // UI ì´ˆê¸°í™” í•¨ìˆ˜
+    // UIManagerë¥¼ ì „ë‹¬ë°›ì•„ ì €ì¥í•œ
     public virtual void Init(UIManager uiManager)
     {
         this.uiManager = uiManager;
     }
 
-    // ÀÌ UI°¡ ¾î¶² UIState¿¡ ÇØ´çÇÏ´ÂÁö ÀÚ½Ä Å¬·¡½º¿¡¼­ Á¤ÀÇ
+    // ì´ UIê°€ ì–´ë–¤ UIStateì— í•´ë‹¹í•˜ëŠ”ì§€ ìì‹ í´ë˜ìŠ¤ì—ì„œ ì •ì˜
     protected abstract UIState GetUIState();
 
-    // ÇöÀç »óÅÂ(state)¿¡ µû¶ó UI È°¼ºÈ­ ¿©ºÎ¸¦ ¼³Á¤
+    // í˜„ì¬ ìƒíƒœ(state)ì— ë”°ë¼ UI í™œì„±í™” ì—¬ë¶€ë¥¼ ì„¤ì •
     public virtual void SetActive(UIState state)
     {
-        // ÇöÀç UIÀÇ »óÅÂ¿Í Àü´ŞµÈ »óÅÂ°¡ °°À¸¸é È°¼ºÈ­, ´Ù¸£¸é ºñÈ°¼ºÈ­
+        // í˜„ì¬ UIì˜ ìƒíƒœì™€ ì „ë‹¬ëœ ìƒíƒœê°€ ê°™ìœ¼ë©´ í™œì„±í™”, ë‹¤ë¥´ë©´ ë¹„í™œì„±í™”
         gameObject.SetActive(GetUIState() == state);
     }
 }

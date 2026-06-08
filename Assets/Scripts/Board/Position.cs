@@ -3,19 +3,19 @@ using System.Collections.Generic;
 
 public class Position
 {
-    // Ã¼½ºÆÇ ÁÂÇ¥ (Çà, ¿­)
+    // ì²´ìŠ¤íŒ ì¢Œí‘œ (í–‰, ì—´)
     public int row { get; }
     public int column { get; }
 
-    // ÁÂÇ¥ »ı¼ºÀÚ
+    // ì¢Œí‘œ ìƒì„±ì
     public Position(int row, int column)
     {
         this.row = row;
         this.column = column;
     }
 
-    // ÇöÀç ÁÂÇ¥ÀÇ Ä­ »ö»ó ¹İÈ¯
-    // (Çà + ¿­)ÀÌ Â¦¼ö¸é White Ä­, È¦¼ö¸é Black Ä­À¸·Î ÆÇÁ¤
+    // í˜„ì¬ ì¢Œí‘œì˜ ì¹¸ ìƒ‰ìƒ ë°˜í™˜
+    // (í–‰ + ì—´)ì´ ì§ìˆ˜ë©´ White ì¹¸, í™€ìˆ˜ë©´ Black ì¹¸ìœ¼ë¡œ íŒì •
     public PlayerColor SquareColor()
     {
         if((row + column) %2 == 0)
@@ -25,38 +25,38 @@ public class Position
         return PlayerColor.Black;
     }
 
-    // °°Àº row, column °ªÀ» °¡Áö¸é °°Àº À§Ä¡·Î ÆÇ´Ü
+    // ê°™ì€ row, column ê°’ì„ ê°€ì§€ë©´ ê°™ì€ ìœ„ì¹˜ë¡œ íŒë‹¨
     public override bool Equals(object obj)
     {
-        // °°Àº ÂüÁ¶¸é µ¿ÀÏ °´Ã¼
+        // ê°™ì€ ì°¸ì¡°ë©´ ë™ì¼ ê°ì²´
         if (ReferenceEquals(this, obj)) return true;
-        // Position Å¸ÀÔÀÌ ¾Æ´Ï¸é false
+        // Position íƒ€ì…ì´ ì•„ë‹ˆë©´ false
         if (obj is not Position other) return false;
 
-        // ÁÂÇ¥°ª ºñ±³
+        // ì¢Œí‘œê°’ ë¹„êµ
         return row == other.row && column == other.column;
     }
 
-    // ÇØ½Ã ±â¹İ ÄÃ·º¼Ç(Dictionary, HashSet µî)¿¡¼­ »ç¿ëµÇ´Â ÇØ½ÃÄÚµå
-    // Equals ±âÁØ(row, column)°ú µ¿ÀÏÇÏ°Ô ±¸¼ºÇØ¾ß ÇÔ
+    // í•´ì‹œ ê¸°ë°˜ ì»¬ë ‰ì…˜(Dictionary, HashSet ë“±)ì—ì„œ ì‚¬ìš©ë˜ëŠ” í•´ì‹œì½”ë“œ
+    // Equals ê¸°ì¤€(row, column)ê³¼ ë™ì¼í•˜ê²Œ êµ¬ì„±í•´ì•¼ í•¨
     public override int GetHashCode()
     {
         return HashCode.Combine(row, column);
     }
 
-    // == ¿¬»êÀÚ ¿À¹ö·Îµå
+    // == ì—°ì‚°ì ì˜¤ë²„ë¡œë“œ
     public static bool operator ==(Position left, Position right)
     {
         return EqualityComparer<Position>.Default.Equals(left, right);
     }
 
-    // != ¿¬»êÀÚ ¿À¹ö·Îµå
+    // != ì—°ì‚°ì ì˜¤ë²„ë¡œë“œ
     public static bool operator !=(Position left, Position right)
     {
         return !(left == right);
     }
 
-    // Position + Direction ¿¬»êÀÚ ¿À¹ö·Îµå
+    // Position + Direction ì—°ì‚°ì ì˜¤ë²„ë¡œë“œ
     public static Position operator +(Position pos, Direction dir)
     {
         return new Position(pos.row + dir.row_delta, pos.column + dir.col_delta);

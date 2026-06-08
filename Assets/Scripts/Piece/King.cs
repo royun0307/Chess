@@ -1,122 +1,122 @@
 using System.Collections.Generic;
 using System.Linq;
 
-// Å·(ÇÑ Ä­¾¿ ÀÌµ¿ÇÏ°í Ä³½½¸µÀÌ °¡´ÉÇÑ Ã¼½º ±â¹°) Å¬·¡½º
+// í‚¹(í•œ ì¹¸ì”© ì´ë™í•˜ê³  ìºìŠ¬ë§ì´ ê°€ëŠ¥í•œ ì²´ìŠ¤ ê¸°ë¬¼) í´ë˜ìŠ¤
 public class King : Piece
 {
-    // ÀÌ ±â¹°ÀÇ Á¾·ù´Â King
+    // ì´ ê¸°ë¬¼ì˜ ì¢…ë¥˜ëŠ” King
     public override PieceType Type => PieceType.King;
     
-    // ÀÌ ±â¹°ÀÇ »ö»ó(Èæ/¹é)
+    // ì´ ê¸°ë¬¼ì˜ ìƒ‰ìƒ(í‘/ë°±)
     public override PlayerColor Color { get; }
 
-    // Å·ÀÌ ÀÌµ¿ÇÒ ¼ö ÀÖ´Â 8°³ÀÇ ¹æÇâ
+    // í‚¹ì´ ì´ë™í•  ìˆ˜ ìˆëŠ” 8ê°œì˜ ë°©í–¥
     private static readonly Direction[] dirs = new Direction[]
     {
-        Direction.North,        // À§
-        Direction.South,        // ¾Æ·¡
-        Direction.East,         // ¿À¸¥ÂÊ
-        Direction.West,         // ¿ŞÂÊ
-        Direction.NorthEast,    // ¿ì»óÇâ
-        Direction.NorthWest,    // ÁÂ»óÇâ
-        Direction.SouthEast,    // ¿ìÇÏÇâ
-        Direction.SouthWest,    // ÁÂÇÏÇâ
+        Direction.North,        // ìœ„
+        Direction.South,        // ì•„ë˜
+        Direction.East,         // ì˜¤ë¥¸ìª½
+        Direction.West,         // ì™¼ìª½
+        Direction.NorthEast,    // ìš°ìƒí–¥
+        Direction.NorthWest,    // ì¢Œìƒí–¥
+        Direction.SouthEast,    // ìš°í•˜í–¥
+        Direction.SouthWest,    // ì¢Œí•˜í–¥
     };
 
-    // Å· »ı¼ºÀÚ
-    // »ı¼ºÇÒ ¶§ ±â¹°ÀÇ »ö»óÀ» ¹Ş¾Æ ÀúÀå
+    // í‚¹ ìƒì„±ì
+    // ìƒì„±í•  ë•Œ ê¸°ë¬¼ì˜ ìƒ‰ìƒì„ ë°›ì•„ ì €ì¥
     public King(PlayerColor color)
     {
         this.Color = color;
     }
 
-    // ÇØ´ç À§Ä¡¿¡ ¾ÆÁ÷ ¿òÁ÷ÀÌÁö ¾ÊÀº ·èÀÌ ÀÖ´ÂÁö È®ÀÎ
-    // Ä³½½¸µ °¡´É ¿©ºÎ¸¦ °Ë»çÇÒ ¶§ »ç¿ë
+    // í•´ë‹¹ ìœ„ì¹˜ì— ì•„ì§ ì›€ì§ì´ì§€ ì•Šì€ ë£©ì´ ìˆëŠ”ì§€ í™•ì¸
+    // ìºìŠ¬ë§ ê°€ëŠ¥ ì—¬ë¶€ë¥¼ ê²€ì‚¬í•  ë•Œ ì‚¬ìš©
     private static bool IsUnmovedRook(Position pos, Board board)
     {
-        // ÇØ´ç Ä­ÀÌ ºñ¾î ÀÖÀ¸¸é ·èÀÌ ÀÖÀ» ¼ö ¾øÀ¸¹Ç·Î false
+        // í•´ë‹¹ ì¹¸ì´ ë¹„ì–´ ìˆìœ¼ë©´ ë£©ì´ ìˆì„ ìˆ˜ ì—†ìœ¼ë¯€ë¡œ false
         if (board.IsEmpty(pos))
         {
             return false;
         }
 
-        // ÇØ´ç À§Ä¡ÀÇ ±â¹°ÀÌ ·èÀÌ°í ¾ÆÁ÷ ¿òÁ÷ÀÌÁö ¾Ê¾Ò´ÂÁö È®ÀÎ
+        // í•´ë‹¹ ìœ„ì¹˜ì˜ ê¸°ë¬¼ì´ ë£©ì´ê³  ì•„ì§ ì›€ì§ì´ì§€ ì•Šì•˜ëŠ”ì§€ í™•ì¸
         Piece piece = board[pos];
         return piece.Type == PieceType.Rook && !piece.hasMoved;
     }
 
-    // Àü´ŞµÈ ¸ğµç À§Ä¡°¡ ºñ¾î ÀÖ´ÂÁö È®ÀÎ
-    // Å·°ú ·è »çÀÌ¿¡ ´Ù¸¥ ±â¹°ÀÌ ¾ø´ÂÁö °Ë»çÇÒ ¶§ »ç¿ë
+    // ì „ë‹¬ëœ ëª¨ë“  ìœ„ì¹˜ê°€ ë¹„ì–´ ìˆëŠ”ì§€ í™•ì¸
+    // í‚¹ê³¼ ë£© ì‚¬ì´ì— ë‹¤ë¥¸ ê¸°ë¬¼ì´ ì—†ëŠ”ì§€ ê²€ì‚¬í•  ë•Œ ì‚¬ìš©
     private static bool AllEmpty(IEnumerable<Position> positions, Board board)
     {
         return positions.All(pos => board.IsEmpty(pos));
     }
 
-    // Å·»çÀÌµå Ä³½Â¸µ °¡´É ¿©ºÎ¸¦ È®ÀÎ
+    // í‚¹ì‚¬ì´ë“œ ìºìŠ¹ë§ ê°€ëŠ¥ ì—¬ë¶€ë¥¼ í™•ì¸
     private bool CanCastleKingSide(Position from, Board board)
     {
-        // Å·ÀÌ ÇÑ ¹øÀÌ¶óµµ ¿òÁ÷¿´À¸¸é Ä³½½¸µ ºÒ°¡
+        // í‚¹ì´ í•œ ë²ˆì´ë¼ë„ ì›€ì§ì˜€ìœ¼ë©´ ìºìŠ¬ë§ ë¶ˆê°€
         if(hasMoved)
         {
             return false;
         }
 
-        // °°Àº ÇàÀÇ ¸Ç ¿À¸¥ÂÊ ·è À§Ä¡
+        // ê°™ì€ í–‰ì˜ ë§¨ ì˜¤ë¥¸ìª½ ë£© ìœ„ì¹˜
         Position rook_pos = new Position(from.row, 7);
         
-        // Å·°ú ·è »çÀÌÀÇ Ä­µé
+        // í‚¹ê³¼ ë£© ì‚¬ì´ì˜ ì¹¸ë“¤
         Position[] between_positions = new Position[] { new(from.row, 5), new(from.row, 6) };
 
-        // ¿òÁ÷ÀÌÁö ¾ÊÀº ·èÀÌ ÀÖ°í, »çÀÌ Ä­ÀÌ ¸ğµÎ ºñ¾î ÀÖÀ¸¸é °¡´É
+        // ì›€ì§ì´ì§€ ì•Šì€ ë£©ì´ ìˆê³ , ì‚¬ì´ ì¹¸ì´ ëª¨ë‘ ë¹„ì–´ ìˆìœ¼ë©´ ê°€ëŠ¥
         return IsUnmovedRook(rook_pos, board) && AllEmpty(between_positions, board);
     }
 
-    // Äı»çÀÌµå Ä³½½¸µ °¡´É ¿©ºÎ¸¦ È®ÀÎ
+    // í€¸ì‚¬ì´ë“œ ìºìŠ¬ë§ ê°€ëŠ¥ ì—¬ë¶€ë¥¼ í™•ì¸
     private bool CanCastleQueenSide(Position from, Board board)
     {
-        // Å·ÀÌ ÇÑ ¹øÀÌ¶óµµ ¿òÁ÷¿´À¸¸é Ä³½½¸µ ºÒ°¡
+        // í‚¹ì´ í•œ ë²ˆì´ë¼ë„ ì›€ì§ì˜€ìœ¼ë©´ ìºìŠ¬ë§ ë¶ˆê°€
         if (hasMoved)
         {
             return false;
         }
 
-        // °°Àº ÇàÀÇ ¸Ç ¿ŞÂÊ ·è À§Ä¡
+        // ê°™ì€ í–‰ì˜ ë§¨ ì™¼ìª½ ë£© ìœ„ì¹˜
         Position rook_pos = new Position(from.row, 0);
         
-        // Å·°ú ·è »çÀÌÀÇ Ä­µé
+        // í‚¹ê³¼ ë£© ì‚¬ì´ì˜ ì¹¸ë“¤
         Position[] between_positions = new Position[] { new(from.row, 1), new(from.row, 2), new(from.row, 3) };
 
-        // ¿òÁ÷ÀÌÁö ¾ÊÀº ·èÀÌ ÀÖ°í, »çÀÌ Ä­ÀÌ ¸ğµÎ ºñ¾î ÀÖÀ¸¸é °¡´É
+        // ì›€ì§ì´ì§€ ì•Šì€ ë£©ì´ ìˆê³ , ì‚¬ì´ ì¹¸ì´ ëª¨ë‘ ë¹„ì–´ ìˆìœ¼ë©´ ê°€ëŠ¥
         return IsUnmovedRook(rook_pos, board) && AllEmpty(between_positions, board);
     }
 
-    // ÇöÀç Å· °´Ã¼¸¦ º¹»çÇØ¼­ »õ·Î¿î Å· °´Ã¼¸¦ ¹İÈ¯
+    // í˜„ì¬ í‚¹ ê°ì²´ë¥¼ ë³µì‚¬í•´ì„œ ìƒˆë¡œìš´ í‚¹ ê°ì²´ë¥¼ ë°˜í™˜
     public override Piece Copy()
     {
-        // °°Àº »ö»óÀÇ Å· »ı¼º
+        // ê°™ì€ ìƒ‰ìƒì˜ í‚¹ ìƒì„±
         King copy = new King(Color);
 
-        // ÀÌµ¿ ¿©ºÎ(hasMoved)µµ ÇÔ²² º¹»ç
+        // ì´ë™ ì—¬ë¶€(hasMoved)ë„ í•¨ê»˜ ë³µì‚¬
         copy.hasMoved = hasMoved;
 
         return copy;
     }
 
-    // ÇöÀç À§Ä¡(from)¿¡¼­ Å·ÀÌ ÀÏ¹İÀûÀ¸·Î ÀÌµ¿ °¡´ÉÇÑ À§Ä¡µéÀ» °è»ê
+    // í˜„ì¬ ìœ„ì¹˜(from)ì—ì„œ í‚¹ì´ ì¼ë°˜ì ìœ¼ë¡œ ì´ë™ ê°€ëŠ¥í•œ ìœ„ì¹˜ë“¤ì„ ê³„ì‚°
     private IEnumerable<Position> MovePositions(Position from, Board board)
     {
-        // 8¹æÇâÀ» ÇÏ³ª¾¿ È®ÀÎ
+        // 8ë°©í–¥ì„ í•˜ë‚˜ì”© í™•ì¸
         foreach (Direction dir in dirs)
         { 
             Position to = from + dir;
 
-            // º¸µå ¹ÛÀ¸·Î ³ª°¡¸é ¹«½Ã
+            // ë³´ë“œ ë°–ìœ¼ë¡œ ë‚˜ê°€ë©´ ë¬´ì‹œ
             if (!Board.IsInside(to))
             {
                 continue;
             }
 
-            // ºó Ä­ÀÌ°Å³ª »ó´ë ±â¹°ÀÌ ÀÖ´Â Ä­ÀÌ¸é ÀÌµ¿ °¡´É
+            // ë¹ˆ ì¹¸ì´ê±°ë‚˜ ìƒëŒ€ ê¸°ë¬¼ì´ ìˆëŠ” ì¹¸ì´ë©´ ì´ë™ ê°€ëŠ¥
             if(board.IsEmpty(to) || board[to].Color != Color)
             {
                 yield return to;
@@ -124,29 +124,29 @@ public class King : Piece
         }
     }
 
-    // ÁhÀç À§Ä¡(from)¿¡¼­ ÀÌµ¿ °¡´ÉÇÑ ¸ğµç ¼ö¸¦ ¹İÈ¯
+    // í–”ì¬ ìœ„ì¹˜(from)ì—ì„œ ì´ë™ ê°€ëŠ¥í•œ ëª¨ë“  ìˆ˜ë¥¼ ë°˜í™˜
     public override IEnumerable<Move> GetMoves(Position from, Board board)
     {
-        // ÀÏ¹İ ÀÌµ¿ °¡´ÉÇÑ À§Ä¡µéÀ» NormalMove·Î ¹İÈ¯
+        // ì¼ë°˜ ì´ë™ ê°€ëŠ¥í•œ ìœ„ì¹˜ë“¤ì„ NormalMoveë¡œ ë°˜í™˜
         foreach (Position to in MovePositions(from, board))
         {
             yield return new NormalMove(from, to);
         }
 
-        // Å·»çÀÌµå Ä³½½¸µÀÌ °¡´ÉÇÏ¸é ÇØ´ç ÀÌµ¿ Ãß°¡
+        // í‚¹ì‚¬ì´ë“œ ìºìŠ¬ë§ì´ ê°€ëŠ¥í•˜ë©´ í•´ë‹¹ ì´ë™ ì¶”ê°€
         if(CanCastleKingSide(from, board))
         {
             yield return new Castle(MoveType.CastleKS, from);
         }
 
-        // Äı»çÀÌµå Ä³½½¸µÀÌ °¡´ÉÇÏ¸é ÇØ´ç ÀÌµ¿ Ãß°¡
+        // í€¸ì‚¬ì´ë“œ ìºìŠ¬ë§ì´ ê°€ëŠ¥í•˜ë©´ í•´ë‹¹ ì´ë™ ì¶”ê°€
         if(CanCastleQueenSide(from, board))
         {
             yield return new Castle(MoveType.CastleQS, from);
         }
     }
 
-    // ÇöÀç Å·ÀÌ »ó´ë Å·À» °ø°İÇÒ ¼ö ÀÖ´ÂÁö È®ÀÎ
+    // í˜„ì¬ í‚¹ì´ ìƒëŒ€ í‚¹ì„ ê³µê²©í•  ìˆ˜ ìˆëŠ”ì§€ í™•ì¸
     public override bool CanCaptureOpponentKing(Position from, Board board)
     {
         return MovePositions(from, board).Any(to =>

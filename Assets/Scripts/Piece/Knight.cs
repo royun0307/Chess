@@ -1,36 +1,36 @@
 using System.Collections.Generic;
 using System.Linq;
 
-// ³ªÀÌÆ®(LÀÚ ÇüÅÂ·Î ÀÌµ¿ÇÏ´Â Ã¼½º ±â¹°) Å¬·¡½º
+// ë‚˜ì´íŠ¸(Lìž í˜•íƒœë¡œ ì´ë™í•˜ëŠ” ì²´ìŠ¤ ê¸°ë¬¼) í´ëž˜ìŠ¤
 public class Knight : Piece
 {
-    // ÀÌ ±â¹°ÀÇ Á¾·ù´Â Knight
+    // ì´ ê¸°ë¬¼ì˜ ì¢…ë¥˜ëŠ” Knight
     public override PieceType Type => PieceType.Knight;
     
-    // ÀÌ ±â¹°ÀÇ »ö»ó(Èæ/¹é)
+    // ì´ ê¸°ë¬¼ì˜ ìƒ‰ìƒ(í‘/ë°±)
     public override PlayerColor Color { get; }
 
-    // ³ªÀÌÆ® »ý¼ºÀÚ
-    // »ý¼ºÇÒ ¶§ ±â¹°ÀÇ »ö»óÀ» ¹Þ¾Æ ÀúÀå
+    // ë‚˜ì´íŠ¸ ìƒì„±ìž
+    // ìƒì„±í•  ë•Œ ê¸°ë¬¼ì˜ ìƒ‰ìƒì„ ë°›ì•„ ì €ìž¥
     public Knight(PlayerColor color)
     {
         this.Color = color;
     }
 
-    // ÇöÀç ³ªÀÌÆ® °´Ã¼¸¦ º¹»çÇØ¼­ »õ·Î¿î ³ªÀÌÆ® °´Ã¼¸¦ ¹ÝÈ¯
+    // í˜„ìž¬ ë‚˜ì´íŠ¸ ê°ì²´ë¥¼ ë³µì‚¬í•´ì„œ ìƒˆë¡œìš´ ë‚˜ì´íŠ¸ ê°ì²´ë¥¼ ë°˜í™˜
     public override Piece Copy()
     {
-        // °°Àº »ö»óÀÇ ³ªÀÌÆ® »ý¼º
+        // ê°™ì€ ìƒ‰ìƒì˜ ë‚˜ì´íŠ¸ ìƒì„±
         Knight copy = new Knight(Color);
         
-        // ÀÌµ¿ ¿©ºÎ(hasMoved)µµ ÇÔ²² º¹»ç
+        // ì´ë™ ì—¬ë¶€(hasMoved)ë„ í•¨ê»˜ ë³µì‚¬
         copy.hasMoved = hasMoved;
 
         return copy;
     }
 
-    // ÇöÀç À§Ä¡(from)¿¡¼­ ³ªÀÌÆ®°¡ °¥ ¼ö ÀÖ´Â ¸ðµç ÈÄº¸ À§Ä¡¸¦ »ý¼º
-    // ³ªÀÌÆ®´Â ¼¼·Î 2Ä­ + °¡·Î 1Ä­, ¶Ç´Â ¼¼·Î 1Ä­ + °¡·Î 2Ä­ ÀÌµ¿ÇÑ´Ù
+    // í˜„ìž¬ ìœ„ì¹˜(from)ì—ì„œ ë‚˜ì´íŠ¸ê°€ ê°ˆ ìˆ˜ ìžˆëŠ” ëª¨ë“  í›„ë³´ ìœ„ì¹˜ë¥¼ ìƒì„±
+    // ë‚˜ì´íŠ¸ëŠ” ì„¸ë¡œ 2ì¹¸ + ê°€ë¡œ 1ì¹¸, ë˜ëŠ” ì„¸ë¡œ 1ì¹¸ + ê°€ë¡œ 2ì¹¸ ì´ë™í•œë‹¤
     private static IEnumerable<Position> PotentialToPosition(Position from)
     {
         foreach(Direction vDir in new Direction[] { Direction.North, Direction.South })
@@ -43,18 +43,18 @@ public class Knight : Piece
         }
     }
 
-    // ÈÄº¸ À§Ä¡µé Áß ½ÇÁ¦·Î ÀÌµ¿ °¡´ÉÇÑ À§Ä¡¸¸ ¹ÝÈ¯
-    // º¸µå ¾È¿¡ ÀÖ¾î¾ß ÇÏ°í, ºó Ä­ÀÌ°Å³ª »ó´ë ±â¹°ÀÌ ÀÖ´Â Ä­ÀÌ¾î¾ß ÇÑ´Ù
+    // í›„ë³´ ìœ„ì¹˜ë“¤ ì¤‘ ì‹¤ì œë¡œ ì´ë™ ê°€ëŠ¥í•œ ìœ„ì¹˜ë§Œ ë°˜í™˜
+    // ë³´ë“œ ì•ˆì— ìžˆì–´ì•¼ í•˜ê³ , ë¹ˆ ì¹¸ì´ê±°ë‚˜ ìƒëŒ€ ê¸°ë¬¼ì´ ìžˆëŠ” ì¹¸ì´ì–´ì•¼ í•œë‹¤
     private IEnumerable<Position> MovePositions(Position from, Board board)
     {
         return PotentialToPosition(from).Where(pos => Board.IsInside(pos) 
             && (board.IsEmpty(pos) || board[pos].Color != Color));
     }
 
-    // ÇöÀç À§Ä¡(from)¿¡¼­ ÀÌµ¿ °¡´ÉÇÑ ¸ðµç ¼ö¸¦ ¹ÝÈ¯ 
+    // í˜„ìž¬ ìœ„ì¹˜(from)ì—ì„œ ì´ë™ ê°€ëŠ¥í•œ ëª¨ë“  ìˆ˜ë¥¼ ë°˜í™˜ 
     public override IEnumerable<Move> GetMoves(Position from, Board board)
     {
-        // ÀÌµ¿ °¡´ÉÇÑ °¢ À§Ä¡¸¦ NormalMove °´Ã¼·Î º¯È¯ÇØ¼­ ¹ÝÈ¯
+        // ì´ë™ ê°€ëŠ¥í•œ ê° ìœ„ì¹˜ë¥¼ NormalMove ê°ì²´ë¡œ ë³€í™˜í•´ì„œ ë°˜í™˜
         return MovePositions(from, board).Select(to => new NormalMove(from, to));
     }
 }

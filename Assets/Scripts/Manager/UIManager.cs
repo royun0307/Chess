@@ -1,79 +1,79 @@
 using UnityEngine;
 using UnityEngine.SocialPlatforms.Impl;
 
-// ÇöÀç ¾î¶² UI È­¸éÀÌ È°¼ºÈ­µÇ¾î ÀÖ´ÂÁö ³ªÅ¸³»´Â »óÅÂ°ª
+// í˜„ì¬ ì–´ë–¤ UI í™”ë©´ì´ í™œì„±í™”ë˜ì–´ ìˆëŠ”ì§€ ë‚˜íƒ€ë‚´ëŠ” ìƒíƒœê°’
 public enum UIState
 {
-    None,       // ¾Æ¹« UIµµ Ç¥½ÃÇÏÁö ¾Ê´Â ±âº» »óÅÂ
-    Result,     // °ÔÀÓ °á°ú UI »óÅÂ
-    Promotion,  // Æù ½Â±Ş ¼±ÅÃ UI »óÅÂ
-    Pause       // ÀÏ½ÃÁ¤Áö UI »óÅÂ
+    None,       // ì•„ë¬´ UIë„ í‘œì‹œí•˜ì§€ ì•ŠëŠ” ê¸°ë³¸ ìƒíƒœ
+    Result,     // ê²Œì„ ê²°ê³¼ UI ìƒíƒœ
+    Promotion,  // í° ìŠ¹ê¸‰ ì„ íƒ UI ìƒíƒœ
+    Pause       // ì¼ì‹œì •ì§€ UI ìƒíƒœ
 }
 
-// °ÔÀÓ ³» UI ÀüÃ¼ »óÅÂ¸¦ °ü¸®ÇÏ´Â ¸Å´ÏÀú
+// ê²Œì„ ë‚´ UI ì „ì²´ ìƒíƒœë¥¼ ê´€ë¦¬í•˜ëŠ” ë§¤ë‹ˆì €
 public class UIManager : MonoBehaviour
 {
-    // ½Ì±ÛÅæ ÀÎ½ºÅÏ½º
+    // ì‹±ê¸€í†¤ ì¸ìŠ¤í„´ìŠ¤
     static UIManager instance;
 
-    // ¿ÜºÎ¿¡¼­ Á¢±ÙÇÒ ¼ö ÀÖ´Â ½Ì±ÛÅæ ÇÁ·ÎÆÛÆ¼
+    // ì™¸ë¶€ì—ì„œ ì ‘ê·¼í•  ìˆ˜ ìˆëŠ” ì‹±ê¸€í†¤ í”„ë¡œí¼í‹°
     public static UIManager Instance { get { return instance; } }
 
-    // ÇöÀç UI »óÅÂ
+    // í˜„ì¬ UI ìƒíƒœ
     UIState currentState = UIState.None;
 
-    // °¢ UI ÂüÁ¶
+    // ê° UI ì°¸ì¡°
     public ResultUI resultUI = null;
     public PromotionUI promotionUI = null;
     public PauseUI pauseUI = null;
 
     private void Awake()
     {
-        // ¾ÆÁ÷ ÀÎ½ºÅÏ½º°¡ ¾øÀ¸¸é ÇöÀç °´Ã¼¸¦ ½Ì±ÛÅæÀ¸·Î µî·Ï
+        // ì•„ì§ ì¸ìŠ¤í„´ìŠ¤ê°€ ì—†ìœ¼ë©´ í˜„ì¬ ê°ì²´ë¥¼ ì‹±ê¸€í†¤ìœ¼ë¡œ ë“±ë¡
         if(instance == null)
         {
             instance = this;
 
-            // °¢ UI ÃÊ±âÈ­
+            // ê° UI ì´ˆê¸°í™”
             resultUI?.Init(this);
             promotionUI?.Init(this);
             pauseUI?.Init(this);
 
-            // ÇöÀç »óÅÂ¿¡ ¸Â°Ô UI È°¼º/ºñÈ°¼º ¹İ¿µ
+            // í˜„ì¬ ìƒíƒœì— ë§ê²Œ UI í™œì„±/ë¹„í™œì„± ë°˜ì˜
             ChangeState(currentState);
         }
         else
         {
-            // ÀÌ¹Ì ÀÎ½ºÅÏ½º°¡ ÀÖÀ¸¸é Áßº¹ »ı¼ºÀÌ¹Ç·Î Á¦°Å
+            // ì´ë¯¸ ì¸ìŠ¤í„´ìŠ¤ê°€ ìˆìœ¼ë©´ ì¤‘ë³µ ìƒì„±ì´ë¯€ë¡œ ì œê±°
             Destroy(this);
         }
     }
 
-    // UI »óÅÂ¸¦ º¯°æÇÏ°í, °¢ UI¿¡ ÇöÀç »óÅÂ¸¦ Àü´Ş
+    // UI ìƒíƒœë¥¼ ë³€ê²½í•˜ê³ , ê° UIì— í˜„ì¬ ìƒíƒœë¥¼ ì „ë‹¬
     public void ChangeState(UIState state)
     {
         currentState = state;
         
-        // °¢ UI°¡ ÀÚ½ÅÀÇ »óÅÂ¿¡ ¸Â°Ô È°¼º/ºñÈ°¼º Ã³¸®ÇÏµµ·Ï È£Ãâ
+        // ê° UIê°€ ìì‹ ì˜ ìƒíƒœì— ë§ê²Œ í™œì„±/ë¹„í™œì„± ì²˜ë¦¬í•˜ë„ë¡ í˜¸ì¶œ
         resultUI?.SetActive(currentState);
         promotionUI?.SetActive(currentState);
         pauseUI?.SetActive(currentState);
     }
 
-    // ´Ù½Ã ½ÃÀÛ ¹öÆ° Å¬¸¯½Ã È£Ãâ
+    // ë‹¤ì‹œ ì‹œì‘ ë²„íŠ¼ í´ë¦­ì‹œ í˜¸ì¶œ
     public void OnClickRestartButton()
     {
         GameManager.Instance.RestartGame();
     }
 
-    // Á¾·á ¹öÆ° Å¬¸¯ ½Ã È£Ãâ
+    // ì¢…ë£Œ ë²„íŠ¼ í´ë¦­ ì‹œ í˜¸ì¶œ
     public void OnClickExit()
     {
 #if UNITY_EDITOR
-        // ¿¡µğÅÍ¿¡¼­´Â ÇÃ·¹ÀÌ ¸ğµå Á¾·á
+        // ì—ë””í„°ì—ì„œëŠ” í”Œë ˆì´ ëª¨ë“œ ì¢…ë£Œ
         UnityEditor.EditorApplication.isPlaying = false;
 #else
-        // ºôµåµÈ °ÔÀÓ¿¡¼­´Â ¾ÖÇÃ¸®ÄÉÀÌ¼Ç Á¾·á
+        // ë¹Œë“œëœ ê²Œì„ì—ì„œëŠ” ì• í”Œë¦¬ì¼€ì´ì…˜ ì¢…ë£Œ
         Application.Quit();
 #endif
     }

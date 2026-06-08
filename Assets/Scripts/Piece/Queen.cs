@@ -1,53 +1,53 @@
 using System.Collections.Generic;
 using System.Linq;
 
-// Äı(Á÷¼±°ú ´ë°¢¼± ¸ğµç ¹æÇâÀ¸·Î ÀÌµ¿ÇÏ´Â Ã¼½º ±â¹°) Å¬·¡½º
+// í€¸(ì§ì„ ê³¼ ëŒ€ê°ì„  ëª¨ë“  ë°©í–¥ìœ¼ë¡œ ì´ë™í•˜ëŠ” ì²´ìŠ¤ ê¸°ë¬¼) í´ë˜ìŠ¤
 public class Queen : Piece
 {
-    // ÀÌ ±â¹°ÀÇ Á¾·ù´Â Queen
+    // ì´ ê¸°ë¬¼ì˜ ì¢…ë¥˜ëŠ” Queen
     public override PieceType Type => PieceType.Queen;
     
-    // ÀÌ ±â¹°ÀÇ »ö»ó(Èæ/¹é)
+    // ì´ ê¸°ë¬¼ì˜ ìƒ‰ìƒ(í‘/ë°±)
     public override PlayerColor Color { get; }
 
-    // ÄıÀÌ ÀÌµ¿ÇÒ ¼ö ÀÖ´Â 8°³ÀÇ ¹æÇâ
-    // »óÇÏÁÂ¿ì + 4°³ÀÇ ´ë°¢¼± ¹æÇâÀ¸·Î ¸ğµÎ ÀÌµ¿ °¡´É
+    // í€¸ì´ ì´ë™í•  ìˆ˜ ìˆëŠ” 8ê°œì˜ ë°©í–¥
+    // ìƒí•˜ì¢Œìš° + 4ê°œì˜ ëŒ€ê°ì„  ë°©í–¥ìœ¼ë¡œ ëª¨ë‘ ì´ë™ ê°€ëŠ¥
     private static readonly Direction[] dirs = new Direction[]
     {
-        Direction.North,        // À§
-        Direction.South,        // ¾Æ·¡
-        Direction.East,         // ¿À¸¥ÂÊ
-        Direction.West,         // ¿ŞÂÊ
-        Direction.NorthEast,    // ¿ì»óÇâ
-        Direction.NorthWest,    // ÁÂ»óÇâ
-        Direction.SouthEast,    // ¿ìÇÏÇâ
-        Direction.SouthWest,    // ÁÂÇÏÇâ
+        Direction.North,        // ìœ„
+        Direction.South,        // ì•„ë˜
+        Direction.East,         // ì˜¤ë¥¸ìª½
+        Direction.West,         // ì™¼ìª½
+        Direction.NorthEast,    // ìš°ìƒí–¥
+        Direction.NorthWest,    // ì¢Œìƒí–¥
+        Direction.SouthEast,    // ìš°í•˜í–¥
+        Direction.SouthWest,    // ì¢Œí•˜í–¥
     };
 
-    // Äı »ı¼ºÀÚ
-    // »ı¼ºÇÒ ¶§ ±â¹°ÀÇ »ö»óÀ» ¹Ş¾Æ ÀúÀå
+    // í€¸ ìƒì„±ì
+    // ìƒì„±í•  ë•Œ ê¸°ë¬¼ì˜ ìƒ‰ìƒì„ ë°›ì•„ ì €ì¥
     public Queen(PlayerColor color)
     {
         this.Color = color;
     }
 
-    // ÇöÀç Äı °´Ã¼¸¦ º¹»çÇØ¼­ »õ·Î¿î Äı °´Ã¼¸¦ ¹İÈ¯
+    // í˜„ì¬ í€¸ ê°ì²´ë¥¼ ë³µì‚¬í•´ì„œ ìƒˆë¡œìš´ í€¸ ê°ì²´ë¥¼ ë°˜í™˜
     public override Piece Copy()
     {
-        // °°Àº »ö»óÀÇ Äı »ı¼º
+        // ê°™ì€ ìƒ‰ìƒì˜ í€¸ ìƒì„±
         Queen copy = new Queen(Color);
 
-        // ÀÌµ¿ ¿©ºÎ(hasMoved)µµ ÇÔ²² º¹»ç
+        // ì´ë™ ì—¬ë¶€(hasMoved)ë„ í•¨ê»˜ ë³µì‚¬
         copy.hasMoved = hasMoved;
 
         return copy;
     }
 
-    // ÇöÀç À§Ä¡(from)¿¡¼­ ÀÌµ¿ °¡´ÉÇÑ ¸ğµç ¼ö¸¦ ¹İÈ¯
+    // í˜„ì¬ ìœ„ì¹˜(from)ì—ì„œ ì´ë™ ê°€ëŠ¥í•œ ëª¨ë“  ìˆ˜ë¥¼ ë°˜í™˜
     public override IEnumerable<Move> GetMoves(Position from, Board board)
     {
-        // 8¹æÇâÀ¸·Î °¥ ¼ö ÀÖ´Â ¸ğµç À§Ä¡¸¦ ±¸ÇÑ µÚ
-        // °¢ À§Ä¡¸¦ NormalMove °´Ã¼·Î º¯È¯ÇØ¼­ ¹İÈ¯
+        // 8ë°©í–¥ìœ¼ë¡œ ê°ˆ ìˆ˜ ìˆëŠ” ëª¨ë“  ìœ„ì¹˜ë¥¼ êµ¬í•œ ë’¤
+        // ê° ìœ„ì¹˜ë¥¼ NormalMove ê°ì²´ë¡œ ë³€í™˜í•´ì„œ ë°˜í™˜
         return MovePositionsInDirs(from, board, dirs).Select(to => new NormalMove(from, to));
     }
 }

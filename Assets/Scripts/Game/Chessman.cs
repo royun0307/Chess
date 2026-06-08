@@ -1,37 +1,37 @@
 using UnityEngine;
 
-// ÀÌ ½ºÅ©¸³°¡ ºÙÀº ¿ÀºêÁ§Æ®¿¡´Â ¹İµå½Ã Collider2D°¡ ÀÖ¾î¾ß ÇÔ
-// ¾øÀ¸¸é Unity°¡ ÀÚµ¿À¸·Î Ãß°¡ÇØÁÜ
+// ì´ ìŠ¤í¬ë¦½ê°€ ë¶™ì€ ì˜¤ë¸Œì íŠ¸ì—ëŠ” ë°˜ë“œì‹œ Collider2Dê°€ ìˆì–´ì•¼ í•¨
+// ì—†ìœ¼ë©´ Unityê°€ ìë™ìœ¼ë¡œ ì¶”ê°€í•´ì¤Œ
 [RequireComponent(typeof(Collider2D))]
 public class Chessman : MonoBehaviour
 {
-    // ÇöÀç Ã¼½º¸»ÀÇ º¸µå »ó À§Ä¡
-    // ¿ÜºÎ¿¡¼­´Â ÀĞ±â¸¸ °¡´É
+    // í˜„ì¬ ì²´ìŠ¤ë§ì˜ ë³´ë“œ ìƒ ìœ„ì¹˜
+    // ì™¸ë¶€ì—ì„œëŠ” ì½ê¸°ë§Œ ê°€ëŠ¥
     public Position Pos { get; private set; }
 
-    // Ã¼½º¸»ÀÇ ½ÃÀÛ À§Ä¡¸¦ ÃÊ±âÈ­
+    // ì²´ìŠ¤ë§ì˜ ì‹œì‘ ìœ„ì¹˜ë¥¼ ì´ˆê¸°í™”
     public void Init(Position startPos)
     {
         Pos = startPos;
     }
 
-    // Ã¼½º¸»ÀÇ º¸µå À§Ä¡¸¦ »õ·Î¿î À§Ä¡·Î º¯°æÇÏ´Â ÇÔ¼ö
+    // ì²´ìŠ¤ë§ì˜ ë³´ë“œ ìœ„ì¹˜ë¥¼ ìƒˆë¡œìš´ ìœ„ì¹˜ë¡œ ë³€ê²½í•˜ëŠ” í•¨ìˆ˜
     public void SetBoardPos(Position newPos)
     {
         Pos = newPos;
     }
 
-    // ¸¶¿ì½º·Î ÀÌ ¿ÀºêÁ§Æ®¸¦ Å¬¸¯Çß´Ù°¡ ¶®À» ¶§ È£ÃâµÇ´Â Unity ÀÌº¥Æ® ÇÔ¼ö
+    // ë§ˆìš°ìŠ¤ë¡œ ì´ ì˜¤ë¸Œì íŠ¸ë¥¼ í´ë¦­í–ˆë‹¤ê°€ ë• ì„ ë•Œ í˜¸ì¶œë˜ëŠ” Unity ì´ë²¤íŠ¸ í•¨ìˆ˜
     private void OnMouseUpAsButton()
     {
-        // GameManager.Instance°¡ ¾øÀ¸¸é ¿¡·¯ Ãâ·Â ÈÄ Á¾·á
+        // GameManager.Instanceê°€ ì—†ìœ¼ë©´ ì—ëŸ¬ ì¶œë ¥ í›„ ì¢…ë£Œ
         if (GameManager.Instance == null)
         {
             Debug.LogError("BoardManager instance is null!");
             return;
         }
 
-        // ÇöÀç Å¬¸¯µÈ Ã¼½º¸» Á¤º¸¸¦ board¿¡ Àü´Ş
+        // í˜„ì¬ í´ë¦­ëœ ì²´ìŠ¤ë§ ì •ë³´ë¥¼ boardì— ì „ë‹¬
         GameManager.Instance.board.OnClickChessman(this);
     }
 }

@@ -1,33 +1,33 @@
 public class PawnPromotion : Move
 {
-    // ÀÌ ÀÌµ¿ÀÇ Á¾·ù´Â Æù ½Â±Þ
+    // ì´ ì´ë™ì˜ ì¢…ë¥˜ëŠ” í° ìŠ¹ê¸‰
     public override MoveType Type => MoveType.PawnPromotion;
     
-    // ½Â±Þ Àü ÆùÀÇ ½ÃÀÛ À§Ä¡
+    // ìŠ¹ê¸‰ ì „ í°ì˜ ì‹œìž‘ ìœ„ì¹˜
     public override Position FromPos { get; }
 
-    // ½Â±Þ ÈÄ ¸»ÀÌ ³õÀÏ À§Ä¡
+    // ìŠ¹ê¸‰ í›„ ë§ì´ ë†“ì¼ ìœ„ì¹˜
     public override Position ToPos { get; }
 
-    // ½Â±ÞÇÒ ¸»ÀÇ Á¾·ù
-    // ³ªÀÌÆ®, ºñ¼ó, ·è, Äý Áß ÇÏ³ª¸¦ ÀúÀå
+    // ìŠ¹ê¸‰í•  ë§ì˜ ì¢…ë¥˜
+    // ë‚˜ì´íŠ¸, ë¹„ìˆ, ë£©, í€¸ ì¤‘ í•˜ë‚˜ë¥¼ ì €ìž¥
     private readonly PieceType newType;
 
     public PawnPromotion(Position from, Position to, PieceType newType)
     {
-        // ½ÃÀÛ À§Ä¡¸¦ ÀúÀå
+        // ì‹œìž‘ ìœ„ì¹˜ë¥¼ ì €ìž¥
         FromPos = from;
 
-        // µµÂø À§Ä¡ ÀúÀå
+        // ë„ì°© ìœ„ì¹˜ ì €ìž¥
         ToPos = to;
 
-        // ¾î¶² ¸»·Î ½Â±ÞÇÒÁö ÀúÀå
+        // ì–´ë–¤ ë§ë¡œ ìŠ¹ê¸‰í• ì§€ ì €ìž¥
         this.newType = newType;
     }
 
     private Piece CreatePromotionPiece(PlayerColor color)
     {
-        // ÀúÀåµÈ ½Â±Þ Å¸ÀÏ¿¡ µû¶ó »õ·Î¿î ¸» °´Ã¼ »ý¼º
+        // ì €ìž¥ëœ ìŠ¹ê¸‰ íƒ€ì¼ì— ë”°ë¼ ìƒˆë¡œìš´ ë§ ê°ì²´ ìƒì„±
         switch (newType) 
         {
             case PieceType.Knight:
@@ -37,8 +37,8 @@ public class PawnPromotion : Move
             case PieceType.Rook:
                 return new Rook(color);
 
-            // ±âº»°ªÀº Äý
-            // Àß¸øµÈ Å¸ÀÔÀÌ µé¾î¿À°Å³ª µû·Î Ã³¸®µÇÁö ¾ÊÀº °æ¿ì ÄýÀ¸·Î ½Â±Þ
+            // ê¸°ë³¸ê°’ì€ í€¸
+            // ìž˜ëª»ëœ íƒ€ìž…ì´ ë“¤ì–´ì˜¤ê±°ë‚˜ ë”°ë¡œ ì²˜ë¦¬ë˜ì§€ ì•Šì€ ê²½ìš° í€¸ìœ¼ë¡œ ìŠ¹ê¸‰
             default:
                 return new Queen(color);
         }
@@ -46,29 +46,29 @@ public class PawnPromotion : Move
 
     public override bool Execute(Board board)
     {
-        // ¿ø·¡ À§Ä¡ÀÇ Æù °¡Á®¿À±â
+        // ì›ëž˜ ìœ„ì¹˜ì˜ í° ê°€ì ¸ì˜¤ê¸°
         Piece pawn = board[FromPos];
 
-        // ±âÁ¸ Æù Á¦°Å
+        // ê¸°ì¡´ í° ì œê±°
         board[FromPos] = null;
 
-        // ÆùÀÇ »ö»óÀ» À¯ÁöÇÑ Ã¤ ½Â±ÞÇÒ »õ ¸» »ý¼º
+        // í°ì˜ ìƒ‰ìƒì„ ìœ ì§€í•œ ì±„ ìŠ¹ê¸‰í•  ìƒˆ ë§ ìƒì„±
         Piece promotion_piece = CreatePromotionPiece(pawn.Color);
         
-        // »õ·Î »ý¼ºµÈ ¸»Àº ÀÌ¹Ì ÇÑ ¹ø ÀÌµ¿ÇÑ °ÍÀ¸·Î Ç¥½Ã
-        // ½Â±Þ Á÷ÈÄÀÇ ¸»ÀÌ¹Ç·Î "Ã³À½ ÀÌµ¿ Àü »óÅÂ"·Î µÑ ÇÊ¿ä°¡ ¾øÀ½
+        // ìƒˆë¡œ ìƒì„±ëœ ë§ì€ ì´ë¯¸ í•œ ë²ˆ ì´ë™í•œ ê²ƒìœ¼ë¡œ í‘œì‹œ
+        // ìŠ¹ê¸‰ ì§í›„ì˜ ë§ì´ë¯€ë¡œ "ì²˜ìŒ ì´ë™ ì „ ìƒíƒœ"ë¡œ ë‘˜ í•„ìš”ê°€ ì—†ìŒ
         promotion_piece.hasMoved = true;
 
-        // µµÂø À§Ä¡¿¡ ½Â±ÞÇÑ ¸» ¹èÄ¡
+        // ë„ì°© ìœ„ì¹˜ì— ìŠ¹ê¸‰í•œ ë§ ë°°ì¹˜
         board[ToPos] = promotion_piece;
 
-        // Æù ÀÌµ¿Àº ¹Ý¼ö Ä«¿îÆ® ÃÊ±âÈ­ ´ë»óÀÌ¹Ç·Î true ¹ÝÈ¯
+        // í° ì´ë™ì€ ë°˜ìˆ˜ ì¹´ìš´íŠ¸ ì´ˆê¸°í™” ëŒ€ìƒì´ë¯€ë¡œ true ë°˜í™˜
         return true;
     }
 
     public PieceType GetPromotionPieceType()
     {
-        // ¾î¶² ¸»·Î ½Â±ÞÇÏ´ÂÁö ¿ÜºÎ¿¡¼­ È®ÀÎÇÒ ¼ö ÀÖ°Ô ¹ÝÈ¯
+        // ì–´ë–¤ ë§ë¡œ ìŠ¹ê¸‰í•˜ëŠ”ì§€ ì™¸ë¶€ì—ì„œ í™•ì¸í•  ìˆ˜ ìžˆê²Œ ë°˜í™˜
         return newType;
     }
 }
