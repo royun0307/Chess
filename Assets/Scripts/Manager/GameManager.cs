@@ -63,4 +63,28 @@ public class GameManager : MonoBehaviour
         // 백부터 시작하는 새로운 게임 상태 생성
         state = new GameState(PlayerColor.White, board.board);
     }
+
+    public void MakeMove(Move move)
+    {
+        state.MakeMove(move);
+
+        if (state.IsGameOver())
+        {
+            ShowResultUI(state.Result);    
+        }
+    }
+
+    private void ShowResultUI(Result result)
+    {
+        if (result.Winner == PlayerColor.None)
+        {
+            UIManager.Instance.resultUI.SetUI(PlayerColor.None, result.EndReason);
+        }
+        else
+        {
+            UIManager.Instance.resultUI.SetUI(result.Winner, result.EndReason);
+        }
+
+        UIManager.Instance.ChangeState(UIState.Result);
+    }
 }

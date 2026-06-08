@@ -30,7 +30,7 @@ public class EngineManager : MonoBehaviour
         Move best = engine.GetBestMove(GameManager.Instance.board.board, GameManager.Instance.state.CurrentPlayer, depth: 3);
 
         // 계산된 수를 게임 상태에 반영
-        GameManager.Instance.state.MakeMove(best);
+        GameManager.Instance.MakeMove(best);
 
         // 변경된 보드 상태를 화면에 다시 그림
         GameManager.Instance.board.RedrawPiecesFromBoard();

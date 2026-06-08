@@ -274,11 +274,11 @@ public class BoardManager : MonoBehaviour
     private void HandleMove(Move move)
     {
         // 게임 상태에 수 반영
-        GameManager.Instance.state.MakeMove(move);
+        GameManager.Instance.MakeMove(move);
         
         // 화면에 다시 그림
         RedrawPiecesFromBoard();
-        
+            
         // 선택 해제
         Deselect();
     }

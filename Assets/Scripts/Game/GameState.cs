@@ -115,39 +115,31 @@ public class GameState
         // 현재 턴 플레이어가 둘 수 있는 합법적인 수가 하나도 없을 때
         if (!AllLegalMovesFor(CurrentPlayer).Any())
         {
+            // 체크 상태인데 둘 수 있는 수가 없으면 체크메이트
             if (Board.IsInCheck(CurrentPlayer))
             {
-                // 체크 상태인데 둘 수 있는 수가 없으면 체크메이트
                 Result = Result.Win(CurrentPlayer.Opponent());
-                UIManager.Instance.resultUI.SetUI(CurrentPlayer.Opponent(), Result.EndReason);
             }
+            // 체크가 아닌데 둘 수 있는 수가 없으면 스테일메이트
             else
             {
-                // 체크가 아닌데 둘 수 있는 수가 없으면 스테일메이트
                 Result = Result.Draw(EndReason.Stalemate);
-                UIManager.Instance.resultUI.SetUI(PlayerColor.None, Result.EndReason);
             }
-
-            // 결과 UI 상태로 전환
-            UIManager.Instance.ChangeState(UIState.Result);
         }
+        // 기물이 부족해서 체크메이트가 불가능한 경우 무승부
         else if (Board.InsufficientMaterial())
         {
-            // 기물이 부족해서 체크메이트가 불가능한 경우 무승부
             Result = Result.Draw(EndReason.InsufficientMaterial);
-            UIManager.Instance.resultUI.SetUI(PlayerColor.None, Result.EndReason);
         }
+        // 50수 룰 만족 시 무승부
         else if (FiftyMoveRules())
         {
-            // 50수 룰 만족 시 무승부
             Result = Result.Draw(EndReason.FiftyMoveRule);
-            UIManager.Instance.resultUI.SetUI(PlayerColor.None, Result.EndReason);
         }
+        // 동일한 상태가 3번 반복되면 무승부
         else if (ThreefoldRepetition())
         {
-            // 동일한 상태가 3번 반복되면 무승부
             Result = Result.Draw(EndReason.ThreefoldRepetition);
-            UIManager.Instance.resultUI.SetUI(PlayerColor.None, Result.EndReason);
         }
     }
 
@@ -187,5 +179,41 @@ public class GameState
     private bool ThreefoldRepetition()
     {
         return state_history[state_string] == 3;
+    }
+
+    public void MakeMoveForTraining(Move move)
+    {
+        Board.SetPawnSkipPosition(CurrentPlayer, null);
+
+        bool capture_or_pawn_move = move.Execute(Board);
+
+        if (capture_or_pawn_move)
+        {
+            no_capture_or_pawn_moves = 0;
+            state_history.Clear();
+        }
+        else
+        {
+            no_capture_or_pawn_moves++;
+        }
+
+        CurrentPlayer = CurrentPlayer.Opponent();
+
+        // 학습 중에는 무거운 반복 상태 문자열 생성과 전체 게임 종료 검사를 매번 하지 않음
+    }
+
+    public bool HasAnyLegalMove(PlayerColor player)
+    {
+        return AllLegalMovesFor(player).Any();
+    }
+
+    public bool IsInCheck(PlayerColor player)
+    {
+        return Board.IsInCheck(player);
+    }
+
+    public void SetTrainingResult(Result result)
+    {
+        Result = result;
     }
 }
