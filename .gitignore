@@ -85,3 +85,6 @@ __pycache__/
 # ML-Agents training outputs
 results/
 summaries/
+
+# Local Unity validation artifacts: builds, cloned projects, Library caches, and logs.
+/Validation/

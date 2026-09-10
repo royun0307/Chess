@@ -1,6 +1,4 @@
 using System.Text;
-using UnityEditor.Build;
-using UnityEngine.Rendering;
 
 // 현재 체스판 상태를 문자열로 변환하는 클래스
 // 주로 3회 반복 체크나 상태 비교를 위해 사용
