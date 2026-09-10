@@ -96,7 +96,8 @@ public class Pawn : Piece
             // 아직 움지이지 않은 폰이면 두 칸 전진도 가능
             Position two_move_pos = one_move_pos + forward;
 
-            if(!hasMoved && CanMoveTo(two_move_pos, board))
+            int homeRow = Color == PlayerColor.White ? 6 : 1;
+            if(!hasMoved && from.row == homeRow && CanMoveTo(two_move_pos, board))
             {
                 yield return new DoublePawn(from, two_move_pos);
             }
@@ -112,7 +113,7 @@ public class Pawn : Piece
             Position to = from + forward + dir;
 
             // 상대가 직전에 두 칸 전진한 폰을 잡을 수 있는 위치라면 앙파상 가능
-            if (to == board.GetPawnSkipPosition(Color.Opponent()))
+            if (to == board.GetPawnSkipPosition(Color.Opponent()) && Board.IsInside(to) && board.IsEmpty(to))
             {
                 yield return new Enpassant(from, to);
             }
@@ -145,10 +146,13 @@ public class Pawn : Piece
     // 현재 폰이 상대 킹을 공격할 수 있는지 확인
     public override bool CanCaptureOpponentKing(Position from, Board board)
     {
-        return DiagonalMoves(from, board).Any(move =>
+        // 공격 칸은 앙파상 이력과 무관하다. 지난 skip 칸을 자기 킹이
+        // 점유했더라도 자기 킹을 공격한다고 판단해서는 안 된다.
+        return new[] { from + forward + Direction.West, from + forward + Direction.East }.Any(to =>
         {
-            Piece piece = board[move.ToPos];
-            return piece != null && piece.Type == PieceType.King;
+            if (!Board.IsInside(to)) return false;
+            Piece piece = board[to];
+            return piece != null && piece.Color == Color.Opponent() && piece.Type == PieceType.King;
         });
     }
 }

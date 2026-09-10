@@ -32,7 +32,7 @@ public class King : Piece
 
     // 해당 위치에 아직 움직이지 않은 룩이 있는지 확인
     // 캐슬링 가능 여부를 검사할 때 사용
-    private static bool IsUnmovedRook(Position pos, Board board)
+    private bool IsUnmovedRook(Position pos, Board board)
     {
         // 해당 칸이 비어 있으면 룩이 있을 수 없으므로 false
         if (board.IsEmpty(pos))
@@ -42,7 +42,7 @@ public class King : Piece
 
         // 해당 위치의 기물이 룩이고 아직 움직이지 않았는지 확인
         Piece piece = board[pos];
-        return piece.Type == PieceType.Rook && !piece.hasMoved;
+        return piece.Type == PieceType.Rook && piece.Color == Color && !piece.hasMoved;
     }
 
     // 전달된 모든 위치가 비어 있는지 확인
@@ -56,7 +56,7 @@ public class King : Piece
     private bool CanCastleKingSide(Position from, Board board)
     {
         // 킹이 한 번이라도 움직였으면 캐슬링 불가
-        if(hasMoved)
+        if(hasMoved || from != new Position(Color == PlayerColor.White ? 7 : 0, 4))
         {
             return false;
         }
@@ -75,7 +75,7 @@ public class King : Piece
     private bool CanCastleQueenSide(Position from, Board board)
     {
         // 킹이 한 번이라도 움직였으면 캐슬링 불가
-        if (hasMoved)
+        if (hasMoved || from != new Position(Color == PlayerColor.White ? 7 : 0, 4))
         {
             return false;
         }

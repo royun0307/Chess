@@ -30,6 +30,21 @@ public class Enpassant : Move
         capture_pos = new Position(from.row, to.column);
     }
 
+    public override bool IsLegal(Board board)
+    {
+        if (!Board.IsInside(FromPos) || !Board.IsInside(ToPos)) return false;
+        Piece pawn = board[FromPos];
+        if (pawn == null || pawn.Type != PieceType.Pawn || !board.IsEmpty(ToPos)) return false;
+        int direction = pawn.Color == PlayerColor.White ? -1 : 1;
+        int captureRow = pawn.Color == PlayerColor.White ? 3 : 4;
+        Piece captured = board[capture_pos];
+        return FromPos.row == captureRow && ToPos.row == FromPos.row + direction &&
+            System.Math.Abs(ToPos.column - FromPos.column) == 1 &&
+            ToPos == board.GetPawnSkipPosition(pawn.Color.Opponent()) &&
+            captured != null && captured.Type == PieceType.Pawn && captured.Color == pawn.Color.Opponent() &&
+            base.IsLegal(board);
+    }
+
     public override bool Execute(Board board)
     {
         // 먼저 내 폰을 목적지로 이동

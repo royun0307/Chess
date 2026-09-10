@@ -62,12 +62,23 @@ public class GameState
     // 실제로 수를 실행하고, 턴 변경 및 게임 종료 여부를 갱신
     public void MakeMove(Move move)
     {
+        ApplyMove(move);
+        UpdateStateString();
+        CheckForGameOver();
+    }
+
+    // 일반 대국과 학습에서 동일하게 적용하는 보드/카운터/턴 전이.
+    private void ApplyMove(Move move)
+    {
         // 현재 플레이어의 앙파상 기능 상태를 먼저 초기화
         Board.SetPawnSkipPosition(CurrentPlayer, null);
 
         // 수를 실행
         // 반환값은 "잡기 또는 폰 이동이 있었는가" 여부
         bool capture_or_pawn_move = move.Execute(Board);
+
+        // 상대의 직전 두 칸 전진에 대한 캡처 기회는 이번 응수로 만료된다.
+        Board.SetPawnSkipPosition(CurrentPlayer.Opponent(), null);
 
         if (capture_or_pawn_move)
         {
@@ -87,11 +98,6 @@ public class GameState
         // 턴을 상대방으로 변경
         CurrentPlayer = CurrentPlayer.Opponent();
         
-        // 새로운 상태 문자열 갱신 및 기록
-        UpdateStateString();
-
-        // 게임 종료 조건 검사
-        CheckForGameOver();
     }
 
     // 특정 플레이어가 둘 수 있는 모든 합법적인 수 반환
@@ -183,22 +189,7 @@ public class GameState
 
     public void MakeMoveForTraining(Move move)
     {
-        Board.SetPawnSkipPosition(CurrentPlayer, null);
-
-        bool capture_or_pawn_move = move.Execute(Board);
-
-        if (capture_or_pawn_move)
-        {
-            no_capture_or_pawn_moves = 0;
-            state_history.Clear();
-        }
-        else
-        {
-            no_capture_or_pawn_moves++;
-        }
-
-        CurrentPlayer = CurrentPlayer.Opponent();
-
+        ApplyMove(move);
         // 학습 중에는 무거운 반복 상태 문자열 생성과 전체 게임 종료 검사를 매번 하지 않음
     }
 

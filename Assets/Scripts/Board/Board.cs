@@ -214,7 +214,7 @@ public class Board
 
     // 캐슬링 권리 판정용:
     // 해당 위치에 킹/룩이 있고, 둘 다 아직 이동하지 않았는지 확인
-    private bool IsUnmovedKingAndRook(Position king_pos, Position rook_pos)
+    private bool IsUnmovedKingAndRook(PlayerColor player, Position king_pos, Position rook_pos)
     {
         if(IsEmpty(king_pos) || IsEmpty(rook_pos))
         {
@@ -224,7 +224,8 @@ public class Board
         Piece king = this[king_pos];
         Piece rook = this[rook_pos];
 
-        return king.Type == PieceType.King && rook.Type == PieceType.Rook && !king.hasMoved && !rook.hasMoved;
+        return king.Type == PieceType.King && rook.Type == PieceType.Rook &&
+            king.Color == player && rook.Color == player && !king.hasMoved && !rook.hasMoved;
     }
 
     // 킹사이드 캐슬링 권리 여부 (말의 이동 여부 기준)
@@ -233,8 +234,8 @@ public class Board
     {
         return player switch
         {
-            PlayerColor.White => IsUnmovedKingAndRook(new Position(7, 4), new Position(7, 7)),
-            PlayerColor.Black => IsUnmovedKingAndRook(new Position(0, 4), new Position(0, 7)),
+            PlayerColor.White => IsUnmovedKingAndRook(player, new Position(7, 4), new Position(7, 7)),
+            PlayerColor.Black => IsUnmovedKingAndRook(player, new Position(0, 4), new Position(0, 7)),
             _ => false
         };
     }
@@ -244,8 +245,8 @@ public class Board
     {
         return player switch
         {
-            PlayerColor.White => IsUnmovedKingAndRook(new Position(7, 4), new Position(7, 0)),
-            PlayerColor.Black => IsUnmovedKingAndRook(new Position(0, 4), new Position(0, 0)),
+            PlayerColor.White => IsUnmovedKingAndRook(player, new Position(7, 4), new Position(7, 0)),
+            PlayerColor.Black => IsUnmovedKingAndRook(player, new Position(0, 4), new Position(0, 0)),
             _ => false
         };
     }
