@@ -1,90 +1,93 @@
 using UnityEngine;
 
-// 게임 전체 흐름을 관리하는 매니저
-// 싱글톤으로 접근하며 보드, 게임 상태, 엔진을 관리함
 public class GameManager : MonoBehaviour
 {
-    // 싱글톤 인스턴스 저장 변수
     private static GameManager instance;
-
-    // 외부에서 GameManager.Instance로 접근하기 위한 프로퍼티
-    public static GameManager Instance {  get { return instance; } }
-
-    // 체스판 화면 및 입력을 관리하는 BoardManager
+    public static GameManager Instance => instance;
     public BoardManager board;
-
-    // 현제 게임 진행 상태를 관리하는 GameState
     public GameState state;
-
-    // AI 엔진 동작을 관리하는 EngineManager
     public EngineManager engine;
+    public GameSession Session { get; private set; }
+    public bool CanHumanMove => Session != null && Session.CanHumanMove;
 
     public void Awake()
     {
-        // 아직 인스턴스가 없으면 현재 오브젝트를 싱글톤 인스턴스로 등록
-        if (instance == null)
-        {
-            instance = this;
-
-            // board가 연결되지 않았다면 현재 오브젝트에 BoardManager 추가
-            if(board == null)
-            {
-                board = gameObject.AddComponent<BoardManager>();
-            }
-
-            // engine이 연결되지 않았다면 현재 오브젝트에 EngineManager 추가
-            if(engine == null)
-            {
-                engine = gameObject.AddComponent<EngineManager>();
-            }
-        }
-        else 
-        { 
-            // 이미 인스턴스가 있으면 중복 생성된 것이므로 제거
-            Destroy(this);
-        }
+        if (instance != null) { Destroy(this); return; }
+        instance = this;
+        if (board == null) board = gameObject.AddComponent<BoardManager>();
+        if (engine == null) engine = gameObject.AddComponent<EngineManager>();
     }
 
-    private void Start()
-    {
-        // 이동 가능 위치 표시판 생성
-        board.InitMovePlatform();
+    private void Start() { board.InitMovePlatform(); RestartGame(); }
 
-        // 게임 시작 또는 재시작
-        RestartGame();
-    }
-
-    // 게임을 초기 상태로 다시 시작하는 함수
     public void RestartGame()
     {
-        // 보드 초기화
+        engine.CancelPendingMove();
+        UIManager.Instance?.promotionUI?.ResetAction();
         board.Init();
-
-        // 백부터 시작하는 새로운 게임 상태 생성
         state = new GameState(PlayerColor.White, board.board);
+        if (Session == null) Session = new GameSession(state);
+        else Session.Restart(state);
+        UIManager.Instance?.ChangeState(UIState.None);
     }
 
     public void MakeMove(Move move)
     {
-        state.MakeMove(move);
-
-        if (state.IsGameOver())
-        {
-            ShowResultUI(state.Result);    
-        }
+        if (Session != null && Session.TryHumanMove(move)) FinishMove();
     }
 
-    private void ShowResultUI(Result result)
+    public bool BeginPromotion(Position from, Position to)
     {
-        if (result.Winner == PlayerColor.None)
+        var ui = UIManager.Instance;
+        if (ui == null || ui.promotionUI == null || Session == null || !Session.BeginPromotion(from, to)) return false;
+        board.Deselect();
+        int revision = Session.Revision;
+        ui.ChangeState(UIState.Promotion);
+        ui.promotionUI.SetUI();
+        ui.promotionUI.select_promotion += type =>
         {
-            UIManager.Instance.resultUI.SetUI(PlayerColor.None, result.EndReason);
-        }
-        else
-        {
-            UIManager.Instance.resultUI.SetUI(result.Winner, result.EndReason);
-        }
+            if (Session.CompletePromotion(type, revision)) FinishMove();
+        };
+        return true;
+    }
 
-        UIManager.Instance.ChangeState(UIState.Result);
+    public void ApplyEngineMove(Move move, GameSession session, int revision)
+    {
+        if (Session != null && ReferenceEquals(Session, session) && Session.TryEngineMove(move, revision)) FinishMove();
+    }
+
+    public void SetPaused(bool paused)
+    {
+        if (Session == null || !Session.SetPaused(paused)) return;
+        engine.CancelPendingMove();
+        board.Deselect();
+        UIManager.Instance?.ChangeState(paused ? UIState.Pause : UIState.None);
+        if (!paused && Session.CanEngineMove) engine.EngineMove();
+    }
+
+    private void FinishMove()
+    {
+        board.Deselect();
+        board.RedrawPiecesFromBoard();
+        if (state.IsGameOver())
+        {
+            engine.CancelPendingMove();
+            var ui = UIManager.Instance;
+            if (ui != null)
+            {
+                ui.resultUI?.SetUI(state.Result.Winner, state.Result.EndReason);
+                ui.ChangeState(UIState.Result);
+            }
+            return;
+        }
+        UIManager.Instance?.ChangeState(UIState.None);
+        if (Session.CanEngineMove) engine.EngineMove();
+    }
+
+    private void OnDestroy()
+    {
+        if (instance != this) return;
+        if (engine != null) engine.CancelPendingMove();
+        instance = null;
     }
 }

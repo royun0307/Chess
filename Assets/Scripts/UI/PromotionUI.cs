@@ -85,29 +85,36 @@ public class PromotionUI : BaseUI
     // 나이트 승급 버튼 클릭 시 호출
     private void OnClickKnightPromotion()
     {
-        select_promotion?.Invoke(PieceType.Knight);
-        uiManager.ChangeState(UIState.None);
+        SelectOnce(PieceType.Knight);
+
     }
 
     // 비숍 승급 버튼 클릭 시 호출
     private void OnClickBishopPromotion()
     {
-        select_promotion?.Invoke(PieceType.Bishop);
-        uiManager.ChangeState(UIState.None);
+        SelectOnce(PieceType.Bishop);
+
     }
 
     // 룩 승급 버튼 클릭 시 호출
     private void OnClickRookPromotion() 
     {
-        select_promotion?.Invoke(PieceType.Rook);
-        uiManager.ChangeState(UIState.None);
+        SelectOnce(PieceType.Rook);
+
     }
 
     // 퀸 승급 버튼 클릭 시 호출
     private void OnClickQuennPromotion()
     {
-        select_promotion?.Invoke(PieceType.Queen);
-        uiManager.ChangeState(UIState.None);
+        SelectOnce(PieceType.Queen);
+
+    }
+
+    private void SelectOnce(PieceType type)
+    {
+        var callback = select_promotion;
+        select_promotion = null;
+        callback?.Invoke(type);
     }
 
     // 등록된 승급 이벤트를 초기화

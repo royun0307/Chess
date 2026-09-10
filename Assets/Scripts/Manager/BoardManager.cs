@@ -193,6 +193,7 @@ public class BoardManager : MonoBehaviour
     // 체스말 클릭 시 호출
     public void OnClickChessman(Chessman chessman)
     {
+        if (chessman == null || !GameManager.Instance.CanHumanMove) return;
         // 이미 선택된 말을 다시 클릭하면 선택 해제 
         if(selected == chessman)
         {
@@ -237,7 +238,7 @@ public class BoardManager : MonoBehaviour
     public void OnClickMovePlate(MovePlate movePlate)
     {
         // 선택된 말이 없으면 아무것도 안 함
-        if(selected == null)
+        if(selected == null || movePlate == null || !GameManager.Instance.CanHumanMove)
         {
             return;
         }
@@ -254,72 +255,11 @@ public class BoardManager : MonoBehaviour
             return;
         }
 
-        // 폰 프로모션이면 승급 처리
         if (mv.Type == MoveType.PawnPromotion)
-        {
-            HandlePromotion(mv.FromPos, mv.ToPos);
-        }
+            GameManager.Instance.BeginPromotion(mv.FromPos, mv.ToPos);
         else
-        {
-            // 일반 이동 처리
-            HandleMove(mv);
-        }
-
-        // 플레이어 수가 끝난 뒤 엔진 수 진행
-        GameManager.Instance.engine.EngineMove();
+            GameManager.Instance.MakeMove(mv);
     }
-
-    // 실제 이동을 처리하는 함수
-    private void HandleMove(Move move)
-    {
-        // 게임 상태에 수 반영
-        GameManager.Instance.MakeMove(move);
-        
-        // 화면에 다시 그림
-        RedrawPiecesFromBoard();
-            
-        // 선택 해제
-        Deselect();
-    }
-
-    // 폰 승급 처리
-    private void HandlePromotion(Position from, Position to)
-    {
-        // 승급 UI 상태로 변경
-        UIManager.Instance.ChangeState(UIState.Promotion);
-        
-        // 승급 선택 UI 표시
-        UIManager.Instance.promotionUI.SetUI();
-
-        // 사용자가 승급 기물을 선택했을 때 실행될 콜백 등록
-        UIManager.Instance.promotionUI.select_promotion += type =>
-        {
-            Move promMove = new PawnPromotion(from, to, type);
-            HandleMove(promMove);
-            ReplaceViewForPromotion(promMove);
-        };
-    }
-
-    // 승급 후 해당 칸의 말 뷰를 새 기물로 교체
-    private void ReplaceViewForPromotion(Move move)
-    {
-        var old = views[move.ToPos.row, move.ToPos.column];
-        if (old != null)
-        {
-            Destroy(old.gameObject);
-            views[move.ToPos.row, move.ToPos.column] = null;
-        }
-
-        // 승급 후 보드에 놓인 기물에 맞는 프리팹 생성
-        var prefab = GetPrefab(board[move.ToPos.row, move.ToPos.column]);
-        var go = Instantiate(prefab, GridToWorld(move.ToPos.row, move.ToPos.column), Quaternion.identity);
-        go.transform.SetParent(pieceParent);
-
-        var cm = go.GetComponent<Chessman>();
-        cm.Init(move.ToPos);
-        views[move.ToPos.row, move.ToPos.column] = cm;
-    }
-
     // 기물 정보에 맞는 프리팹 반환
     private GameObject GetPrefab(Piece piece)
     {
@@ -336,7 +276,7 @@ public class BoardManager : MonoBehaviour
     }
 
     // 현재 선택 상태와 이동 플레이트 표시를 모두 초기화
-    private void Deselect()
+    public void Deselect()
     {
         selected = null;
         cachedMoves.Clear();
