@@ -1,5 +1,6 @@
 public static class SimplePST
 {
+    // 행은 백 기준 1랭크부터 8랭크 순서. Board 좌표 변환은 엔진 GetPST에서 처리한다.
     public static readonly int[,] PawnPST_MG = {
         { 0,   0,   0,   0,   0,   0,   0,   0 },
         { 5,  10,  10, -20, -20, 10, 10,  5 },

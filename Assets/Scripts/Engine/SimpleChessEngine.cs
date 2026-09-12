@@ -12,15 +12,14 @@ public class SimpleChessEngine : IChessEngine
     private const int QDEPTH_LIMIT = 8;
 
     // 기물 기본 가치
-    static readonly int[] PieceValue =
+    static readonly IReadOnlyDictionary<PieceType, int> PieceValue = new Dictionary<PieceType, int>
     {
-        0,    // None
-        100,  // Pawn
-        320,  // Knight
-        330,  // Bishop
-        500,  // Rook
-        900,  // Queen
-        100000     // King
+        [PieceType.Pawn] = 100,
+        [PieceType.Knight] = 320,
+        [PieceType.Bishop] = 330,
+        [PieceType.Rook] = 500,
+        [PieceType.Queen] = 900,
+        [PieceType.King] = 100000
     };
 
     //  현재 보드와 차례, 탐색 깊이를 받아 최선의 수를 반환
@@ -37,7 +36,7 @@ public class SimpleChessEngine : IChessEngine
         OrderMoves(board, moves, side_to_move);
 
         // 둘 수 있는 수가 없으면 default 반환
-        if (moves.Count == 0)
+        if (moves.Count == 0 || board.InsufficientMaterial())
             return best_move;
 
         int alpha = -INF;
@@ -46,11 +45,10 @@ public class SimpleChessEngine : IChessEngine
         // 루트 노드에서 모든 수를 시험
         foreach (var move in moves)
         {
-            Board next = board.Copy();
-            move.Execute(next);
+            Board next = NextBoard(board, move, side_to_move);
 
             // 상대 턴으로 들어가서 탐색
-            int score = Search(next, depth - 1, alpha, beta, side_to_move.Opponent());
+            int score = SearchNode(next, Math.Max(1, depth) - 1, alpha, beta, side_to_move.Opponent(), 1);
 
             if (side_to_move == PlayerColor.White)
             {
@@ -84,47 +82,21 @@ public class SimpleChessEngine : IChessEngine
     // 미니맥스 + 알파베타 탐색
     private int Search(Board board, int depth, int alpha, int beta, PlayerColor side_to_move)
     {
-        // 깊이가 다 떨어지면 정적 평가 or 퀘이선스 탐색
+        return SearchNode(board, depth, alpha, beta, side_to_move, 0);
+    }
+
+    private int SearchNode(Board board, int depth, int alpha, int beta, PlayerColor side_to_move, int ply)
+    {
+        var moves = new GameState(side_to_move, board).AllLegalMovesFor(side_to_move).ToList();
+        // 깊이 제한이나 정적 평가보다 실제 종료 상태가 우선이다.
+        if (TryTerminalScore(board, side_to_move, moves, ply, out int terminal)) return terminal;
         if (depth <= 0)
         {
-            // 체크 상태면 퀘이선스 탐색
-            if (board.IsInCheck(side_to_move))
-                return Quiescence(board, alpha, beta, side_to_move, QDEPTH_LIMIT);
-
-            int eval = Evaluate(board);
-
-            GameState st = new GameState(side_to_move, board);
-            var ms = st.AllLegalMovesFor(side_to_move);
-
-            // 전술적 수(잡기, 프로모션)가 있는지 확인
-            bool hasTactical = ms.Any(m => IsTacticalMove(board, m));
-            // 전술 수가 없으면 정적 평가
-            if (!hasTactical)
-                return eval;
-
-            // 전술 수가 있으면 horizon effect 방지를 위해 퀘이선스 탐색
-            return Quiescence(board, alpha, beta, side_to_move, QDEPTH_LIMIT);
+            if (!board.IsInCheck(side_to_move) && !moves.Any(m => IsTacticalMove(board, m)))
+                return Evaluate(board);
+            return QuiescenceNode(board, alpha, beta, side_to_move, QDEPTH_LIMIT, ply);
         }
-
-        GameState state = new GameState(side_to_move, board);
-        List<Move> moves = state.AllLegalMovesFor(side_to_move).ToList();
-        // 좋은 수부터 보게 해서 pruning 효율 향상
         OrderMoves(board, moves, side_to_move);
-
-        // 합법 수가 없으면 체크메이트 or 스테일메이트
-        if (moves.Count == 0)
-        {
-            if (board.IsInCheck(side_to_move))
-            {
-                // 현제 상태가 체크 상태이면, 체크메이트
-                return side_to_move == PlayerColor.White ? -INF + 1 : INF - 1;
-            }
-            else
-            {
-                // 현제 상태가 체그 상태가 아니면, 스테일메이트
-                return 0;
-            }
-        }
 
         if (side_to_move == PlayerColor.White)
         {
@@ -133,10 +105,9 @@ public class SimpleChessEngine : IChessEngine
 
             foreach (var move in moves)
             {
-                Board next = board.Copy();
-                move.Execute(next);
+                Board next = NextBoard(board, move, side_to_move);
 
-                int score = Search(next, depth - 1, alpha, beta, side_to_move.Opponent());
+                int score = SearchNode(next, depth - 1, alpha, beta, side_to_move.Opponent(), ply + 1);
                 value = Math.Max(value, score);
                 alpha = Math.Max(alpha, value);
 
@@ -153,10 +124,9 @@ public class SimpleChessEngine : IChessEngine
 
             foreach (var move in moves)
             {
-                Board next = board.Copy();
-                move.Execute(next);
+                Board next = NextBoard(board, move, side_to_move);
 
-                int score = Search(next, depth - 1, alpha, beta, side_to_move.Opponent());
+                int score = SearchNode(next, depth - 1, alpha, beta, side_to_move.Opponent(), ply + 1);
                 value = Math.Min(value, score);
                 beta = Math.Min(beta, value);
 
@@ -192,8 +162,7 @@ public class SimpleChessEngine : IChessEngine
     // 현재 코드에서는 사용되지 않지만, 체크를 거는 수 등을 반영할 수 있다.
     private int ScoreMove(Board board, Move move, PlayerColor side_to_move, int base_mat)
     {
-        Board next = board.Copy();
-        move.Execute(next);
+        Board next = NextBoard(board, move, side_to_move);
 
         int next_mat = EvaluateMaterial(next);
         int delta = next_mat - base_mat;
@@ -229,7 +198,7 @@ public class SimpleChessEngine : IChessEngine
         // 프로모션이면 매우 높은 점수
         if (move is PawnPromotion promo)
         {
-            score += 8000 + PieceValue[(int)promo.GetPromotionPieceType()];
+            score += 8000 + PieceValue[promo.GetPromotionPieceType()];
         }
 
         Piece victim = board[tr, tc];
@@ -238,8 +207,8 @@ public class SimpleChessEngine : IChessEngine
         bool isEnPassant = move is Enpassant;
         if (victim != null || isEnPassant)
         {
-            int victimValue = victim != null ? PieceValue[(int)victim.Type] : PieceValue[(int)PieceType.Pawn];
-            int attackerValue = PieceValue[(int)attacker.Type];
+            int victimValue = victim != null ? PieceValue[victim.Type] : PieceValue[PieceType.Pawn];
+            int attackerValue = PieceValue[attacker.Type];
             score += 10000 + victimValue * 10 - attackerValue;
         }
 
@@ -258,14 +227,14 @@ public class SimpleChessEngine : IChessEngine
         GetFromTo(move, out int fr, out int fc, out int tr, out int tc);
 
         Piece attacker = board[fr, fc];
-        int attacker_value = attacker != null ? PieceValue[(int)attacker.Type] : 0;
+        int attacker_value = attacker != null ? PieceValue[attacker.Type] : 0;
 
         int score = 0;
 
         // 프로모션은 매우 강한 전술이므로 큰 점수
         if (move is PawnPromotion promo)
         {
-            score += 20000 + PieceValue[(int)promo.GetPromotionPieceType()];
+            score += 20000 + PieceValue[promo.GetPromotionPieceType()];
         }
 
         // 잡기 수면 MVV-LVA 방식으로 점수 부여
@@ -273,7 +242,7 @@ public class SimpleChessEngine : IChessEngine
         {
             Piece victim = board[tr, tc];
 
-            int victim_value = victim != null ? PieceValue[(int)victim.Type] : PieceValue[(int)PieceType.Pawn];
+            int victim_value = victim != null ? PieceValue[victim.Type] : PieceValue[PieceType.Pawn];
             score += 10000 + victim_value * 10 - attacker_value;
         }
         return score;
@@ -283,92 +252,75 @@ public class SimpleChessEngine : IChessEngine
     // 일반 탐색 깊이가 끝난 뒤, 불안정한 전술 상황(잡기/프로모션)을 조금 더 본다
     private int Quiescence(Board board, int alpha, int beta, PlayerColor side_to_move, int qdepth)
     {
-        // 이동성은 제외한 정적 평가
-        int stand_pat = EvaluateStatic(board);
+        return QuiescenceNode(board, alpha, beta, side_to_move, qdepth, 0);
+    }
 
-        if (side_to_move == PlayerColor.White)
+    private int QuiescenceNode(Board board, int alpha, int beta, PlayerColor side_to_move, int qdepth, int ply)
+    {
+        var moves = new GameState(side_to_move, board).AllLegalMovesFor(side_to_move).ToList();
+        if (TryTerminalScore(board, side_to_move, moves, ply, out int terminal)) return terminal;
+        bool inCheck = board.IsInCheck(side_to_move);
+        bool maximize = side_to_move == PlayerColor.White;
+        int best = maximize ? -INF : INF;
+
+        // 체크일 때는 pass를 뜻하는 stand-pat도, 전술 수만 남기는 필터도 금지한다.
+        if (!inCheck)
         {
-            //이미 beta 이상이면 더 볼 필요 없음
-            if (stand_pat >= beta) return beta;
-            if (stand_pat > alpha) alpha = stand_pat;
+            best = EvaluateStatic(board);
+            if (qdepth <= 0) return best;
+            if (maximize)
+            {
+                if (best >= beta) return best;
+                alpha = Math.Max(alpha, best);
+            }
+            else
+            {
+                if (best <= alpha) return best;
+                beta = Math.Min(beta, best);
+            }
+            moves.RemoveAll(m => !IsTacticalMove(board, m));
         }
-        else
+
+        OrderTacticalMoves(board, moves);
+        foreach (var move in moves)
         {
-            // 흑은 작은 값을 선호
-            if (stand_pat <= alpha) return alpha;
-            if (stand_pat < beta) beta = stand_pat;
+            Board next = NextBoard(board, move, side_to_move);
+            // 깊이를 소진한 체크 국면에서도 반드시 한 번 회피한 뒤 평가한다.
+            // 자식의 종료 여부를 먼저 확인하며, 재귀 연장은 여기서 끝내 유한하게 유지한다.
+            int score = qdepth <= 0
+                ? EvaluateLeaf(next, side_to_move.Opponent(), ply + 1)
+                : QuiescenceNode(next, alpha, beta, side_to_move.Opponent(), qdepth - 1, ply + 1);
+            best = maximize ? Math.Max(best, score) : Math.Min(best, score);
+            if (maximize) alpha = Math.Max(alpha, best);
+            else beta = Math.Min(beta, best);
+            if (alpha >= beta) break;
         }
+        return best;
+    }
 
-        // 퀘이선스 깊이 제한
-        if (qdepth <= 0)
-        {
-            return stand_pat;
-        }
+    private int EvaluateLeaf(Board board, PlayerColor side, int ply)
+    {
+        var moves = new GameState(side, board).AllLegalMovesFor(side).ToList();
+        return TryTerminalScore(board, side, moves, ply, out int terminal) ? terminal : EvaluateStatic(board);
+    }
 
-        GameState state = new GameState(side_to_move, board);
-        List<Move> moves = state.AllLegalMovesFor(side_to_move).ToList();
-
-        // 둘 수기 있는 수가 없으면 체크메이트/스테일메이트 처리
+    private static bool TryTerminalScore(Board board, PlayerColor side, List<Move> moves, int ply, out int score)
+    {
+        score = 0;
         if (moves.Count == 0)
         {
-            if (board.IsInCheck(side_to_move))
-                return side_to_move == PlayerColor.White ? -INF + 1 : INF - 1;
-            return 0;
+            if (board.IsInCheck(side))
+                score = side == PlayerColor.White ? -INF + 1 + ply : INF - 1 - ply;
+            return true;
         }
+        return board.InsufficientMaterial();
+    }
 
-        // 전술 수만 추림
-        List<Move> tactical = new List<Move>();
-        for (int i = 0; i < moves.Count; i++)
-        {
-            if (IsTacticalMove(board, moves[i]))
-            {
-                tactical.Add(moves[i]);
-            }
-        }
-
-        // 전술 수가 없으면 현재 정적 평가 반환
-        if (tactical.Count == 0)
-            return stand_pat;
-
-        // 좋은 전술 수부터 본다
-        OrderTacticalMoves(board, tactical);
-
-        if (side_to_move == PlayerColor.White)
-        {
-            int best = stand_pat;
-
-            foreach (var move in tactical)
-            {
-                Board next = board.Copy();
-                move.Execute(next);
-
-                int score = Quiescence(next, alpha, beta, side_to_move.Opponent(), qdepth - 1);
-                // 여기서는 백이므로 최대값을 추적해야 한다
-                best = Math.Max(best, score);
-                alpha = Math.Max(alpha, score);
-                if (alpha >= beta) break;
-            }
-
-            return best;
-        }
-        else
-        {
-            int best = stand_pat;
-
-            foreach (var move in tactical)
-            {
-                Board next = board.Copy();
-                move.Execute(next);
-
-                int score = Quiescence(next, alpha, beta, side_to_move.Opponent(), qdepth - 1);
-                // 흑이므로 최소값 추적
-                best = Math.Min(best, score);
-
-                beta = Math.Min(beta, best);
-                if (beta <= alpha) break;
-            }
-            return best;
-        }
+    private static Board NextBoard(Board board, Move move, PlayerColor side)
+    {
+        var next = new GameState(side, board.Copy());
+        next.MakeMoveForTraining(move);
+        return next.Board;
     }
 
     // 현재 보드 기준으로 이 수가 잡기인지 판볖
@@ -433,7 +385,7 @@ public class SimpleChessEngine : IChessEngine
                 Piece p = board[r, c];
                 if (p == null) continue;
 
-                int v = PieceValue[(int)p.Type];
+                int v = PieceValue[p.Type];
                 score += p.Color == PlayerColor.White ? v : -v;
             }
         }
@@ -445,7 +397,8 @@ public class SimpleChessEngine : IChessEngine
     // 혹은 보드를 뒤집어서 같은 테이블을 재사용
     int GetPST(Piece p, int r, int c)
     {
-        int rr = p.Color == PlayerColor.White ? r : 7 - r;
+        // PST의 row 0은 백의 1랭크, Board의 row 0은 8랭크다.
+        int rr = p.Color == PlayerColor.White ? 7 - r : r;
 
         switch (p.Type)
         {
@@ -555,7 +508,7 @@ public class SimpleChessEngine : IChessEngine
                 if (is_white)
                 {
                     // 벡 폰은 위쪽 방향 검사
-                    for (int rr = r + 1; rr < 8; rr++)
+                    for (int rr = r - 1; rr >= 0; rr--)
                     {
                         Piece pp = board[rr, file];
                         if (pp != null && pp.Type == PieceType.Pawn && pp.Color != color)
@@ -568,7 +521,7 @@ public class SimpleChessEngine : IChessEngine
                 else
                 {
                     // 흑 폰은 아래쪽 방향 검사
-                    for (int rr = r - 1; rr >= 0; rr--)
+                    for (int rr = r + 1; rr < 8; rr++)
                     {
                         Piece pp = board[rr, file];
                         if (pp != null && pp.Type == PieceType.Pawn && pp.Color != color)
@@ -583,7 +536,7 @@ public class SimpleChessEngine : IChessEngine
             // 앞에 막는 상대 폰이 없으면 통과된 폰 보너스
             if (!blocked)
             {
-                int rank = is_white ? r : (7 - r);
+                int rank = is_white ? 7 - r : r;
                 score += is_white ? (20 + rank * 5) : -(20 + rank * 5);
             }
         }
