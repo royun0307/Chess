@@ -1,0 +1,24 @@
+{
+    "name": "Chess.Tests.EditMode",
+    "references": [
+        "Chess.Core",
+        "Chess.Engine",
+        "Chess.Runtime",
+        "Chess.Training",
+        "Unity.ML-Agents",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "autoReferenced": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "noEngineReferences": false
+}

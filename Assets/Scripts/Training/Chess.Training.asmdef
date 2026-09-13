@@ -1,0 +1,11 @@
+{
+    "name": "Chess.Training",
+    "references": [
+        "Chess.Core",
+        "Unity.ML-Agents"
+    ],
+    "autoReferenced": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "noEngineReferences": false
+}

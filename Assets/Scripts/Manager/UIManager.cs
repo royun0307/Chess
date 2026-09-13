@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SocialPlatforms.Impl;
 
 // 현재 어떤 UI 화면이 활성화되어 있는지 나타내는 상태값
 public enum UIState

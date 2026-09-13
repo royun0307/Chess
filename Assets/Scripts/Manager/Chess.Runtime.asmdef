@@ -1,0 +1,13 @@
+{
+    "name": "Chess.Runtime",
+    "references": [
+        "Chess.Core",
+        "Chess.Engine",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro"
+    ],
+    "autoReferenced": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "noEngineReferences": false
+}

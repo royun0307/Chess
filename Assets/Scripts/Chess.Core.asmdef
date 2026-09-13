@@ -1,0 +1,8 @@
+{
+    "name": "Chess.Core",
+    "references": [],
+    "autoReferenced": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "noEngineReferences": true
+}
