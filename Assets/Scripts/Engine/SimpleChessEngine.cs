@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
+using System.Threading;
 
 //간단한 체스 엔진 구현
-public class SimpleChessEngine : IChessEngine
+public class SimpleChessEngine : IBudgetedChessEngine
 {
     // 탐색에서 사용하는 매우 큰 값
     private const int INF = 1000000;
@@ -24,6 +26,56 @@ public class SimpleChessEngine : IChessEngine
 
     //  현재 보드와 차례, 탐색 깊이를 받아 최선의 수를 반환
     public Move GetBestMove(Board board, PlayerColor side_to_move, int depth)
+    {
+        return SearchAtDepth(board, side_to_move, depth, null);
+    }
+
+    private sealed class SearchTimeoutException : Exception { }
+    private sealed class SearchControl
+    {
+        public readonly Stopwatch Clock = Stopwatch.StartNew();
+        public long Nodes;
+        private readonly TimeSpan limit;
+        private readonly CancellationToken token;
+        public SearchControl(TimeSpan limit, CancellationToken token) { this.limit = limit; this.token = token; }
+        public void Check()
+        {
+            token.ThrowIfCancellationRequested();
+            if (Clock.Elapsed >= limit) throw new SearchTimeoutException();
+        }
+        public void Visit() { Check(); Nodes++; }
+    }
+
+    public EngineSearchResult FindBestMove(Board board, PlayerColor side, int maxDepth, TimeSpan timeLimit, CancellationToken token)
+    {
+        if (board == null) throw new ArgumentNullException(nameof(board));
+        if (maxDepth < 1 || maxDepth > 64) throw new ArgumentOutOfRangeException(nameof(maxDepth));
+        if (timeLimit < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(timeLimit));
+        token.ThrowIfCancellationRequested();
+        var control = new SearchControl(timeLimit, token);
+        var best = new GameState(side, board).AllLegalMovesFor(side).FirstOrDefault();
+        token.ThrowIfCancellationRequested();
+        if (best == null || board.InsufficientMaterial())
+            return new EngineSearchResult(null, 0, 0, control.Clock.Elapsed, false);
+        int completed = 0;
+        bool timedOut = false;
+        try
+        {
+            for (int depth = 1; depth <= maxDepth; depth++)
+            {
+                control.Check();
+                var candidate = SearchAtDepth(board, side, depth, control);
+                control.Check();
+                best = candidate;
+                completed = depth;
+            }
+        }
+        catch (SearchTimeoutException) { timedOut = true; }
+        token.ThrowIfCancellationRequested();
+        return new EngineSearchResult(best, completed, control.Nodes, control.Clock.Elapsed, timedOut);
+    }
+
+    private Move SearchAtDepth(Board board, PlayerColor side_to_move, int depth, SearchControl control)
     {
         Move best_move = default;
         // 백이면 최대 점수를, 흑이면 최소 점수를 찾는다
@@ -48,7 +100,7 @@ public class SimpleChessEngine : IChessEngine
             Board next = NextBoard(board, move, side_to_move);
 
             // 상대 턴으로 들어가서 탐색
-            int score = SearchNode(next, Math.Max(1, depth) - 1, alpha, beta, side_to_move.Opponent(), 1);
+            int score = SearchNode(next, Math.Max(1, depth) - 1, alpha, beta, side_to_move.Opponent(), 1, control);
 
             if (side_to_move == PlayerColor.White)
             {
@@ -85,8 +137,9 @@ public class SimpleChessEngine : IChessEngine
         return SearchNode(board, depth, alpha, beta, side_to_move, 0);
     }
 
-    private int SearchNode(Board board, int depth, int alpha, int beta, PlayerColor side_to_move, int ply)
+    private int SearchNode(Board board, int depth, int alpha, int beta, PlayerColor side_to_move, int ply, SearchControl control = null)
     {
+        control?.Visit();
         var moves = new GameState(side_to_move, board).AllLegalMovesFor(side_to_move).ToList();
         // 깊이 제한이나 정적 평가보다 실제 종료 상태가 우선이다.
         if (TryTerminalScore(board, side_to_move, moves, ply, out int terminal)) return terminal;
@@ -94,7 +147,7 @@ public class SimpleChessEngine : IChessEngine
         {
             if (!board.IsInCheck(side_to_move) && !moves.Any(m => IsTacticalMove(board, m)))
                 return Evaluate(board);
-            return QuiescenceNode(board, alpha, beta, side_to_move, QDEPTH_LIMIT, ply);
+            return QuiescenceNode(board, alpha, beta, side_to_move, QDEPTH_LIMIT, ply, control);
         }
         OrderMoves(board, moves, side_to_move);
 
@@ -107,7 +160,7 @@ public class SimpleChessEngine : IChessEngine
             {
                 Board next = NextBoard(board, move, side_to_move);
 
-                int score = SearchNode(next, depth - 1, alpha, beta, side_to_move.Opponent(), ply + 1);
+                int score = SearchNode(next, depth - 1, alpha, beta, side_to_move.Opponent(), ply + 1, control);
                 value = Math.Max(value, score);
                 alpha = Math.Max(alpha, value);
 
@@ -126,7 +179,7 @@ public class SimpleChessEngine : IChessEngine
             {
                 Board next = NextBoard(board, move, side_to_move);
 
-                int score = SearchNode(next, depth - 1, alpha, beta, side_to_move.Opponent(), ply + 1);
+                int score = SearchNode(next, depth - 1, alpha, beta, side_to_move.Opponent(), ply + 1, control);
                 value = Math.Min(value, score);
                 beta = Math.Min(beta, value);
 
@@ -255,8 +308,9 @@ public class SimpleChessEngine : IChessEngine
         return QuiescenceNode(board, alpha, beta, side_to_move, qdepth, 0);
     }
 
-    private int QuiescenceNode(Board board, int alpha, int beta, PlayerColor side_to_move, int qdepth, int ply)
+    private int QuiescenceNode(Board board, int alpha, int beta, PlayerColor side_to_move, int qdepth, int ply, SearchControl control = null)
     {
+        control?.Visit();
         var moves = new GameState(side_to_move, board).AllLegalMovesFor(side_to_move).ToList();
         if (TryTerminalScore(board, side_to_move, moves, ply, out int terminal)) return terminal;
         bool inCheck = board.IsInCheck(side_to_move);
@@ -288,8 +342,8 @@ public class SimpleChessEngine : IChessEngine
             // 깊이를 소진한 체크 국면에서도 반드시 한 번 회피한 뒤 평가한다.
             // 자식의 종료 여부를 먼저 확인하며, 재귀 연장은 여기서 끝내 유한하게 유지한다.
             int score = qdepth <= 0
-                ? EvaluateLeaf(next, side_to_move.Opponent(), ply + 1)
-                : QuiescenceNode(next, alpha, beta, side_to_move.Opponent(), qdepth - 1, ply + 1);
+                ? EvaluateLeaf(next, side_to_move.Opponent(), ply + 1, control)
+                : QuiescenceNode(next, alpha, beta, side_to_move.Opponent(), qdepth - 1, ply + 1, control);
             best = maximize ? Math.Max(best, score) : Math.Min(best, score);
             if (maximize) alpha = Math.Max(alpha, best);
             else beta = Math.Min(beta, best);
@@ -298,8 +352,9 @@ public class SimpleChessEngine : IChessEngine
         return best;
     }
 
-    private int EvaluateLeaf(Board board, PlayerColor side, int ply)
+    private int EvaluateLeaf(Board board, PlayerColor side, int ply, SearchControl control = null)
     {
+        control?.Visit();
         var moves = new GameState(side, board).AllLegalMovesFor(side).ToList();
         return TryTerminalScore(board, side, moves, ply, out int terminal) ? terminal : EvaluateStatic(board);
     }

@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
         instance = this;
         if (board == null) board = gameObject.AddComponent<BoardManager>();
         if (engine == null) engine = gameObject.AddComponent<EngineManager>();
+        if (GetComponent<EngineStatusUI>() == null) gameObject.AddComponent<EngineStatusUI>();
     }
 
     private void Start() { board.InitMovePlatform(); RestartGame(); }
@@ -51,9 +52,11 @@ public class GameManager : MonoBehaviour
         return true;
     }
 
-    public void ApplyEngineMove(Move move, GameSession session, int revision)
+    public bool ApplyEngineMove(Move move, GameSession session, int revision)
     {
-        if (Session != null && ReferenceEquals(Session, session) && Session.TryEngineMove(move, revision)) FinishMove();
+        if (Session == null || !ReferenceEquals(Session, session) || !Session.TryEngineMove(move, revision)) return false;
+        FinishMove();
+        return true;
     }
 
     public void SetPaused(bool paused)
