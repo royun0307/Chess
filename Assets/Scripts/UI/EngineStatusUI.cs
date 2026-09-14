@@ -31,7 +31,7 @@ public sealed class EngineStatusUI : MonoBehaviour
         background.color = new Color(0.08f, 0.1f, 0.14f, 0.94f);
         background.raycastTarget = false;
         label = CreateText(strip.transform, "Turn status");
-        label.margin = new Vector4(12, 0, 90, 0);
+        label.margin = new Vector4(12, 0, 12, 0);
         var buttonObject = new GameObject("Retry AI", typeof(RectTransform), typeof(Image), typeof(Button));
         buttonObject.transform.SetParent(strip.transform, false);
         var buttonRect = buttonObject.GetComponent<RectTransform>();
@@ -73,5 +73,6 @@ public sealed class EngineStatusUI : MonoBehaviour
             session.CanHumanMove ? "Your turn (White)" : "AI turn (Black)";
         if (label.text != status) label.text = status;
         if (retry.gameObject.activeSelf != failed) retry.gameObject.SetActive(failed);
+        label.margin = new Vector4(12, 0, failed ? 90 : 12, 0);
     }
 }

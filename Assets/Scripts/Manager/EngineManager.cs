@@ -44,6 +44,9 @@ public class EngineManager : MonoBehaviour
             CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
     }
 
+    // Re-enabling on Black's turn must replace the canceled request.
+    // EngineMove already rejects uninitialized sessions and duplicate requests.
+    private void OnEnable() { EngineMove(); }
     private void OnDisable() { CancelPendingMove(); }
 
     private IEnumerator AITurn(GameManager manager, GameSession session, int revision, CancellationTokenSource source)

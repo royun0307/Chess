@@ -1,3 +1,4 @@
+using UnityEngine;
 using UnityEngine.UI;
 
 public class PauseUI : BaseUI
@@ -8,6 +9,12 @@ public class PauseUI : BaseUI
     public override void Init(UIManager uiManager)
     {
         base.Init(uiManager);
+        // The scene's old center-relative offset put this control off-screen at 720p.
+        // Keep it in the top-left corner without changing scene/prefab references.
+        var rect = (RectTransform)pause_button.transform;
+        rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0, 1);
+        rect.anchoredPosition = new Vector2(12, -12);
+        rect.sizeDelta = new Vector2(40, 40);
         pause_button.onClick.AddListener(OnClickPauseButton);
         restart_button.onClick.AddListener(uiManager.OnClickRestartButton);
         continue_button.onClick.AddListener(() => GameManager.Instance.SetPaused(false));
