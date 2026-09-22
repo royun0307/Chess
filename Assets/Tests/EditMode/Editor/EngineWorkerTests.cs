@@ -27,6 +27,7 @@ public class EngineWorkerTests
         yield return new EnterPlayMode();
         yield return null;
         var manager = GameManager.Instance;
+        manager.StartMatch(5, 3, PlayerColor.White);
         var fake = new RetryEngine();
         typeof(EngineManager).GetField("engine", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(manager.engine, fake);
         LogAssert.Expect(LogType.Warning, new System.Text.RegularExpressions.Regex("InvalidOperationException: Expected worker failure"));
@@ -70,6 +71,7 @@ public class EngineWorkerTests
         yield return new EnterPlayMode();
         yield return null;
         var manager = GameManager.Instance;
+        manager.StartMatch(5, 3, PlayerColor.White);
         var fake = new BlockingEngine();
         typeof(EngineManager).GetField("engine", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(manager.engine, fake);
         manager.MakeMove(manager.state.AllLegalMovesFor(PlayerColor.White).First());

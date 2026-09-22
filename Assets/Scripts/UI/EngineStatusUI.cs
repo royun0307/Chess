@@ -66,11 +66,11 @@ public sealed class EngineStatusUI : MonoBehaviour
         var manager = GameManager.Instance;
         var session = manager?.Session;
         bool failed = session != null && session.CanEngineMove && manager.engine.LastError != null;
-        string status = session == null ? "Starting..." :
+        string status = manager != null && manager.SetupVisible ? "Set up your game" : session == null ? "Starting..." :
             session.State.IsGameOver() ? "Game over" : session.Paused ? "Paused" :
             session.PromotionPending ? "Choose promotion" :
             failed ? "AI unavailable" : manager.engine.IsThinking ? "AI thinking..." :
-            session.CanHumanMove ? "Your turn (White)" : "AI turn (Black)";
+            session.CanHumanMove ? "Your turn (" + session.HumanColor + ")" : "AI turn (" + session.HumanColor.Opponent() + ")";
         if (label.text != status) label.text = status;
         if (retry.gameObject.activeSelf != failed) retry.gameObject.SetActive(failed);
         label.margin = new Vector4(12, 0, failed ? 90 : 12, 0);

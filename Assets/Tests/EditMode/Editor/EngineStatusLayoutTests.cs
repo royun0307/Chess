@@ -111,7 +111,7 @@ public class EngineStatusLayoutTests
 
     private static IEnumerator Capture(string name)
     {
-        string path = Path.GetFullPath("Validation/Stage6/screens/" + name + ".png");
+        string path = Path.GetFullPath("Validation/Stage7/screens/" + name + ".png");
         Directory.CreateDirectory(Path.GetDirectoryName(path));
         // EditMode's runner accepts null yields even while the scene is playing.
         // CaptureScreenshot schedules the readback after rendering the next frame.
@@ -122,6 +122,77 @@ public class EngineStatusLayoutTests
             yield return null;
         Assert.IsTrue(File.Exists(path) && File.GetLastWriteTimeUtc(path) >= requestedAt,
             "A fresh Game view screenshot was not saved: " + path);
+    }
+
+    [UnityTest]
+    public IEnumerator MatchSetupAndBothPerspectivesRemainVisible()
+    {
+        var manager = GameManager.Instance;
+        manager.engine.enabled = false;
+        foreach (var size in new[] { new Vector2Int(1280, 720), new Vector2Int(800, 600), new Vector2Int(540, 960) })
+        {
+            SelectSize(size.x, size.y);
+            for (int i = 0; i < 10; i++) yield return null;
+            manager.ShowSetup();
+            yield return null;
+            Assert.IsFalse(manager.CanHumanMove);
+            double remaining = manager.Session.WhiteSeconds;
+            yield return null;
+            Assert.AreEqual(remaining, manager.Session.WhiteSeconds);
+            Canvas.ForceUpdateCanvases();
+            var setup = manager.GetComponentsInChildren<RectTransform>().Single(r => r.name == "Start screen");
+            foreach (var button in setup.GetComponentsInChildren<Button>())
+            {
+                var rect = ScreenRect((RectTransform)button.transform);
+                InsideScreen(rect, button.name);
+                Assert.AreEqual(button, Hits(rect.center).First().gameObject.GetComponentInParent<Button>(), "Setup button is obstructed");
+            }
+            var centerHit = Hits(Camera.main.WorldToScreenPoint(Vector3.zero)).First();
+            Assert.IsTrue(centerHit.gameObject.transform.IsChildOf(setup), "Setup must block the board");
+            yield return Capture(size.x + "x" + size.y + "-setup");
+            foreach (var side in new[] { PlayerColor.White, PlayerColor.Black })
+            {
+                manager.StartMatch(10, 5, side);
+                for (int i = 0; i < 5; i++) yield return null;
+                var analysis = manager.GetComponent<PositionAnalysis>();
+                for (float end = Time.realtimeSinceStartup + 5; analysis.Busy && Time.realtimeSinceStartup < end;) yield return null;
+                Assert.IsTrue(analysis.Score.HasValue, "Current initial position must produce a completed evaluation");
+                yield return null;
+                Canvas.ForceUpdateCanvases();
+                Assert.AreEqual(side == PlayerColor.Black, manager.board.Flipped);
+                var allPieces = UnityEngine.Object.FindObjectsByType<Chessman>(FindObjectsSortMode.None);
+                float ownY = allPieces.Where(p => manager.state.Board[p.Pos].Color == side).Average(p => p.transform.position.y);
+                float otherY = allPieces.Where(p => manager.state.Board[p.Pos].Color != side).Average(p => p.transform.position.y);
+                Assert.Less(ownY, otherY);
+                foreach (var piece in allPieces)
+                    Assert.IsFalse(Hits(Camera.main.WorldToScreenPoint(piece.transform.position)).Any(h => h.gameObject.GetComponent<Graphic>() != null), "HUD blocks a piece in " + side + " perspective");
+                foreach (var name in new[] { "Opponent card", "Player card", "Evaluation bar", "Evaluation number badge", "New game" })
+                {
+                    var rect = manager.GetComponentsInChildren<RectTransform>().Single(r => r.name == name && r.GetComponent<Image>() != null);
+                    InsideScreen(ScreenRect(rect), name);
+                }
+                foreach (var text in manager.GetComponentsInChildren<TextMeshProUGUI>())
+                {
+                    text.ForceMeshUpdate();
+                    Assert.IsFalse(text.isTextOverflowing, text.name);
+                }
+                yield return Capture(size.x + "x" + size.y + "-" + side);
+                MatchSettingsTests.Play(manager.Session, 6, 4, 4, 4);
+                MatchSettingsTests.Play(manager.Session, 1, 3, 3, 3);
+                MatchSettingsTests.Play(manager.Session, 4, 4, 3, 3);
+                manager.board.RedrawPiecesFromBoard();
+                yield return null;
+                var cardName = side == PlayerColor.White ? "Player card" : "Opponent card";
+                var capturedCard = manager.GetComponentsInChildren<RectTransform>().Single(r => r.name == cardName);
+                var icons = capturedCard.GetComponentsInChildren<Image>().Where(i => i.name.StartsWith("Captured piece")).ToArray();
+                Assert.AreEqual(1, icons.Length);
+                Assert.NotNull(icons[0].sprite);
+                Assert.IsTrue(capturedCard.GetComponentsInChildren<TextMeshProUGUI>().Any(t => t.text == "+1"));
+                for (float end = Time.realtimeSinceStartup + 5; analysis.Busy && Time.realtimeSinceStartup < end;) yield return null;
+                yield return null;
+                yield return Capture(size.x + "x" + size.y + "-" + side + "-capture");
+            }
+        }
     }
 
     [UnityTest]
@@ -158,10 +229,15 @@ public class EngineStatusLayoutTests
                     Assert.IsFalse(ScreenRect(strip).Contains(screen), "Status covers a square");
                     Assert.IsFalse(Hits(screen).Any(h => h.gameObject.GetComponent<Graphic>() != null), "UI intercepts a board square");
                 }
-            Assert.IsTrue(Hits(ScreenRect((RectTransform)pause.transform).center).Any(h => h.gameObject == pause.gameObject), "Pause cannot receive clicks");
+            Assert.IsTrue(Hits(ScreenRect((RectTransform)pause.transform).center).Any(h => h.gameObject.GetComponentInParent<Button>() == pause), "Pause cannot receive clicks");
             pause.onClick.Invoke();
             yield return null;
             Assert.AreEqual("Paused", status.DisplayText);
+            var hudCanvas = manager.GetComponentsInChildren<Canvas>().Single(c => c.name == "Match interface");
+            Assert.Less(hudCanvas.sortingOrder, UIManager.Instance.pauseUI.GetComponentInParent<Canvas>().sortingOrder,
+                "Evaluation bar and HUD must render behind the pause dialog");
+            var continueButton = UIManager.Instance.pauseUI.continue_button;
+            Assert.AreEqual(continueButton, Hits(ScreenRect((RectTransform)continueButton.transform).center).First().gameObject.GetComponentInParent<Button>());
             yield return Capture(prefix + "-paused");
             UIManager.Instance.pauseUI.continue_button.onClick.Invoke();
             typeof(EngineManager).GetField("engine", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(manager.engine, new FailedEngine());

@@ -5,7 +5,8 @@ public enum EndReason
     Stalemate,              // 스테일메이트
     FiftyMoveRule,          // 50수 룰
     InsufficientMaterial,   // 기물 부족
-    ThreefoldRepetition     // 동일한 상태 3회 반복
+    ThreefoldRepetition,    // 동일한 상태 3회 반복
+    Timeout
 };
 
 // 게임 종료 경과를 나타내는 클래스

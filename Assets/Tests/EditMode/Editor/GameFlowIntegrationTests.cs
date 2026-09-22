@@ -25,6 +25,7 @@ public class GameFlowIntegrationTests
         yield return new EnterPlayMode();
         yield return null;
         var manager = GameManager.Instance;
+        manager.StartMatch(5, 3, PlayerColor.White);
         var fake = new CountingEngine();
         typeof(EngineManager).GetField("engine", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(manager.engine, fake);
         manager.MakeMove(manager.state.AllLegalMovesFor(PlayerColor.White).First());

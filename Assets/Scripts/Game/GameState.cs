@@ -154,6 +154,15 @@ public class GameState
     {
         return Result != null;
     }
+
+    public void EndOnTime()
+    {
+        if (IsGameOver()) return;
+        var winner = CurrentPlayer.Opponent();
+        bool bareKing = Board.PiecePositionsFor(winner).All(p => Board[p].Type == PieceType.King);
+        Result = bareKing || Board.InsufficientMaterial()
+            ? Result.Draw(EndReason.Timeout) : new Result(winner, EndReason.Timeout);
+    }
     
     // 50수 룰 검사
     // 반수 100번 = 양쪽이 각각 50번씩 둔 것

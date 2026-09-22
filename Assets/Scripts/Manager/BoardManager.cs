@@ -40,6 +40,22 @@ public class BoardManager : MonoBehaviour
 
     // 현제 선택된 체스말
     private Chessman selected;
+    public bool Flipped { get; private set; }
+    public Sprite PieceSprite(PlayerColor color, PieceType type)
+    {
+        return prefabMap.TryGetValue((color, type), out var prefab) && prefab != null
+            ? prefab.GetComponentInChildren<SpriteRenderer>()?.sprite : null;
+    }
+
+    public void SetPerspective(PlayerColor player)
+    {
+        Flipped = player == PlayerColor.Black;
+        Deselect();
+        for (int r = 0; r < 8; r++)
+            for (int c = 0; c < 8; c++)
+                if (move_plates[r, c] != null) move_plates[r, c].transform.position = GridToWorld(r, c, 0f);
+        if (board != null) RedrawPiecesFromBoard();
+    }
 
     private void Awake()
     {
@@ -270,6 +286,7 @@ public class BoardManager : MonoBehaviour
     // 보드 좌표(row, col)를 월드 좌표로 변환
     private Vector3 GridToWorld(int row, int col, float z = 1f)
     {
+        if (Flipped) { row = 7 - row; col = 7 - col; }
         float x = origin.x + col * cellSize;
         float y = origin.y + (7 - row) * cellSize;
         return new Vector3(x, y, z);

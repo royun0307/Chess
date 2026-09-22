@@ -17,6 +17,7 @@ public class EngineLifecycleTests
         EditorSceneManager.OpenScene("Assets/Scenes/MainScene.unity");
         yield return new EnterPlayMode();
         yield return null;
+        GameManager.Instance.StartMatch(5, 3, PlayerColor.White);
     }
 
     [UnityTearDown]

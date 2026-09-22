@@ -35,6 +35,7 @@ public class SimpleChessEngine : IBudgetedChessEngine
     {
         public readonly Stopwatch Clock = Stopwatch.StartNew();
         public long Nodes;
+        public int RootScore;
         private readonly TimeSpan limit;
         private readonly CancellationToken token;
         public SearchControl(TimeSpan limit, CancellationToken token) { this.limit = limit; this.token = token; }
@@ -58,6 +59,7 @@ public class SimpleChessEngine : IBudgetedChessEngine
         if (best == null || board.InsufficientMaterial())
             return new EngineSearchResult(null, 0, 0, control.Clock.Elapsed, false);
         int completed = 0;
+        int? evaluation = null;
         bool timedOut = false;
         try
         {
@@ -68,11 +70,12 @@ public class SimpleChessEngine : IBudgetedChessEngine
                 control.Check();
                 best = candidate;
                 completed = depth;
+                evaluation = control.RootScore;
             }
         }
         catch (SearchTimeoutException) { timedOut = true; }
         token.ThrowIfCancellationRequested();
-        return new EngineSearchResult(best, completed, control.Nodes, control.Clock.Elapsed, timedOut);
+        return new EngineSearchResult(best, completed, control.Nodes, control.Clock.Elapsed, timedOut, evaluation);
     }
 
     private Move SearchAtDepth(Board board, PlayerColor side_to_move, int depth, SearchControl control)
@@ -128,6 +131,7 @@ public class SimpleChessEngine : IBudgetedChessEngine
                 break;
         }
 
+        if (control != null) control.RootScore = best_score;
         return best_move;
     }
 
