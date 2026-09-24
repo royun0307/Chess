@@ -1,0 +1,9 @@
+{
+    "name": "Chess.Validation.Player",
+    "references": ["Chess.Core", "Chess.Engine", "Chess.Runtime", "UnityEngine.UI", "Unity.TextMeshPro"],
+    "defineConstraints": ["UNITY_EDITOR || STAGE8_PLAYER_VALIDATION"],
+    "autoReferenced": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "noEngineReferences": false
+}
